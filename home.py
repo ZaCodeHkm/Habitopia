@@ -10,4 +10,4 @@ def pet():
     return render_template("pet.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True) #to remove before deploying
