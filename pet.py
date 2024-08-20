@@ -26,7 +26,7 @@ currentTime INTEGER NOT NULL)"""
 
 #inputting and recording the time that the user last visited the pet page (also used for the first time)
 curs_obj.execute(petTable)
-lastvisitTime = (time.time(),)
+lastvisitTime = (time.time(),) #apparently, this must be a tuple in order to replace any qmarks in the line below.
 curs_obj.execute("INSERT INTO Time (lastvisitTime) VALUES (?)", lastvisitTime)
 conn_obj.commit() #to make the change persistent
 curs_obj.execute("SELECT * FROM Time")
