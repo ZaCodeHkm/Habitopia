@@ -12,7 +12,8 @@
 
 import time, sqlite3
 
-petsOwned = 0 #temporary until there is a counter for pets owned for each user.
+petsOwned = 1 #temporary until there is a counter for pets owned for each user.
+lastvisitTime = (time.time(),) #apparently, this must be a tuple in order to replace any qmarks in the line below. #also, apparently not.
 currentTime = (time.time(),)
 
 #------ACTUAL CODE------#
@@ -24,21 +25,21 @@ curs_obj = conn_obj.cursor()
 petTable = """CREATE TABLE IF NOT EXISTS
 Time (
 petID INTEGER PRIMARY KEY,
-lastvisitTime INTEGER NOT NULL,S
-currentTime INTEGER NOT NULL)"""
+lastvisitTime INTEGER,
+currentTime INTEGER)"""
 
 #inputting and recording the time that the user last visited the pet page (also used for the first time)
 curs_obj.execute(petTable)
-lastvisitTime = (time.time(),) #apparently, this must be a tuple in order to replace any qmarks in the line below.
 if petsOwned == 0:  #for first time. the user will be given a free pet. every other visit will not use this code.
-    curs_obj.execute("INSERT INTO Time (lastvisitTime) VALUES (?)", lastvisitTime)
+    curs_obj.execute("INSERT INTO Time (currentTime) VALUES (?)", (currentTime))
     conn_obj.commit() #to make the change persistent
 
-if petsOwned == 1: # every visit after the 1st will use this code.
-    curs_obj.execute("REPLACE INTO Time (lastvisittime) VALUES (?)", currentTime)
+elif petsOwned >= 1: # every visit after the 1st will use this code.
+    curs_obj.execute("UPDATE Time SET (lastvisittime) = (currentTime)")
+    curs_obj.execute("UPDATE Time SET (currentTime) = (?)", currentTime)
     conn_obj.commit()
-    
-curs_obj.execute("SELECT * FROM Time")
+
+curs_obj.execute("SELECT lastvisitTime,currentTime FROM Time ORDER BY lastvisitTime DESC LIMIT 1")
 print(curs_obj.fetchone()) #temporary, just to show that it still works when coding/testing.
 conn_obj.close()
 
