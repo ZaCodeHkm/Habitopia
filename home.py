@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 app = Flask(__name__)
 
-@app.route("")
+@app.route("/")
 def home():
     return render_template("home.html")
 
@@ -10,11 +10,11 @@ def pet():
     return render_template("pet.html")
 
 @app.route("/login")
-def pet():
+def login():
     return render_template("login.html")
 
 @app.route("/register")
-def pet():
+def register():
     return render_template("register.html")
 
 if __name__ == "__main__":
