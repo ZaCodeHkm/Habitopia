@@ -1,0 +1,80 @@
+/* Body & Background */
+
+.pixelify-sans{
+  font-family: "Pixelify Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+#wrap {
+  width: 900px;
+  height: 540px;
+  margin: 100px auto;
+  background: #e0e2e7;
+  overflow: hidden;
+  padding: 15px;
+}
+  
+body{
+  background: url("animatedbackground.gif") ;
+  background-repeat: no-repeat;
+  background-size: cover ;
+  background-attachment: fixed;
+  background-position: center;
+  height: 1200px;
+  margin: 0;
+  padding: 0;
+  overflow: scroll;
+}
+
+
+/* Header */
+
+
+/* Nav bar */ 
+
+.material-symbols-outlined {
+  padding: 10px 14px;
+  text-align: center;
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24;  
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav {
+  background-color: #c1c1c1 ;
+  overflow: hidden;
+}
+.nav a{
+  text-decoration: none;
+  float: left;
+  text-align: center;
+  color: #131313;
+  padding: 14px 16px;
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif;
+}
+
+.nav a:hover {
+  background-color: aliceblue;
+  color:#131313;
+}
+
+.nav a.active {
+  background-color: aliceblue;
+  color:#131313;
+}
+
+/* Content */
+
+.class{
+  background-color: #e0e2e7; 
+}

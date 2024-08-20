@@ -1,8 +1,33 @@
 <!DOCTYPE html>
 <head>
-    <body>
-        <h1>Your pet will be here.</h1>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles/PetStyles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <title>Pets!</title>
+</head>
+    <body id="wrap">
+        <div class="nav">
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('register') }}">Register/Login</a></li>
+                <li><a href="">Habit Tracker</a></li>
+                <li><a href="{{ url_for('pet') }}">Pet</a></li>
+                <li><a href="">Shop</a></li>
+                <li><a href="">Account</a></li>
+                <li><span class="material-symbols-outlined">notifications</span></li>   
+            </ul>
+        
+        </div>
+        <div class="PetDisplay">
+            <h1>Habitbuddies</h1>
+                <h2>-insert pets name-</h2>
+                <h2></h2>
+            <div class="PetBox">
+                Pet will go here!
+            </div>
+        </div>
     </body>
 
-</head>
