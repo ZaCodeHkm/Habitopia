@@ -12,6 +12,9 @@
 
 import time, sqlite3
 
+petsOwned = 0 #temporary until there is a counter for pets owned for each user.
+currentTime = (time.time(),)
+
 #------ACTUAL CODE------#
 #define connection and cursor
 conn_obj = sqlite3.connect('petdata.db')
@@ -27,8 +30,14 @@ currentTime INTEGER NOT NULL)"""
 #inputting and recording the time that the user last visited the pet page (also used for the first time)
 curs_obj.execute(petTable)
 lastvisitTime = (time.time(),) #apparently, this must be a tuple in order to replace any qmarks in the line below.
-curs_obj.execute("INSERT INTO Time (lastvisitTime) VALUES (?)", lastvisitTime)
-conn_obj.commit() #to make the change persistent
+if petsOwned == 0:  #for first time. the user will be given a free pet. every other visit will not use this code.
+    curs_obj.execute("INSERT INTO Time (lastvisitTime) VALUES (?)", lastvisitTime)
+    conn_obj.commit() #to make the change persistent
+
+if petsOwned == 1: # every visit after the 1st will use this code.
+    curs_obj.execute("REPLACE INTO Time (lastvisittime) VALUES (?)", currentTime)
+    conn_obj.commit()
+    
 curs_obj.execute("SELECT * FROM Time")
 print(curs_obj.fetchone()) #temporary, just to show that it still works when coding/testing.
 conn_obj.close()
