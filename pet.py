@@ -30,14 +30,15 @@ currentTime INTEGER)"""
 
 #inputting and recording the time that the user last visited the pet page (also used for the first time)
 curs_obj.execute(petTable)
-if petsOwned == 0:  #for first time. the user will be given a free pet. every other visit will not use this code.
+while petsOwned == 0:  #for first time. the user will be given a free pet. every other visit will not use this code.
     curs_obj.execute("INSERT INTO Time (currentTime) VALUES (?)", (currentTime))
     conn_obj.commit() #to make the change persistent
-
-elif petsOwned >= 1: # every visit after the 1st will use this code.
-    curs_obj.execute("UPDATE Time SET (lastvisittime) = (currentTime)")
-    curs_obj.execute("UPDATE Time SET (currentTime) = (?)", currentTime)
-    conn_obj.commit()
+    petsOwned += 1 #to simulate the user getting a pet. this will disable this section of code for every visit after.
+else:
+    if petsOwned >= 1: # every visit after the 1st will use this code.
+        curs_obj.execute("UPDATE Time SET (lastvisittime) = (currentTime)")
+        curs_obj.execute("UPDATE Time SET (currentTime) = (?)", currentTime)
+        conn_obj.commit()
 
 curs_obj.execute("SELECT lastvisitTime,currentTime FROM Time ORDER BY lastvisitTime DESC LIMIT 1")
 print(curs_obj.fetchone()) #temporary, just to show that it still works when coding/testing.
