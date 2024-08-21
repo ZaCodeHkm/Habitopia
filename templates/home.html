@@ -11,23 +11,32 @@
     <title>Home!</title>
 </head>
     <body class="body">
+        <div class="topbox">
+            <ul>
+                <li><span class="material-symbols-outlined icon">close</span></li>
+                <li><span class="material-symbols-outlined icon">web_asset</span></li>
+                <li><span class="material-symbols-outlined icon">minimize</span></li>
+            </ul>
+        </div>
+        <div class="nav">
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('register') }}">Register/Login</a></li>
+                <li><a href="">Habit Tracker</a></li>
+                <li><a href="{{ url_for('pet') }}">Pet</a></li>
+                <li><a href="">Shop</a></li>
+                <li><a href="">Account</a></li>
+                <li><span class="material-symbols-outlined notif">notifications</span></li>
+                
+            </ul>
+        </div>
+
         <div id="wrap">
             <div id="header">
                 <h1>Habitopia - Home</h1>
             </div>
 
-            <div class="nav">
-                <ul>
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('register') }}">Register/Login</a></li>
-                    <li><a href="">Habit Tracker</a></li>
-                    <li><a href="{{ url_for('pet') }}">Pet</a></li>
-                    <li><a href="">Shop</a></li>
-                    <li><a href="">Account</a></li>
-                    <li><span class="material-symbols-outlined">notifications</span></li>
-                    
-                </ul>
-            </div>
+            
 
             <div class="content">
             </div>

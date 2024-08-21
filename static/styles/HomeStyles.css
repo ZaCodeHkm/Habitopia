@@ -25,7 +25,45 @@ body{
   margin: 0;
   padding: 0;
   overflow: scroll;
+  overflow-x: hidden;
 }
+
+.topbox{
+  background-color: #2d4535;
+  height: 50px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.icon{
+  background-color: #c1c1c1;
+  height: 30px;
+  width: 30px;
+  margin: 2px 2px;
+  float:right;
+  border: 5px outset #c1c1c1;
+  
+}
+
+
+/* scroll-bar */
+::-webkit-scrollbar{
+  background-color: aliceblue;
+  width: 30px;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: #c1c1c1;
+  border: 3px outset #c1c1c1;
+}
+
+::-webkit-scrollbar-button{
+  border: 3px outset #c1c1c1;
+  height: 30px;
+}
+
+
 
 
 /* Header */
@@ -34,7 +72,6 @@ body{
 /* Nav bar */ 
 
 .material-symbols-outlined {
-  padding: 10px 14px;
   text-align: center;
   font-variation-settings:
   'FILL' 0,
@@ -50,15 +87,19 @@ ul {
 }
 
 .nav {
-  background-color: #c1c1c1 ;
+  background-color: #e0e2e7 ;
+  width:1920px; 
   overflow: hidden;
+  position: fixed;
+  top: 50px;
+  width: 100%;
 }
 .nav a{
   text-decoration: none;
   float: left;
   text-align: center;
   color: #131313;
-  padding: 14px 16px;
+  padding: 8px 10px;
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif;
 }
@@ -68,10 +109,15 @@ ul {
   color:#131313;
 }
 
-.nav a.active {
-  background-color: aliceblue;
+.nav a:active {
+  background-color: #7f7f7f;
   color:#131313;
 }
+
+.notif{
+  padding: 8px 10px;
+}
+
 
 /* Content */
 
