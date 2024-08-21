@@ -46,6 +46,10 @@ body{
   
 }
 
+h1 {
+  font-family: "Pixelify Sans", sans-serif ;
+}
+
 
 /* scroll-bar */
 ::-webkit-scrollbar{

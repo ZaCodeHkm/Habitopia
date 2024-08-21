@@ -45,6 +45,10 @@ body{
   border: 5px outset #c1c1c1;
 }
 
+h1 {
+  font-family: "Pixelify Sans", sans-serif ;
+}
+
 /* Scroll Bar */
 ::-webkit-scrollbar{
   background-color: aliceblue;
