@@ -20,12 +20,12 @@
         <div class="nav">
                 <ul>
                     <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('register') }}">Register/Login</a></li>
-                    <li><a href="">Habit Tracker</a></li>
+                    <li><a href="{{ url_for('login') }}">Login/Register</a></li>
+                    <li><a href="{{ url_for('habit') }}">Habit Tracker</a></li>
                     <li><a href="{{ url_for('pet') }}">Pet</a></li>
-                    <li><a href="">Shop</a></li>
-                    <li><a href="">Account</a></li>
-                    <li><span class="material-symbols-outlined">notifications</span></li>   
+                    <li><a href="{{ url_for('shop') }}">Shop</a></li>
+                    <li><a href="{{ url_for('account') }}">Account</a></li>
+                    <li><span class="material-symbols-outlined notif">notifications</span></li>
                 </ul>
             
             </div>
