@@ -1,6 +1,6 @@
-/* Body & Backround */
+/* Body & Background */
 
-pixelify-sans{
+.pixelify-sans{
   font-family: "Pixelify Sans", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
@@ -43,13 +43,15 @@ body{
   margin: 2px 2px;
   float:right;
   border: 5px outset #c1c1c1;
+  
 }
 
 h1 {
   font-family: "Pixelify Sans", sans-serif ;
 }
 
-/* Scroll Bar */
+
+/* scroll-bar */
 ::-webkit-scrollbar{
   background-color: aliceblue;
   width: 30px;
@@ -65,59 +67,64 @@ h1 {
   height: 30px;
 }
 
+
+
+
+/* Header */
+
+
 /* Nav bar */ 
 
 .material-symbols-outlined {
-    text-align: center;
-    font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;  
-  }
-  
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .nav {
-    background-color: #e0e2e7 ;
-    width:1920px;
-    overflow: hidden;
-    position: fixed;
-    top: 50px;
-    width: 100%;
-  }
-  .nav a{
-    text-decoration: none;
-    float: left;
-    text-align: center;
-    color: #131313;
-    padding: 8px 10px;
-    font-size: 17px;
-    font-family: "Pixelify Sans", sans-serif ;
-  }
-  
-  .nav a:hover {
-    background-color: aliceblue;
-    color:#131313;
-  }
-  
-  .nav a:active {
-    background-color: #7f7f7f;
-    color:#131313;
-  }
+  text-align: center;
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24;  
+}
 
- 
-  
-  /* Body */
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
 
-  .PetBox {
-    width: 200px;
-    height: 100px;
-    border: 10px solid black;
-    padding: 10px;
-    margin: 10px;
+.nav {
+  background-color: #e0e2e7 ;
+  width:1920px; 
+  overflow: hidden;
+  position: fixed;
+  top: 50px;
+  width: 100%;
+}
+.nav a{
+  text-decoration: none;
+  float: left;
+  text-align: center;
+  color: #131313;
+  padding: 8px 10px;
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif;
+}
+
+.nav a:hover {
+  background-color: aliceblue;
+  color:#131313;
+}
+
+.nav a:active {
+  background-color: #7f7f7f;
+  color:#131313;
+}
+
+.notif{
+  padding: 8px 10px;
+}
+
+
+/* Content */
+
+.class{
+  background-color: #e0e2e7; 
 }

@@ -21,10 +21,6 @@ class User(db.Model, UserMixin):
 def home():
     return render_template("home.html")
 
-@app.route("/pet")
-def pet():
-    return render_template("pet.html")
-
 @app.route("/login")
 def login():
     return render_template("login.html")
@@ -32,6 +28,23 @@ def login():
 @app.route("/register")
 def register():
     return render_template("register.html")
+
+@app.route("/habit")
+def habit():
+    return render_template("habit.html")
+
+@app.route("/pet")
+def pet():
+    return render_template("pet.html")
+
+@app.route("/shop")
+def shop():
+    return render_template("shop.html")
+
+@app.route("/account")
+def account():
+    return render_template("account.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True) #to remove before deploying
