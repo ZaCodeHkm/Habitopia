@@ -1,9 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 
 app = Flask(__name__)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+#secret key to encrypt cookies
 app.config['SECRET_KEY'] = 'secretkey'
 db = SQLAlchemy(app)
 
