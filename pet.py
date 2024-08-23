@@ -3,7 +3,7 @@
     # TO-DO: 
     # DONE 1. Make it so that no new rows of lastvisitTime are created. I want it so that during each successful visit, lastvisitTime will be replaced by the 
     # previous currentTime. 
-    # 2. To calculate the difference between the two and store it in a new column. To make the hunger loss cumulative with each visit.
+    # 2. To calculate the difference between the two and store it in a new column.
     # 3. New column or table to be added to make the hunger loss cumulative. Otherwise, people will keep logging in to prevent the hunger loss from 
     # reducing. 
     # 4. Food/feeding system and how it connects to the hunger loss mechanic. Resets the hunger bar to a certain level.
