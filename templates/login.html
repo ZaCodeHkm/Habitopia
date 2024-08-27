@@ -1,6 +1,7 @@
 
 {% extends "base.html" %}
 {% block title %}Login!{% endblock %}
+{% block css%}<link rel="stylesheet" href="/static/styles/LoginStyles.css">{% endblock %}
 {% block Pagename %}Login/Register{% endblock %}
 {% block content %}<a href="{{url_for('register')}}">What?? Don't have an account yet? Sign up then!</a>{% endblock %}
 
