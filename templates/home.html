@@ -1,45 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/styles/HomeStyles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
-    <title>Home!</title>
-</head>
-    <body class="body">
-        <div class="topbox">
-            <ul>
-                <li><span class="material-symbols-outlined icon">close</span></li>
-                <li><span class="material-symbols-outlined icon">web_asset</span></li>
-                <li><span class="material-symbols-outlined icon">minimize</span></li>
-            </ul>
-        </div>
-        <div class="nav">
-            <ul>
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('login') }}">Login/Register</a></li>
-                <li><a href="{{ url_for('habit') }}">Habit Tracker</a></li>
-                <li><a href="{{ url_for('pet') }}">Pet</a></li>
-                <li><a href="{{ url_for('shop') }}">Shop</a></li>
-                <li><a href="{{ url_for('account') }}">Account</a></li>
-                <li><span class="material-symbols-outlined notif">notifications</span></li>
-                
-            </ul>
-        </div>
+{% extends "base.html" %}
+{% block title %}Home!{% endblock %}
+{% block Pagename %}Home{% endblock %}
+{% block content %}
+<div id="header">
+</div>
 
-        <div id="wrap">
-            <div id="header">
-                <h1>Habitopia - Home</h1>
-            </div>
+<div class="content">
+</div>
+{% endblock %}
 
-            
 
-            <div class="content">
-            </div>
-        </div>
-    </body>
-</html>

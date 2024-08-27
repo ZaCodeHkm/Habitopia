@@ -3,25 +3,52 @@
     # TO-DO: 
     # DONE 1. Make it so that no new rows of lastvisitTime are created. I want it so that during each successful visit, lastvisitTime will be replaced by the 
     # previous currentTime. 
-    # 2. To calculate the difference between the two and store it in a new column.
-    # 3. New column or table to be added to make the hunger loss cumulative. Otherwise, people will keep logging in to prevent the hunger loss from 
+    # DONE 2. To calculate the difference between the two and store it in a new column.
+    # DONE 3. New column or table to be added to make the hunger loss cumulative. Otherwise, people will keep logging in to prevent the hunger loss from 
     # reducing. 
-    # 4. Food/feeding system and how it connects to the hunger loss mechanic. Resets the hunger bar to a certain level.
-    # 5. Make unique pet ID system that will save to a different table or row depending on the pet.
-    # 6. Make basic display section in pet.html to show to mr willie.
-    # 7. Comm with shawn so that he also includes the pet number as a stat to record for each user. Explanation down below in the DEPENDENCY section.
-    # DONE 8. Make currentTime be recorded. It will be the time recorded for every visit except the first.
-    # 9. Make the hunger bar.
-    # 
+    # 3a.Make the cumulative column only reset when fed.
+    # 4. Create buttons on pet.html
+    # 4a. First one will be a button to select pet. Make it so correct rows (correct pets) are selected based off the button pressed.
+    # 5. Food/feeding system and how it connects to the hunger loss mechanic. Resets the hunger bar to a certain level.
+    # 6. Make unique pet ID system that will save to a different table or row depending on the pet.
+    # 7. Make basic display section in pet.html to show to mr willie.
+    # 8. Comm with shawn so that he also includes the pet number as a stat to record for each user. Explanation down below in the DEPENDENCY section.
+    # DONE 9. Make currentTime be recorded. It will be the time recorded for every visit except the first.
+    # 10. Make the hunger bar. (Assigned to Shawn.)
+    # 11. Connect this system to the account system. Basically, need code to read and write data from ad to the account database (ex: #of petsOwned, petName, petEvolution, etc.)
 
 import time, sqlite3
 
+#------ACTUAL CODE------#
 petsOwned = 1 #temporary until there is a counter for pets owned for each user.
 lastvisitTime = (time.time(),) #apparently, this must be a tuple in order to replace any qmarks in the line below. #also, apparently not.
 currentTime = (time.time(),)
 petHunger = 100
+#------FUNCTIONS------#
+def hungerFunc():
+    curs_obj.execute("UPDATE Time SET (lastvisittime) = (currentTime)")
+    curs_obj.execute("UPDATE Time SET (currentTime) = (?)", currentTime)
+    curs_obj.execute("UPDATE Time SET (timeDifference) = (currentTime) - (lastvisitTime)")
+    curs_obj.execute("UPDATE Time SET (cumulativeDiff) = (cumulativeDiff) + (timeDifference)")
+    hungerTuple = curs_obj.execute("SELECT cumulativeDiff from Time").fetchone()
+    feedTime = hungerTuple[0]
 
-#------ACTUAL CODE------#
+    if feedTime >= 86400 and feedTime < 172800:
+        petHunger -= 33
+    if feedTime >= 172800 and feedTime < 259200:
+        petHunger -= 66
+    if feedTime >= 259200 and feedTime <345600:  
+        petHunger -= 99
+    if feedTime >= 345600:
+        petHunger -= 100
+        print('petLoss') #temporary to show what happens if the user messes up.
+
+#------END FUNCTIONS------#
+
+# def feedFunc():
+    #when certain button is clicked, reset pet hunger to max. (For now)
+    #finding out how to connect HTML buttons to this code.s
+
 #define connection and cursor
 conn_obj = sqlite3.connect('petdata.db')
 curs_obj = conn_obj.cursor()
@@ -38,18 +65,17 @@ curs_obj.execute(petTable)
 while petsOwned == 0:  #for first time. the user will be given a free pet. every other visit will not use this code.
     curs_obj.execute("INSERT INTO Time (currentTime) VALUES (?)", (currentTime))
     conn_obj.commit() #to make the change persistent
-    petsOwned += 1 #to simulate the user getting a pet. this will disable this section of code for every visit after.
+    petsOwned += 1 #to simulate the user getting their first pet. this will 'disable' this section of code for every visit after. 
 else:
-    if petsOwned >= 1: # every visit after the 1st will use this code.
-        curs_obj.execute("UPDATE Time SET (lastvisittime) = (currentTime)")
-        curs_obj.execute("UPDATE Time SET (currentTime) = (?)", currentTime)
-        curs_obj.execute("UPDATE Time SET (timeDifference) = (currentTime) - (lastvisitTime)")
-        # curs_obj.execute()
-        conn_obj.commit()
+    if petsOwned >= 1: # every visit after the 1st will use this function for each pet.
+        hungerFunc()
+conn_obj.commit()
+
+
 
 curs_obj.execute("SELECT lastvisitTime,currentTime FROM Time ORDER BY lastvisitTime DESC LIMIT 1")
 print(curs_obj.fetchone()) #temporary, just to show that it still works when coding/testing.
-print(petHunger)
+curs_obj.execute("UPDATE Time SET petHunger = 100")
 conn_obj.close()
 
 #---DEPENDENCY ON OTHER SYSTEMS---#
@@ -57,10 +83,9 @@ conn_obj.close()
 # tutorial.
 # if petsOwned == 0:
 #     popUp freepetchoice.ui
-#     print tutorial #have to figure out how to make popups that are interactive (to allow the user to choose a free pet)
-# record lastvisitTime (also used to record time of the first visit. which is planned so that it is replaced with the previous currentTime in every other visit.)
+#     print tutorial #have to figure out how to make buttons (to allow the user to choose a free pet)
 
-# also need the account system, or at least the ID part of it done so I have a unique ID to use to pull up the correct pet database 
+# also need the account system, or at least the ID part of it done so I have a unique ID to use to pull up the correct pet data 
 # for each user. (should I make separate database for each user? is that a waste? maybe i have to make the table more detailed.)
 
 
