@@ -17,6 +17,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
 
 
+
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -47,4 +48,6 @@ def account():
 
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True) #to remove before deploying
