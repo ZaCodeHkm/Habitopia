@@ -71,7 +71,14 @@ h1 {
 
 
 /* Header */
-
+.title{
+  color:#e0e2e7;
+  text-align: center;
+  margin-top: 200px;
+  margin-bottom: 200px;
+  font-size: 100px;
+  text-shadow: 1px 3px 0 #969696, 1px 13px 5px #aba8a8;
+}
 
 /* Nav bar */ 
 
@@ -118,9 +125,16 @@ ul {
   color:#131313;
 }
 
+.active{
+  background-color: #7f7f7f;
+  color:#131313;
+}
+
 .notif{
   padding: 8px 10px;
+  float: right;
 }
+
 
 
 /* Content */

@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
     <title>Register!</title>
+
+    
 </head>
 
 <body> 
@@ -26,7 +28,7 @@
             <li><a href="{{ url_for('habit') }}">Habit Tracker</a></li>
             <li><a href="{{ url_for('pet') }}">Pet</a></li>
             <li><a href="{{ url_for('shop') }}">Shop</a></li>
-            <li><a href="{{ url_for('account') }}">Account</a></li>
+            <li><a class="active" href="{{ url_for('account') }}">Account</a></li>
             <li><span class="material-symbols-outlined notif">notifications</span></li>
             
         </ul>

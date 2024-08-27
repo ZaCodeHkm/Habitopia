@@ -118,9 +118,18 @@
     color:#131313;
   }
   
+  
+  .active{
+    background-color: #7f7f7f;
+    color:#131313;
+  }
+  
   .notif{
     padding: 8px 10px;
+    float: right;
   }
+
+  
   
   
   /* Content */
