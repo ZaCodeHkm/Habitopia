@@ -1,39 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/styles/HabitStyles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
-    <title>Habit Tracker!</title>
-</head>
-
-<body> 
-    <div class="topbox">
-        <ul>
-            <li><span class="material-symbols-outlined icon">close</span></li>
-            <li><span class="material-symbols-outlined icon">web_asset</span></li>
-            <li><span class="material-symbols-outlined icon">minimize</span></li>
-        </ul>
-    </div>
-    <div class="nav">
-        <ul>
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('login') }}">Login/Register</a></li>
-            <li><a href="{{ url_for('habit') }}">Habit Tracker</a></li>
-            <li><a href="{{ url_for('pet') }}">Pet</a></li>
-            <li><a href="{{ url_for('shop') }}">Shop</a></li>
-            <li><a href="{{ url_for('account') }}">Account</a></li>
-            <li><span class="material-symbols-outlined notif">notifications</span></li>
-            
-        </ul>
-    </div>
-    <div id="wrap">
-        <h1>Habit Tracker</h1>
-    </div>
-</body>
-
-</html>
+{% extends "base.html" %}
+{% block title %}Habit Tracker!{% endblock %}
+{% block Pagename %}Habit Tracker{% endblock %}
+{% block content %}{% endblock %}
