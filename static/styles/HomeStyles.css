@@ -68,7 +68,19 @@ h1 {
 }
 
 
-
+.header {
+  color: #FFFFFF;
+  background: #ece9e9;
+  text-shadow: 3px 5px 2px #474747;
+  color: #FFFFFF;
+  background: #ece9e9;
+  font-size: 200px;
+  height: fit-content;
+  width: fit-content;
+  font-family: "Pixelify Sans", sans-serif ;
+  margin-top: 1000px;
+  margin-bottom: 1000px;
+  }
 
 /* Header */
 
