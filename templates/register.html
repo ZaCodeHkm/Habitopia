@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Login!{% endblock %}
 {% block Pagename %}Login/Register{% endblock %}
-{% block content %}<a href="{{url_for('login')}}">Already have an account? Start logging in!</a>{% endblock %}
-
-
+{% block content %}
+            <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div>{{ form.username.label }} {{ form.username() }}</div>
+            <div>{{ form.password.label }} {{ form.password() }}</div>
+            <div>{{ form.submit() }}</div>
+        </form>
+        
+        <a href="{{url_for('login')}}">Already have an account? Start logging in!</a>
+{% endblock %}

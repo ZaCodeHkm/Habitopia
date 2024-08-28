@@ -1,8 +1,16 @@
 
+
 {% extends "base.html" %}
 {% block title %}Login!{% endblock %}
 {% block css%}<link rel="stylesheet" href="/static/styles/LoginStyles.css">{% endblock %}
 {% block Pagename %}Login/Register{% endblock %}
-{% block content %}<a href="{{url_for('register')}}">What?? Don't have an account yet? Sign up then!</a>{% endblock %}
+{% block content %}
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div>{{ form.username.label }} {{ form.username() }}</div>
+            <div>{{ form.password.label }} {{ form.password() }}</div>
+            <div>{{ form.submit() }}</div>
+        </form>
 
-
+        <a href="{{url_for('register')}}">What?? Don't have an account yet? Sign up then!</a>
+</a>{% endblock %}
