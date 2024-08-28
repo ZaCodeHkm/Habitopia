@@ -25,6 +25,7 @@ class Habit(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100))
     complete = db.Column(db.Boolean)
+    
 
 
 class RegisterForm(FlaskForm):
@@ -79,7 +80,8 @@ def update(habit_id):
     habit = Habit.query.filter_by(id=habit_id).first()
     habit.complete = not habit.complete
     db.session.commit()
-    return redirect(url_for("habit"))
+    return redirect(url_for("index"))
+
 
 @app.route("/delete/<int:habit_id>")
 def delete(habit_id):
