@@ -18,42 +18,66 @@
     # 11. Connect this system to the account system. Basically, need code to read and write data from ad to the account database (ex: #of petsOwned, petName, petEvolution, etc.)
 
 import time, sqlite3
-
+#change table to use last fed time instead?
 #------ACTUAL CODE------#
 petsOwned = 1 #temporary until there is a counter for pets owned for each user.
 lastvisitTime = (time.time(),) #apparently, this must be a tuple in order to replace any qmarks in the line below. #also, apparently not.
 currentTime = (time.time(),)
-petHunger = 100
 #------FUNCTIONS------#
 def hungerFunc():
+    conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
+    curs_obj = conn_obj.cursor()
     curs_obj.execute("UPDATE Time SET (lastvisittime) = (currentTime)")
     curs_obj.execute("UPDATE Time SET (currentTime) = (?)", currentTime)
     curs_obj.execute("UPDATE Time SET (timeDifference) = (currentTime) - (lastvisitTime)")
     curs_obj.execute("UPDATE Time SET (cumulativeDiff) = (cumulativeDiff) + (timeDifference)")
-    hungerTuple = curs_obj.execute("SELECT cumulativeDiff from Time").fetchone()
-    feedTime = hungerTuple[0]
+    timeTuple = curs_obj.execute("SELECT cumulativeDiff from Time").fetchone()
+    feedTime = timeTuple[0]
+    curs_obj.execute("UPDATE Time SET (petHunger) = 100")
 
-    if feedTime >= 86400 and feedTime < 172800:
-        petHunger -= 33
+    if feedTime >= 5 and feedTime < 172800:
+        curs_obj.execute("UPDATE Time SET (petHunger) = 67")
     if feedTime >= 172800 and feedTime < 259200:
-        petHunger -= 66
-    if feedTime >= 259200 and feedTime <345600:  
-        petHunger -= 99
+        curs_obj.execute("UPDATE Time SET (petHunger) = 34")
+    if feedTime >= 259200 and feedTime < 345600:  
+        curs_obj.execute("UPDATE Time SET (petHunger) = 1")
     if feedTime >= 345600:
-        petHunger -= 100
+        curs_obj.execute("UPDATE Time SET (petHunger) = 0")
         print('petLoss') #temporary to show what happens if the user messes up.
+    conn_obj.commit()
 
-#------END FUNCTIONS------#
+def getHunger(): 
+    #initially put this in one function (hungerFunc). issue is, trying to get petHunger from it resulted in it 
+    # running twice. thanks to u/GeorgeFranklyMathnet on reddit for this simple solution of splitting it up.
+    conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
+    curs_obj = conn_obj.cursor()
+    hungerTuple = curs_obj.execute("SELECT petHunger from Time").fetchone()
+    pH = hungerTuple[0]
+    return pH
+petHunger = getHunger() 
 
-# def feedFunc():
+def feedFunc():
+    conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
+    curs_obj = conn_obj.cursor()
+    curs_obj.execute("UPDATE Time SET (petHunger) = 100")
+    curs_obj.execute("UPDATE Time SET (cumulativeDiff) = 0")
+    conn_obj.commit()
+
+    
+
     #when certain button is clicked, reset pet hunger to max. (For now)
     #finding out how to connect HTML buttons to this code.s
 
+#def firstPet()
+#------END FUNCTIONS------#
+
+
+
 #define connection and cursor
-conn_obj = sqlite3.connect('petdata.db')
+conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
 curs_obj = conn_obj.cursor()
 
-#create table to store pet data
+#create table to store pet data.
 petTable = """CREATE TABLE IF NOT EXISTS
 Time (
 petID INTEGER PRIMARY KEY,
@@ -62,8 +86,8 @@ currentTime INTEGER)"""
 
 #inputting and recording the time that the user last visited the pet page (also used for the first time)
 curs_obj.execute(petTable)
-while petsOwned == 0:  #for first time. the user will be given a free pet. every other visit will not use this code.
-    curs_obj.execute("INSERT INTO Time (currentTime) VALUES (?)", (currentTime))
+if petsOwned == 0:  #for first time. the user will be given a free pet. every other visit will not use this code.
+    curs_obj.execute("UPDATE Time SET (currentTime) = (?)", (currentTime))
     conn_obj.commit() #to make the change persistent
     petsOwned += 1 #to simulate the user getting their first pet. this will 'disable' this section of code for every visit after. 
 else:
@@ -75,7 +99,7 @@ conn_obj.commit()
 
 curs_obj.execute("SELECT lastvisitTime,currentTime FROM Time ORDER BY lastvisitTime DESC LIMIT 1")
 print(curs_obj.fetchone()) #temporary, just to show that it still works when coding/testing.
-curs_obj.execute("UPDATE Time SET petHunger = 100")
+print(petHunger)
 conn_obj.close()
 
 #---DEPENDENCY ON OTHER SYSTEMS---#

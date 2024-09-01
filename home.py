@@ -4,7 +4,8 @@ from flask_login import UserMixin
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
-
+from pet import hungerFunc, feedFunc, petHunger
+import sqlite3
 
 app = Flask(__name__)
 
@@ -90,9 +91,20 @@ def delete(habit_id):
     db.session.commit()
     return redirect(url_for("habit"))
 
-@app.route("/pet")
+@app.route("/pet", methods=["GET","POST"])
 def pet():
-    return render_template("pet.html")
+    hungerFunc()
+    return render_template("pet.html", satiety=petHunger)
+def pet_feed():
+    if request.form == "POST":
+        feedFunc()
+        return render_template("pet.html", satiety=petHunger)
+
+# def usercheck(): #code to check if user is logged in
+#     something something authentication verification
+# def petsOwned(): #code to check number of pets owned per user
+#     conn_obj = sqlite3.connect('database.db', check_same_thread=False)
+#     curs_obj = conn_obj.cursor()
 
 @app.route("/shop")
 def shop():
