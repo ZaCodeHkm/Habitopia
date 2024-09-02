@@ -1,4 +1,13 @@
 {% extends "base.html" %}
+{% block css %} <link rel="stylesheet" href="/static/styles/PetStyles.css" > {% endblock %}
 {% block title %}Pets!{% endblock %}
 {% block Pagename %}Pets{% endblock %}
-{% block content %}{% endblock %}
+{% block content %}
+<fieldset>
+    <legend>Your pet needs food</legend>
+    <meter form="Feed" min="0" max="100" value= '{{ satiety }}' ></meter>
+    <form action="/pet" value="Feed" method="post">
+        <button type="submit" value="Feed">Feed</button>
+    </form>
+</fieldset>
+{% endblock %}

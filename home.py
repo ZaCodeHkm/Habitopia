@@ -1,9 +1,11 @@
-from flask import Flask, render_template, url_for, redirect, flash
+from flask import Flask, render_template, url_for, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
+from pet import hungerFunc, feedFunc, petHunger
+import sqlite3
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
@@ -25,6 +27,13 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
    
+#Table for Habits
+class Habit(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    title = db.Column(db.String(100))
+    complete = db.Column(db.Boolean)
+    
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -77,15 +86,51 @@ def register():
             return redirect(url_for('login'))
     return render_template("register.html", form=form)
 
+#habit 
 @app.route("/habit")
 @login_required
 def habit():
-    return render_template("habit.html")
+    habit_list = Habit.query.all()
+    return render_template("habit.html", habit_list=habit_list)
 
-@app.route("/pet")
+@app.route("/add", methods=["POST"])
+def add():
+    title = request.form.get("title")
+    new_habit = Habit(title=title, complete=False)
+    db.session.add(new_habit)
+    db.session.commit()
+    return redirect(url_for("habit"))
+
+@app.route("/update/<int:habit_id>")
+def update(habit_id):
+    habit = Habit.query.filter_by(id=habit_id).first()
+    habit.complete = not habit.complete
+    db.session.commit()
+    return redirect(url_for("index"))
+
+
+@app.route("/delete/<int:habit_id>")
+def delete(habit_id):
+    habit = Habit.query.filter_by(id=habit_id).first()
+    db.session.delete(habit)
+    db.session.commit()
+    return redirect(url_for("habit"))
+
+@app.route("/pet", methods=["GET","POST"])
 @login_required
 def pet():
-    return render_template("pet.html")
+    hungerFunc()
+    return render_template("pet.html", satiety=petHunger)
+def pet_feed():
+    if request.form == "POST":
+        feedFunc()
+        return render_template("pet.html", satiety=petHunger)
+
+# def usercheck(): #code to check if user is logged in
+#     something something authentication verification
+# def petsOwned(): #code to check number of pets owned per user
+#     conn_obj = sqlite3.connect('database.db', check_same_thread=False)
+#     curs_obj = conn_obj.cursor()
 
 @app.route("/shop")
 @login_required
