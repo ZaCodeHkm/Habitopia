@@ -57,10 +57,10 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash("Login Successful!")
+            flash("Login Successful!", "Success")
             return redirect(url_for("home"))
         else:
-            flash("Invalid Username or Password.")
+            flash("Invalid Username or Password.", "danger")
            
     return render_template("login.html", form=form)
 
@@ -69,7 +69,7 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
-            hashed_password = bcrypt.generate_password_hash(form.password.data)
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             new_user = User(username=form.username.data, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
