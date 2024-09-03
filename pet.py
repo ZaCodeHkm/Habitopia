@@ -6,16 +6,17 @@
     # DONE 2. To calculate the difference between the two and store it in a new column.
     # DONE 3. New column or table to be added to make the hunger loss cumulative. Otherwise, people will keep logging in to prevent the hunger loss from 
     # reducing. 
-    # 3a.Make the cumulative column only reset when fed.
-    # 4. Create buttons on pet.html
-    # 4a. First one will be a button to select pet. Make it so correct rows (correct pets) are selected based off the button pressed.
-    # 5. Food/feeding system and how it connects to the hunger loss mechanic. Resets the hunger bar to a certain level.
-    # 6. Make unique pet ID system that will save to a different table or row depending on the pet.
-    # 7. Make basic display section in pet.html to show to mr willie.
-    # 8. Comm with shawn so that he also includes the pet number as a stat to record for each user. Explanation down below in the DEPENDENCY section.
-    # DONE 9. Make currentTime be recorded. It will be the time recorded for every visit except the first.
-    # 10. Make the hunger bar. (Assigned to Shawn.)
-    # 11. Connect this system to the account system. Basically, need code to read and write data from ad to the account database (ex: #of petsOwned, petName, petEvolution, etc.)
+    # DONE 3a.Make the cumulative column only reset when fed.
+    # 4. Make redirect to /pet after petfeed
+    # WIP 5. Create buttons on pet.html
+    # 5a. First one will be a button to select pet. Make it so correct rows (correct pets) are selected based off the button pressed.
+    # 6. Food/feeding system and how it connects to the hunger loss mechanic. Resets the hunger bar to a certain level.
+    # 7. Make unique pet ID system that will save to a different table or row depending on the pet.
+    # 8. Make basic display section in pet.html to show to mr willie.
+    # 9. Comm with shawn so that he also includes the pet number as a stat to record for each user. Explanation down below in the DEPENDENCY section.
+    # DONE 10. Make currentTime be recorded. It will be the time recorded for every visit except the first.
+    # DONE 11. Make the hunger bar.
+    # 12. Connect this system to the account system. Basically, need code to read user ID and display the correct pet information. (ex: #of petsOwned, petName, petEvolution, etc.)
 
 import time, sqlite3
 #change table to use last fed time instead?
@@ -23,8 +24,9 @@ import time, sqlite3
 petsOwned = 1 #temporary until there is a counter for pets owned for each user.
 lastvisitTime = (time.time(),) #apparently, this must be a tuple in order to replace any qmarks in the line below. #also, apparently not.
 currentTime = (time.time(),)
-#------FUNCTIONS------#
+#------HUNGER FUNCTIONS------#
 def hungerFunc():
+    currentTime = (time.time(),)
     conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
     curs_obj = conn_obj.cursor()
     curs_obj.execute("UPDATE Time SET (lastvisittime) = (currentTime)")
@@ -34,8 +36,8 @@ def hungerFunc():
     timeTuple = curs_obj.execute("SELECT cumulativeDiff from Time").fetchone()
     feedTime = timeTuple[0]
     curs_obj.execute("UPDATE Time SET (petHunger) = 100")
-
-    if feedTime >= 5 and feedTime < 172800:
+    print("Time since last fed: " + str(feedTime))
+    if feedTime >= 20 and feedTime < 172800:
         curs_obj.execute("UPDATE Time SET (petHunger) = 67")
     if feedTime >= 172800 and feedTime < 259200:
         curs_obj.execute("UPDATE Time SET (petHunger) = 34")
@@ -48,25 +50,30 @@ def hungerFunc():
 
 def getHunger(): 
     #initially put this in one function (hungerFunc). issue is, trying to get petHunger from it resulted in it 
-    # running twice. thanks to u/GeorgeFranklyMathnet on reddit for this simple solution of splitting it up.
+    # running twice. thanks to a comment by u/GeorgeFranklyMathnet on reddit for this simple solution of splitting it up.
     conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
     curs_obj = conn_obj.cursor()
     hungerTuple = curs_obj.execute("SELECT petHunger from Time").fetchone()
     pH = hungerTuple[0]
     return pH
-petHunger = getHunger() 
+
+#------XP FUNCTIONS------#
+def expFunc():
+
+    return
+# petHunger = str(getHunger()) #leaving this as a reminder. this value is static and only obtained when starting the page. which is
+# not good enough for when i need the hunger value to be obtained immediately. solution was to add getHunger() directly in the app.route
+# for the feeding system (/petfeed). this way, every time feed button is pressed, flask detects that button press and runs both getHunger() 
+# and feedFunc(), updating the meter immediately.
 
 def feedFunc():
     conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
     curs_obj = conn_obj.cursor()
     curs_obj.execute("UPDATE Time SET (petHunger) = 100")
     curs_obj.execute("UPDATE Time SET (cumulativeDiff) = 0")
+    
     conn_obj.commit()
 
-    
-
-    #when certain button is clicked, reset pet hunger to max. (For now)
-    #finding out how to connect HTML buttons to this code.s
 
 #def firstPet()
 #------END FUNCTIONS------#
@@ -96,10 +103,8 @@ else:
 conn_obj.commit()
 
 
-
 curs_obj.execute("SELECT lastvisitTime,currentTime FROM Time ORDER BY lastvisitTime DESC LIMIT 1")
 print(curs_obj.fetchone()) #temporary, just to show that it still works when coding/testing.
-print(petHunger)
 conn_obj.close()
 
 #---DEPENDENCY ON OTHER SYSTEMS---#

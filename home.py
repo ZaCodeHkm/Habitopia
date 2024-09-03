@@ -4,7 +4,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, log
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
-from pet import hungerFunc, feedFunc, petHunger
+from pet import hungerFunc, feedFunc, getHunger
 import sqlite3
 from flask_bcrypt import Bcrypt
 
@@ -127,21 +127,28 @@ def delete(habit_id):
     db.session.commit()
     return redirect(url_for("habit"))
 
+#-----PET-----#
 @app.route("/pet", methods=["GET","POST"])
 @login_required
 def pet():
+    print("hungerFunc is working")
     hungerFunc()
-    return render_template("pet.html", satiety=petHunger)
-def pet_feed():
-    if request.form == "POST":
-        feedFunc()
-        return render_template("pet.html", satiety=petHunger)
+    return render_template("pet.html", satiety=getHunger())
 
 # def usercheck(): #code to check if user is logged in
 #     something something authentication verification
 # def petsOwned(): #code to check number of pets owned per user
 #     conn_obj = sqlite3.connect('database.db', check_same_thread=False)
 #     curs_obj = conn_obj.cursor()
+
+@app.route("/petfeed", methods=['POST'])
+def pet_feed():
+    petHunger = str(getHunger())
+    print("Hunger was: "+petHunger)
+    feedFunc()
+    petHunger = str(getHunger())
+    print("Hunger now: "+petHunger)
+    return render_template("pet.html", satiety=petHunger)
 
 @app.route("/shop")
 @login_required
