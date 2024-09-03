@@ -24,7 +24,7 @@ import time, sqlite3
 petsOwned = 1 #temporary until there is a counter for pets owned for each user.
 lastvisitTime = (time.time(),) #apparently, this must be a tuple in order to replace any qmarks in the line below. #also, apparently not.
 currentTime = (time.time(),)
-#------FUNCTIONS------#
+#------HUNGER FUNCTIONS------#
 def hungerFunc():
     currentTime = (time.time(),)
     conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
@@ -57,10 +57,14 @@ def getHunger():
     pH = hungerTuple[0]
     return pH
 
+#------XP FUNCTIONS------#
+def expFunc():
+
+    return
 # petHunger = str(getHunger()) #leaving this as a reminder. this value is static and only obtained when starting the page. which is
 # not good enough for when i need the hunger value to be obtained immediately. solution was to add getHunger() directly in the app.route
-# for the feeding system (/petfeed). this way, every time feed button is pressed, flask detects it and runs both getHunger() and feedFunc(),
-# updating the meter immediately.
+# for the feeding system (/petfeed). this way, every time feed button is pressed, flask detects that button press and runs both getHunger() 
+# and feedFunc(), updating the meter immediately.
 
 def feedFunc():
     conn_obj = sqlite3.connect('petdata.db', check_same_thread=False)
@@ -70,10 +74,6 @@ def feedFunc():
     
     conn_obj.commit()
 
-    
-
-    #when certain button is clicked, reset pet hunger to max. (For now)
-    #finding out how to connect HTML buttons to this code.s
 
 #def firstPet()
 #------END FUNCTIONS------#
