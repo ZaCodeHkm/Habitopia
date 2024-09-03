@@ -1,4 +1,22 @@
 {% extends "base.html" %}
 {% block css %} <link rel="stylesheet" href="/static/styles/AccountStyles.css" > {% endblock %}
 {% block Pagename %}Account{% endblock %}
-{% block content %}{% endblock %}
+{% block content %}
+            {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <div>
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+<h1>Hello, you are logged in.</h1>
+    <a href="{{url_for('logout')}}">Log out</a>
+
+
+{% endblock %}
+
+
