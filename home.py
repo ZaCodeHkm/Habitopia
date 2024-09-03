@@ -21,6 +21,11 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
 #Table for database
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -67,7 +72,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             flash("Login Successful!", "Success")
-            return redirect(url_for("home"))
+            return redirect(url_for("account"))
         else:
             flash("Invalid Username or Password.", "danger")
            
@@ -85,6 +90,12 @@ def register():
             flash("Registration Successful! You can now log in")
             return redirect(url_for('login'))
     return render_template("register.html", form=form)
+
+@app.route("/dashboard", methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
+
 
 #habit 
 @app.route("/habit")
