@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block css %} <link rel="stylesheet" href="/static/styles/AccountStyles.css" > {% endblock %}
+{% block css %} 
+                <link rel="stylesheet" href="/static/styles/AccountStyles.css">
+{% endblock %}
 {% block Pagename %}Account{% endblock %}
 {% block content %}
             {% with messages = get_flashed_messages(with_categories=True) %}
@@ -13,9 +15,11 @@
         </div>
     {% endif %}
 {% endwith %}
-<h1>Hello, you are logged in.</h1>
-    <a href="{{url_for('logout')}}">Log out</a>
 
+
+<form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Are you sure you want to delete your account?');">
+    <button type="submit" class="btn btn-danger">Delete Account</button>
+</form>
 
 {% endblock %}
 
