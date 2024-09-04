@@ -6,8 +6,9 @@
                 <link rel="stylesheet" href="/static/styles/LoginStyles.css">
     {% endblock %}
 {% block Pagename %}Login{% endblock %}
+{% block heading %}htps://habitopia/login{% endblock %}
 {% block content %}
-<div>
+<div id="wrap">
     {% with messages = get_flashed_messages(with_categories=True) %}
             <ul>
                 {% for category, message in messages %}
@@ -15,7 +16,6 @@
                 {% endfor %}
             </ul>
     {% endwith %}
-</div>
     <form method="POST" action="">
             {{ form.hidden_tag() }}
             <div>{{ form.username.label }} {{ form.username() }}</div>
@@ -24,4 +24,5 @@
         </form>
 
         <a href="{{url_for('register')}}">What?? Don't have an account yet? Sign up then!</a>
-</a>{% endblock %}
+</div>
+{% endblock %}

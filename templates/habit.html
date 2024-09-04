@@ -2,9 +2,9 @@
 {% block css %} <link rel="stylesheet" href="/static/styles/HabitStyles.css" > {% endblock %}
 {% block title %}Habit Tracker!{% endblock %}
 {% block Pagename %}Habit Tracker{% endblock %}
-
+{% block heading %}htps://habitopia/habit{% endblock %}
 {% block content %}
-
+<div id="wrap">
     <form action="/add" method="post">
         <div>
             <label for="title">Habit:</label>
@@ -59,7 +59,7 @@
         </tr>
         {% endfor %}
     </table>
-    
+</div>    
 
 
 {% endblock %}

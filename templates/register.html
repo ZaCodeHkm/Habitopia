@@ -6,7 +6,9 @@
                 <link rel="stylesheet" href="/static/styles/RegisterStyles.css">
     {% endblock %}
 {% block Pagename %}Register{% endblock %}
+{% block heading %}htps://habitopia/register{% endblock %}
 {% block content %}
+
 <div>
     {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
@@ -19,7 +21,7 @@
         {% endif %}
     {% endwith %}
 </div>
-
+<div id="wrap">
     <form method="POST" action="">
             {{ form.hidden_tag() }}
             <div>{{ form.username.label }} {{ form.username() }}</div>
@@ -28,4 +30,5 @@
         </form>
         
         <a href="{{url_for('login')}}">Already have an account? Start logging in!</a>
+</div>
 {% endblock %}

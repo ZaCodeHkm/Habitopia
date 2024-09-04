@@ -1,36 +1,31 @@
+<!DOCTYPE html>
+<html>
+    {% extends "base.html" %}
+    {% block css %} <link rel="stylesheet" href="/static/styles/HomeStyles.css" > {% endblock %}
+    {% block title %}Home!{% endblock %}
+    {% block heading %}htps://habitopia/home{% endblock %}
+    {% block Pagename %}Home{% endblock %}
 
 
-{% extends "base.html" %}
-{% block css %} 
-                <link rel="stylesheet" href="/static/styles/HomeStyles.css">
-{% endblock %}
-{% block title %}Home!{% endblock %}
-{% block Pagename %}Home{% endblock %}
-
-<div id="header">
-    <h1>HABITOPIA</h1>
-</div>
 
 {% block content %}
 
-<div>
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            <ul>
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
-</div>
 
-<a href="{{url_for('logout')}}">Log out</a>
 
     
+    <body>
 
-    <div class="content">
-    </div>
+    
+        <div>
+            <h1 class="title">HABITOPIA</h1>
+        </div>   
+        <div id="wrap">
+            <h1>Home</h1>
+            
+        </div>        
+            
+        
+    </body>
+
 {% endblock %}
-
-
+</html>
