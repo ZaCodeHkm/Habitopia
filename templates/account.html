@@ -1,4 +1,27 @@
 {% extends "base.html" %}
-{% block css %} <link rel="stylesheet" href="/static/styles/AccountStyles.css" > {% endblock %}
+{% block css %} 
+                <link rel="stylesheet" href="/static/styles/AccountStyles.css">
+{% endblock %}
 {% block Pagename %}Account{% endblock %}
-{% block content %}{% endblock %}
+{% block heading %}htps://habitopia/account{% endblock %}
+{% block content %}
+            {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <div>
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+
+<form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Are you sure you want to delete your account?');">
+    <button type="submit" class="btn btn-danger">Delete Account</button>
+</form>
+
+{% endblock %}
+
+

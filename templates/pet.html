@@ -2,8 +2,21 @@
 {% block css %} <link rel="stylesheet" href="/static/styles/PetStyles.css" > {% endblock %}
 {% block title %}Pets!{% endblock %}
 {% block Pagename %}Pets{% endblock %}
+{% block heading %}htps://habitopia/pet{% endblock %}
 {% block content %}
 <div id="wrap">
-    
+
+    <fieldset>
+        <legend>Your pet needs food</legend>
+        <meter form="Feed" min="0" max="100" value= '{{ satiety }}' ></meter>
+        <form action="/petfeed" value="Feed" method="post">
+            <button type="submit" value="Feed">Feed</button>
+        </form>
+    </fieldset>
+    <fieldset>
+        <legend>Habit XP</legend>
+        <meter form="XP" min="0" max="100" value= '{{ XP }}' ></meter>
+    </fieldset>
+
 </div>
 {% endblock %}

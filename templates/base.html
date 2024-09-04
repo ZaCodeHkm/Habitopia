@@ -14,7 +14,7 @@
         <div class="topbox">
             <ul>
                 <h5 class="topboxtext">{% block heading %}{% endblock %}</h5>
-                <li><img src="/static/styles/assets/exit.png" class="icon logout"></li>
+                <li><a href="{{url_for('logout')}}"><img src="/static/styles/assets/exit.png" class="icon logout"></a></li>
                 <li><img src="/static/styles/assets/window-active.png" class="icon"></li>
                 <li><a href=""><img src="/static/styles/assets/minimise-active.png" class="icon"></a></li>
                 
