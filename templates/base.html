@@ -13,7 +13,9 @@
 <body>
     <div class="topbox">
         <ul>
-            <li><span class="material-symbols-outlined icon">close</span></li>
+            <a href="{{url_for('logout')}}">
+                <span class="material-symbols-outlined icon">close</span>
+            </a>
             <li><span class="material-symbols-outlined icon">web_asset</span></li>
             <li><span class="material-symbols-outlined icon">minimize</span></li>
         </ul>
@@ -21,7 +23,7 @@
     <div class="nav">
         <ul>
             <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('login') }}">Login/Register</a></li>
+            <li><a href="{{ url_for('login') }}">Login/Register</a></li> 
             <li><a href="{{ url_for('habit') }}">Habit Tracker</a></li>
             <li><a href="{{ url_for('pet') }}">Pet</a></li>
             <li><a href="{{ url_for('shop') }}">Shop</a></li>

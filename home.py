@@ -37,11 +37,6 @@ class Habit(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100))
     complete = db.Column(db.Boolean)
-    
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
@@ -60,8 +55,9 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 @app.route("/")
+@login_required
 def home():
-    flash("hello")
+    flash("Hello!")
     return render_template("home.html")
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -72,29 +68,38 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             flash("Login Successful!", "Success")
-            return redirect(url_for("account"))
+            return redirect(url_for("home"))
         else:
             flash("Invalid Username or Password.", "danger")
-           
     return render_template("login.html", form=form)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
-
     if form.validate_on_submit():
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             new_user = User(username=form.username.data, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
-            flash("Registration Successful! You can now log in")
+            flash("Registration Successful! You can now log in.", "success")
             return redirect(url_for('login'))
     return render_template("register.html", form=form)
 
-@app.route("/dashboard", methods=['GET', 'POST'])
+@app.route("/delete_account", methods=['POST'])
 @login_required
-def dashboard():
-    return render_template("dashboard.html")
+def delete_account():
+    user = current_user
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        flash("Your account has been deleted successfully.", "success")
+    except Exception as error:
+        db.session.rollback()
+        flash("An error occurred while deleting your account. Please try again.", "danger")
+
+    logout_user()
+    return redirect(url_for('register'))
 
 
 #habit 

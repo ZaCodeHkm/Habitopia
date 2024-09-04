@@ -1,5 +1,9 @@
+
+
 {% extends "base.html" %}
-{% block css %} <link rel="stylesheet" href="/static/styles/HomeStyles.css" > {% endblock %}
+{% block css %} 
+                <link rel="stylesheet" href="/static/styles/HomeStyles.css">
+{% endblock %}
 {% block title %}Home!{% endblock %}
 {% block Pagename %}Home{% endblock %}
 
@@ -9,18 +13,20 @@
 
 {% block content %}
 
-{% with messages = get_flashed_messages(with_categories=True) %}
-{% if messages %}
-    <div>
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
-{% endwith %}
-        
+<div>
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+
+<a href="{{url_for('logout')}}">Log out</a>
+
     
 
     <div class="content">
