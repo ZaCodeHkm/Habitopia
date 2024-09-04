@@ -36,7 +36,11 @@ class User(db.Model, UserMixin):
 class Habit(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100))
-    complete = db.Column(db.Boolean)
+    
+
+
+
+
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
@@ -56,7 +60,6 @@ class LoginForm(FlaskForm):
 
 @app.route("/")
 def home():
-    flash("Hello!")
     return render_template("home.html")
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -115,6 +118,7 @@ def add():
     db.session.add(new_habit)
     db.session.commit()
     return redirect(url_for("habit"))
+
 
 @app.route("/update/<int:habit_id>")
 def update(habit_id):

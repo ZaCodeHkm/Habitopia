@@ -5,6 +5,7 @@
 {% block heading %}htps://habitopia/habit{% endblock %}
 {% block content %}
 <div id="wrap">
+    <h1>Habit Tracker</h1>
     <form action="/add" method="post">
         <div>
             <label for="title">Habit:</label>
@@ -16,6 +17,7 @@
     <table>
         <tr>
            <th colspan="2">Habit</th>
+
             
         </tr>
         <br>
@@ -55,7 +57,7 @@
                 <td><input type="checkbox" name="complete"></td>
                 <td><input type="checkbox" name="complete"></td>
             </form>
-            <td><a href="/delete/{{habit.id}}">Delete</a></td>
+            <td><a href="/delete/{{habit.id}}" class="delete">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
