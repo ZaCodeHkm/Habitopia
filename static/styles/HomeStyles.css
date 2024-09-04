@@ -9,45 +9,65 @@
 #wrap {
   width: 900px;
   height: 540px;
-  margin: 100px auto;
+  margin: 400px auto;
   background: #e0e2e7;
   overflow: hidden;
   padding: 15px;
 }
   
-body{
-  background: url("animatedbackground.gif") ;
+.body{
+  background-image: url("/static/styles/animatedbackground.gif") ;
   background-repeat: no-repeat;
   background-size: cover ;
   background-attachment: fixed;
   background-position: center;
-  height: 1200px;
+  height: 100vh;
+  width: 100%;
   margin: 0;
   padding: 0;
   overflow: scroll;
   overflow-x: hidden;
 }
 
-.topbox{
-  background-color: #2d4535;
-  height: 50px;
-  position: fixed;
+.topboxbg{
+  background-color:#e0e2e7;
+  position:fixed;
+  height: 40px;
   top: 0;
   width: 100%;
 }
 
-.icon{
-  background-color: #c1c1c1;
+.topbox{
+  background-color: #2d4535;
   height: 30px;
+  position: fixed;
+  margin: 1px 4px;
+  top: 1px;
+  width: 99.5%;
+}
+
+
+
+.icon {
   width: 30px;
-  margin: 2px 2px;
   float:right;
-  border: 5px outset #c1c1c1;
-  
+  margin:2px;
+  vertical-align: baseline;
 }
 
 h1 {
   font-family: "Pixelify Sans", sans-serif ;
+}
+
+.topboxtext {
+  float: left;
+  color: #FFFFFF;
+  margin: 2px 2px;
+  text-align: left;
+  font-family: "Pixelify Sans", sans-serif ;
+  font-size: 20px;
+  vertical-align: baseline;
+
 }
 
 
@@ -68,22 +88,20 @@ h1 {
 }
 
 
-.header {
+
+
+/* Title */
+
+.title {
   color: #FFFFFF;
-  background: #ece9e9;
   text-shadow: 3px 5px 2px #474747;
-  color: #FFFFFF;
-  background: #ece9e9;
-  font-size: 200px;
-  height: fit-content;
-  width: fit-content;
+  font-size: 1000% ;
   font-family: "Pixelify Sans", sans-serif ;
-  margin-top: 1000px;
-  margin-bottom: 1000px;
+  text-align: center;
+  margin: 200px auto;
+  
+
   }
-
-/* Header */
-
 
 /* Nav bar */ 
 
@@ -93,8 +111,10 @@ h1 {
   'FILL' 0,
   'wght' 400,
   'GRAD' 0,
-  'opsz' 24;  
+  'opsz' 20;  
 }
+
+
 
 ul {
   list-style-type: none;
@@ -104,10 +124,12 @@ ul {
 
 .nav {
   background-color: #e0e2e7 ;
-  width:1920px; 
+  border: 5px ridge #e0e2e7;
+  width:99.5%;
+  margin: auto; 
   overflow: hidden;
   position: fixed;
-  top: 50px;
+  top: 33px;
   width: 100%;
 }
 .nav a{
@@ -115,7 +137,7 @@ ul {
   float: left;
   text-align: center;
   color: #131313;
-  padding: 8px 10px;
+  padding: 2px 10px;
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif;
 }
