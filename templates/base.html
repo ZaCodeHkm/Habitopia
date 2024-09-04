@@ -4,37 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block css %}{% endblock %}
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body>
-    <div class="topbox">
-        <ul>
-            <li><span class="material-symbols-outlined icon">close</span></li>
-            <li><span class="material-symbols-outlined icon">web_asset</span></li>
-            <li><span class="material-symbols-outlined icon">minimize</span></li>
-        </ul>
-    </div>
-    <div class="nav">
-        <ul>
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('login') }}">Login/Register</a></li>
-            <li><a href="{{ url_for('habit') }}">Habit Tracker</a></li>
-            <li><a href="{{ url_for('pet') }}">Pet</a></li>
-            <li><a href="{{ url_for('shop') }}">Shop</a></li>
-            <li><a href="{{ url_for('account') }}">Account</a></li>
-            <li><span class="material-symbols-outlined notif">notifications</span></li>
-            
-        </ul>
-    </div>
-    <div id="wrap">
-        <h1>{% block Pagename %}{% endblock %}</h1>
-        {% block content %}
-        {% endblock %}
-    </div>
+<body class="body">
+    <div class="topboxbg">
+        <div class="topbox">
+            <ul>
+                <h5 class="topboxtext">{% block heading %}{% endblock %}</h5>
+                <li><img src="/static/styles/assets/exit.png" class="icon logout"></li>
+                <li><img src="/static/styles/assets/window-active.png" class="icon"></li>
+                <li><a href=""><img src="/static/styles/assets/minimise-active.png" class="icon"></a></li>
+                
+                
+            </ul>
+        </div>
     
+        <div class="nav">
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('login') }}">Login/Register</a></li>
+                <li><a href="{{ url_for('habit') }}">Habit Tracker</a></li>
+                <li><a href="{{ url_for('pet') }}">Pet</a></li>
+                <li><a href="{{ url_for('shop') }}">Shop</a></li>
+                <li><a href="{{ url_for('account') }}">Account</a></li>
+                <li class="icon"><img src="/static/styles/assets/envelope_closed-0.png" style="width:20px"></li>
+                
+            </ul>
+        </div>
+    </div>
+    {% block content %}
+    
+    {% endblock %}
 </body>
 </html>

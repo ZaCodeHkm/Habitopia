@@ -4,7 +4,7 @@
 {% block Pagename %}Habit Tracker{% endblock %}
 
 {% block content %}
-
+<div id="wrap">
     <form action="/add" method="post">
         <div>
             <label for="title">Habit:</label>
@@ -59,7 +59,7 @@
         </tr>
         {% endfor %}
     </table>
-    
+</div>    
 
 
 {% endblock %}

@@ -3,6 +3,7 @@
 {% block css %} <link rel="stylesheet" href="/static/styles/RegisterStlyles" > {% endblock %}
 {% block Pagename %}Login/Register{% endblock %}
 {% block content %}
+<div id="wrap">
             <form method="POST" action="">
             {{ form.hidden_tag() }}
             <div>{{ form.username.label }} {{ form.username() }}</div>
@@ -11,4 +12,5 @@
         </form>
         
         <a href="{{url_for('login')}}">Already have an account? Start logging in!</a>
+</div>
 {% endblock %}
