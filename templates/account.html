@@ -16,6 +16,9 @@
     {% endif %}
 {% endwith %}
 
+<div>
+    <a href="{{url_for('logout')}}">Log out</a>
+</div>
 
 <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Are you sure you want to delete your account?');">
     <button type="submit" class="btn btn-danger">Delete Account</button>

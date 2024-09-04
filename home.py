@@ -55,7 +55,6 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 @app.route("/")
-@login_required
 def home():
     flash("Hello!")
     return render_template("home.html")
