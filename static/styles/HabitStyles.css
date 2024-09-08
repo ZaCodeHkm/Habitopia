@@ -9,7 +9,7 @@
 #wrap {
   width: 900px;
   height: 540px;
-  margin: 60px auto;
+  margin: 100px auto;
   background: #e0e2e7;
   overflow: hidden;
   padding: 15px;
@@ -165,6 +165,19 @@ table, th, td {
 
 .class{
   background-color: #e0e2e7; 
+}
+
+input[type=checkbox]{
+  margin: 1px;
+  width: 21px;
+  height: 21px;
+
+}
+
+.delete{
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 17px;
+  padding: 5px;
 }
   
 
