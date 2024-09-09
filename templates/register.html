@@ -8,19 +8,18 @@
 {% block Pagename %}Register{% endblock %}
 {% block heading %}htps://habitopia/register{% endblock %}
 {% block content %}
-
-<div>
-    {% with messages = get_flashed_messages(with_categories=True) %}
+<div id="wrap">
+    <h1>Register</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <ul>
+            <ul class=flashes>
                 {% for category, message in messages %}
                     <li class="{{ category }}">{{ message }}</li>
                 {% endfor %}
             </ul>
         {% endif %}
     {% endwith %}
-</div>
-<div id="wrap">
+
     <form method="POST" action="">
             {{ form.hidden_tag() }}
             <div>{{ form.username.label }} {{ form.username() }}</div>

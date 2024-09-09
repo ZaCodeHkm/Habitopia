@@ -56,7 +56,6 @@ class LoginForm(FlaskForm):
 
 @app.route("/")
 def home():
-    flash("Hello!")
     return render_template("home.html")
 
 @app.route("/login", methods=['GET', 'POST'])
