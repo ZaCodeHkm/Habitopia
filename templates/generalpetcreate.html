@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block css %} <link rel="stylesheet" href="/static/styles/PetStyles.css" > {% endblock %}
+{% block title %}Pets!{% endblock %}
+{% block Pagename %}Pets{% endblock %}
+{% block heading %}htps://habitopia/pet{% endblock %}
+{% block content %}
+<div id="wrap">
+        <p>Your new pet {{ petname }}.. in egg form!<br>
+            You'll have to feed it to make sure it stays healthy and grows big!</p>
+            <div class="petbox">
+            <!-- INSERT PIC OF THE NEW PET EGG<img src="/static/petimages/Sereno.png" alt="Sereno Pet" width="256px" height="328px"> -->
+            </div>
+                <form action="/generalpetcreate" method="post" class="form-inline">
+                    <fieldset>
+                    <legend><label for="petname">What would you like to name your pet? </label></legend>
+                    <input name="petname" type="text" placeholder="{{ specificname }}" required>
+                    <input type="submit" value="Name">               
+                </fieldset>
+                </form>
+                <form action="/returnpet" method="get" class="form-inline">
+                  <button type="submit" value="returnpet">Return to your Pet page.</button>
+                 </form>
+        <div id="wrap">
+{% endblock %}

@@ -6,17 +6,23 @@
 {% block content %}
 <div id="wrap">
     <h1>Pet</h1>
-    <fieldset>
+    <h2>{{ petname }}</h2>
+    <span class="petbox">
+        <img src="/static/petimages/Sereno.png" alt="Sereno Pet" width="256px" height="328px">
+    </span>
+    <fieldset class="fieldset-inline">
         <legend>Your pet needs food</legend>
-        <meter form="Feed" min="0" max="100" value= '{{ satiety }}' ></meter>
-        <form action="/petfeed" value="Feed" method="post">
+        <meter form="Feed" min="0" max="100" value='{{ satiety }}' ></meter>
+        <form action="/petfeed" value="Feed" method="get">
             <button type="submit" value="Feed">Feed</button>
         </form>
     </fieldset>
-    <fieldset>
+    <fieldset class="fieldset-inline">
         <legend>Habit XP</legend>
         <meter form="XP" min="0" max="100" value= '{{ XP }}' ></meter>
     </fieldset>
+    <li><a href="firstpetcreate">First pet page --only for dev purposes--</a></li>
+    <li><a href="generalpetcreate">General get pet page --only for dev purposes--</a></li>
 
 </div>
 {% endblock %}

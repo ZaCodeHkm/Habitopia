@@ -5,8 +5,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from pet import hungerFunc, feedFunc, getHunger
-import sqlite3
+from datetime import datetime
 from flask_bcrypt import Bcrypt
+import sqlite3
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -31,16 +32,45 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
-   
+
 #Table for Habits
 class Habit(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100))
     
 
+#--Table for Pets
+class Pets(db.Model):
+    def mydefault(context):
+        return context.get_current_parameters()['currentTime']
 
+    with app.app_context():
+        petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+        petID = db.Column(db.Integer, primary_key=True)
+        petName = db.Column(db.String(30), nullable=False, default='Sereno')
+        lastfedTime = db.Column(db.DateTime, default=mydefault)
+        currentTime = db.Column(db.DateTime, default=datetime.now)
+        hunger = db.Column(db.Integer)
+        petType = db.Column(db.Integer, nullable=False, default=1)
+        petXP = db.Column(db.Integer)
+        petLevel = db.Column(db.Integer, nullable=False)
 
+        def __repr__(self):
+            return f"{self.petName}"
 
+class PetsOwned(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
+    petsOwned = db.Column(db.Integer, nullable=False, default=0)
+    pet1 = db.Column(db.Integer, nullable=False, default=0)
+    pet2 = db.Column(db.Integer, nullable=False, default=0)
+    pet3 = db.Column(db.Integer, nullable=False, default=0)
+    pet4 = db.Column(db.Integer, nullable=False, default=0)
+    pet5 = db.Column(db.Integer, nullable=False, default=0)
+
+class UserItems(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
+    coins = db.Column(db.Integer, nullable=False, default=0)
+    petFood = db.Column(db.Integer, nullable=False, default=0)
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
@@ -135,34 +165,88 @@ def delete(habit_id):
     db.session.commit()
     return redirect(url_for("habit"))
 
-#-----PET-----#
+#-----Pets-----#
 @app.route("/pet", methods=["GET","POST"])
 @login_required
 def pet():
-    print("hungerFunc is working")
-    hungerFunc()
-    return render_template("pet.html", satiety=getHunger())
+    # usercheck = db.session.query(PetsOwned).with_entities(PetsOwned.user_id).filter(PetsOwned.user_id==current_user.id).first()
+    usercheck = PetsOwned.query.filter_by(user_id = current_user.id).first()
+    print(usercheck)
+    # print(current_user.id)
+    if (usercheck == None):#if user is new and has no pets, this value will be None.
+        #here is that gives the user their pet and sends the pets name to DB       
+        return render_template("firstpetcreate.html")
+    if (usercheck.petsOwned >= 1):
+        petname = Pets.query.filter_by(petOwner = current_user.id).first()
+        return render_template("pet.html", petname=petname)
 
-# def usercheck(): #code to check if user is logged in
-#     something something authentication verification
-# def petsOwned(): #code to check number of pets owned per user
-#     conn_obj = sqlite3.connect('database.db', check_same_thread=False)
-#     curs_obj = conn_obj.cursor()
+@app.route("/firstpetcreate", methods=["GET","POST"])
+@login_required
+def firstpetCreate():
+    if request.method == "POST":
+        firstPet()
+    return render_template("firstpetcreate.html")
 
-@app.route("/petfeed", methods=['POST'])
-def pet_feed():
-    petHunger = str(getHunger())
-    print("Hunger was: "+petHunger)
-    feedFunc()
-    petHunger = str(getHunger())
-    print("Hunger now: "+petHunger)
-    return render_template("pet.html", satiety=petHunger)
+def firstPet():
+    petname = request.form['petname']
+    newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100, petXP=0, petLevel=1)
+    countPet = PetsOwned(user_id=current_user.id, petsOwned = 1, pet1 = 1)
+    db.session.add(newPet)
+    db.session.add(countPet)
+    db.session.commit()
+    # print(petname)
+    # new_pet = Pets(petName=f'{petname}', petType=1, petLevel=1, petOwner=current_user)
+    # current_user.petsOwned = 1
+    # db.session.add(new_pet)
+    # db.session.commit()
+    return render_template("firstpetcreate.html")
+    
+# @app.route("/generalpetcreate", methods=["GET","POST"])
+# def generalPet():
+#     petname = request.form['petname']
+#     if petBuyType = 2: #subject to change depending on shop
+#         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=2, petXP=0, petLevel=1)
+#     if petBuyType = 3: #subject to change depending on shop
+#         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=3, petXP=0, petLevel=1)
+#     if petBuyType = 4: #subject to change depending on shop
+#         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=4, petXP=0, petLevel=1)
+#     if petBuyType = 5: #subject to change depending on shop
+#         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=5, petXP=0, petLevel=1)
+
+@app.route("/returnpet", methods=["GET", "`POST"])
+def returnpet():
+    return render_template("pet.html")
+
+# @app.route("/namepet", methods=["POST"])
+# def returnpet():
+#     #add function to name pets
+#     return render_template("pet.html")
+
+# def firstPet():
+#     # usercheck = User.query.get(1)
+#     print('free pet given')
+#     current_user.petsOwned = 1
+#     db.session.commit()
+#     print(current_user.petsOwned) #testline
+# # def petsOwned(): #code to check number of pets owned per user
+# #     conn_obj = sqlite3.connect('database.db', check_same_thread=False)
+# #     curs_obj = conn_obj.cursor()
+
+# @app.route("/petfeed", methods=['POST'])
+# def pet_feed():
+#     petHunger = str(getHunger())
+#     print("Hunger was: "+petHunger)
+#     feedFunc()
+#     petHunger = str(getHunger())
+#     print("Hunger now: "+petHunger)
+#     return render_template("pet.html", satiety=petHunger)
 
 @app.route("/shop")
 @login_required
 def shop():
     return render_template("shop.html")
 
+#-----Account-----#
 @app.route("/account")
 @login_required
 def account():
@@ -175,7 +259,7 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for('login'))
 
-
+#-----Runs the app-----#
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
