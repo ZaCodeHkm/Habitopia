@@ -2,67 +2,120 @@
 {% block css %} <link rel="stylesheet" href="/static/styles/HabitStyles.css" > {% endblock %}
 {% block title %}Habit Tracker!{% endblock %}
 {% block Pagename %}Habit Tracker{% endblock %}
-{% block heading %}htps://habitopia/habit{% endblock %}
+{% block heading %}https://habitopia/habit{% endblock %}
 {% block content %}
 <div id="wrap">
-    <h1>Habit Tracker</h1>
-    <form action="/add" method="post">
-        <div>
-            <label for="title">Habit:</label>
-            <input type="text" name="title" placeholder="Enter New Habit...">
-            <button type="submit"> ADD </button>
+
+    <button id="openModalBtn" onclick="openModal()">Add Habit</button>
+
+    <!-- Add Habit Modal -->
+        <div id="addHabitModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Add a New Habit</h2>
+                <form action="/add_habit" method="POST">
+                    <input type="text" name="name" placeholder="Habit Name" required>
+                    <input type="color" name="color" value="#0000FF">
+                    <input type="text" name="tag" placeholder="Tag (e.g., health)">
+                    <input type="number" name="frequency" placeholder="Frequency (times per month)" required>
+                    <button type="submit">Add Habit</button>
+                </form>
+            </div>
         </div>
-    </form>
-    
-    <table>
-        <tr>
-           <th colspan="2">Habit</th>
 
+    {% if habits %}
+        <!-- Month Navigation -->
+        <div class="month-navigation">
+            <a href="{{ url_for('habit', month=(month_start - relativedelta(months=1)).strftime('%Y-%m')) }}">Previous Month</a>
+            <span>{{ selected_month }}</span>
+            <a href="{{ url_for('habit', month=(month_start + relativedelta(months=1)).strftime('%Y-%m')) }}">Next Month</a>
+        </div>
+        
+
+        
+        <div class="habit-calendar">
+                
+            </div>
+                <table>
+                    <tr>
+                        <th>Habit</th>
+                        <th>Tag</th>
+                        <th>Goal</th>
+                            {% for day in range(1, (month_start + relativedelta(months=1) - timedelta(days=1)).day + 1) %}
+                                <th>{{ day }}</th>
+                            {% endfor %}
+                        <th>Actions</th>
+                    </tr>
             
-        </tr>
-        <br>
-        {% for habit in habit_list %}
-        <tr>
-            <td colspan="2"> {{ habit.title }} </td>
-            <form>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
-                <td><input type="checkbox" name="complete"></td>
+                    {% for habit in habits %}
+                        <tr>
+                            <div class="checkbox-calendar">
+                                <td>{{ habit.name }}</td>
+                                <td>{{ habit.tag }}</td>
+                                <td>{{ habit.frequency }}</td>
+                                {% for day in range(1, (month_start + relativedelta(months=1) - timedelta(days=1)).day + 1) %}
+                                    {% set date = selected_month + '-%02d' % day %}
+                                    {% set checked = False %}
+                                    {% for log in logs %}
+                                        {% if log.habit_id == habit.id and log.date.strftime('%Y-%m-%d') == date %}
+                                            {% set checked = log.checked %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <td>
+                                        <div class="calendar-box{% if checked %} checked{% endif %}" 
+                                            id="box-{{ habit.id }}-{{ date }}"
+                                            data-habit-id="{{ habit.id }}"
+                                            data-date="{{ date }}"
+                                            data-color="{{ habit.color }}"
+                                            data-checked="{{ 'true' if checked else 'false' }}"
+                                            onclick="toggleBox(this)">
+                                        </div>
+                                    </td>
+                                {% endfor %}
+                                <td>
+                                    <form action="{{ url_for('delete', habit_id=habit.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="delete">Delete</button>
+                                    </form>
+                                </td>
+                            </div>
+                        </tr>
+                    {% endfor %} 
+                </table>
+        </div>
+        
+    
+    {% else %}
+        <p>No habits! Click [Add Habits] to add a habit!</p>
+    {% endif %}
+</div>
+<div id="wrap2">
+    <button id="openDiaryModalBtn" onclick="openDiaryModal()">Add Diary Entry</button>
+    <div id="diaryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDiaryModal()">&times;</span>
+            <h2>Add a Diary Entry</h2>
+            <form action="/add_diary" method="POST">
+                <input type="date" name="date" required>
+                <textarea name="text" placeholder="Write your diary entry here..." required></textarea>
+                <button type="submit">Add Entry</button>
             </form>
-            <td><a href="/delete/{{habit.id}}" class="delete">Delete</a></td>
-        </tr>
+        </div>
+    </div>
+
+    <div class="diary-entries">
+        {% for entry in diary_entries %}
+            <div class="diary-entry">
+                <p class="entry-date">{{ entry.date.strftime('%Y-%m-%d') }}</p>
+                <p class="entry-text">{{ entry.text }}</p>
+                <form action="{{ url_for('delete_diary', entry_id=entry.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete">Delete</button>
+                </form>
+            </div>
+        {% else %}
+            <p>No diary entries found. Click [Add Diary Entry] to add to your diary! </p>
         {% endfor %}
-    </table>
-</div>    
-
-
+    </div>
+</div>
+<script src="/static/styles/habit.js"></script>
 {% endblock %}
 

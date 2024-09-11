@@ -7,13 +7,25 @@
   font-style: normal;
 }
 #wrap {
+  width: 1400px;
+  height: 540px;
+  margin: 100px auto;
+  background: #e0e2e7;
+  overflow: scroll;
+  overflow-x: hidden;
+  padding: 15px;
+}
+
+#wrap2 {
   width: 900px;
   height: 540px;
   margin: 100px auto;
   background: #e0e2e7;
-  overflow: hidden;
+  overflow: scroll;
   padding: 15px;
+  overflow-x: hidden;
 }
+
   
 .body{
   background-image: url("/static/styles/animatedbackground.gif") ;
@@ -157,29 +169,213 @@ ul {
   float: right;
 }
 
-table, th, td {
-  border: 1px solid black;
-  border-collapse: collapse;
-}
+
 /* Content */
 
 .class{
   background-color: #e0e2e7; 
 }
 
-input[type=checkbox]{
-  margin: 1px;
-  width: 21px;
-  height: 21px;
 
-}
-
-.delete{
+.delete {
   font-family: "Pixelify Sans", sans-serif;
-  font-size: 17px;
-  padding: 5px;
+  font-size: 12px; /* Adjust size according to your design */
+  padding: 5px 10px;
+  background-color:#7f7f7f; /* Light red background */
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  vertical-align: baseline;
 }
-  
+
+.delete:hover {
+  background-color:#474747; /* Darker red on hover */
+}
+
+.delete:disabled {
+  background-color: #cccccc; /* Grey when disabled */
+  cursor: not-allowed;
+}
+
+/*Table*/
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 1px;
+  text-align: center;
+}
+
+th {
+  background-color: #e0e2e7;
+  color: #333;
+}
+/*Habit*/
+
+.habits-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.habit {
+  margin-bottom: 20px;
+}
+
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
 
 
-  
+.checkbox-calendar {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+
+.month-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px;
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 20px;
+  padding: 5px 10px;
+  background-color:#7f7f7f; 
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+.month-navigation a:visited {
+    text-decoration: none;
+    color:#FFFFFF;
+}
+
+
+.calendar-box {
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  margin: 1px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.calendar-box.unchecked {
+  background-color: white;
+}
+
+.calendar-box.checked {
+  border: 1px solid #000;
+}
+
+
+
+/* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/*Diary CSS*/
+.modal-content {
+  background-color: white; /* You can change this color for differentiation */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.diary-section {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+
+.diary-entry {
+  background: #ffffff;
+  border: 1px solid #ccc;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.entry-date {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.entry-text {
+  color: #333;
+}
