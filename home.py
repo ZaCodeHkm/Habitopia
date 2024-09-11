@@ -215,7 +215,7 @@ def firstPet():
 
 @app.route("/returnpet", methods=["GET", "`POST"])
 def returnpet():
-    return render_template("pet.html")
+    return redirect(url_for("pet"))
 
 # @app.route("/namepet", methods=["POST"])
 # def returnpet():
