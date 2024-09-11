@@ -10,21 +10,22 @@
 {% block content %}
 <div id="wrap">
     <h1>Login</h1>
-    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <ul>
+            <ul class=flashes>
                 {% for category, message in messages %}
                     <li class="{{ category }}">{{ message }}</li>
                 {% endfor %}
             </ul>
         {% endif %}
     {% endwith %}
+
     <form method="POST" action="">
             {{ form.hidden_tag() }}
             <div>{{ form.username.label }} {{ form.username() }}</div>
             <div>{{ form.password.label }} {{ form.password() }}</div>
             <div>{{ form.submit() }}</div>
-        </form>
+    </form>
 
         <a href="{{url_for('register')}}">What?? Don't have an account yet? Sign up then!</a>
 </div>

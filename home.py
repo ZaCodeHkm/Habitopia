@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError
+from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
 from pet import hungerFunc, feedFunc, getHunger
 from datetime import datetime
 from flask_bcrypt import Bcrypt
@@ -27,7 +27,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-#Table for database
+#Table for User
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
@@ -88,10 +88,25 @@ class LoginForm(FlaskForm):
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "Password"})
     submit = SubmitField("Login")
 
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField(validators=[InputRequired()], render_kw={"placeholder": "Current Password"})
+    new_password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "New Password"})
+    confirm_new_password = PasswordField(validators=[InputRequired(), EqualTo('new_password', message='Passwords must match')], render_kw={"placeholder": "Confirm New Password"})
+    submit = SubmitField("Change Password")
+
+
+
+
+
 @app.route("/")
 def home():
-    return render_template("home.html")
+    username = None
+    if current_user.is_authenticated:
+        username = current_user.username
+    return render_template("home.html", username=username)
 
+###############Account System Stuff #####################
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -133,6 +148,34 @@ def delete_account():
     logout_user()
     return redirect(url_for('register'))
 
+@app.route("/change_password", methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    
+    if form.validate_on_submit():
+        #check if current password matches the one in database
+        if bcrypt.check_password_hash(current_user.password, form.current_password.data):
+            # Check if the new password is the same as the old password
+            if bcrypt.check_password_hash(current_user.password, form.new_password.data):
+                flash("Your new password cannot be the same as the old password.", "danger")
+                # Return early, stopping the rest of the function from executing
+                return render_template("change_password.html", form=form)
+               
+            hashed_new_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+            current_user.password = hashed_new_password
+            
+            try:
+                db.session.commit()
+                flash("Your password has been changed successfully!", "success")
+                return redirect(url_for('account'))
+            except Exception as error:
+                db.session.rollback()
+                flash("An error occurred while updating your password. Please try again.", "danger")
+        else:
+            flash("Your current password is incorrect.", "danger")
+    
+    return render_template("change_password.html", form=form)
 
 #habit 
 @app.route("/habit")
@@ -250,7 +293,7 @@ def shop():
 @app.route("/account")
 @login_required
 def account():
-    return render_template("account.html")
+    return render_template("account.html", user=current_user)
 
 @app.route("/logout")
 @login_required
