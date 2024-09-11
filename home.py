@@ -54,6 +54,7 @@ class Pets(db.Model):
         petType = db.Column(db.Integer, nullable=False, default=1)
         petXP = db.Column(db.Integer)
         petLevel = db.Column(db.Integer, nullable=False)
+        activePet = db.Column(db.Integer, default=1, nullable=False)
 
         def __repr__(self):
             return f"{self.petName}"
@@ -94,8 +95,6 @@ class ChangePasswordForm(FlaskForm):
     new_password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "New Password"})
     confirm_new_password = PasswordField(validators=[InputRequired(), EqualTo('new_password', message='Passwords must match')], render_kw={"placeholder": "Confirm New Password"})
     submit = SubmitField("Change Password")
-
-
 
 
 
@@ -220,8 +219,13 @@ def pet():
         #here is that gives the user their pet and sends the pets name to DB       
         return render_template("firstpetcreate.html")
     if (usercheck.petsOwned >= 1):
-        petname = Pets.query.filter_by(petOwner = current_user.id).first()
-        return render_template("pet.html", petname=petname)
+        petname = Pets.query.filter_by(petOwner = current_user.id, activePet = 1).first()
+        XPcount = Pets.query.get(current_user.id).petXP
+        petlevel = Pets.query.get(current_user.id).petLevel
+        # pettype = Pets.query.get(current_user.id).petType
+        # if pettype == 1:
+
+        return render_template("pet.html", petname=petname, XPcount = XPcount, petlevel = petlevel)
 
 @app.route("/firstpetcreate", methods=["GET","POST"])
 @login_required
@@ -230,6 +234,12 @@ def firstpetCreate():
         firstPet()
     return render_template("firstpetcreate.html")
 
+
+@app.route("/returnpet", methods=["GET", "`POST"])
+def returnpet():
+    return redirect(url_for("pet"))
+
+#--Pet Functions--#
 def firstPet():
     petname = request.form['petname']
     newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100, petXP=0, petLevel=1)
@@ -237,13 +247,16 @@ def firstPet():
     db.session.add(newPet)
     db.session.add(countPet)
     db.session.commit()
-    # print(petname)
-    # new_pet = Pets(petName=f'{petname}', petType=1, petLevel=1, petOwner=current_user)
-    # current_user.petsOwned = 1
-    # db.session.add(new_pet)
-    # db.session.commit()
     return render_template("firstpetcreate.html")
-    
+
+# def activePet():
+#     active = Pets.query.get(current_user.id).activePet
+#     typecheck = Pets.query.get(current_user.id).petType
+#     if active == 1:
+#         if typecheck == 1:
+#         if typecheck == 2:
+#         if typecheck == 3:
+
 # @app.route("/generalpetcreate", methods=["GET","POST"])
 # def generalPet():
 #     petname = request.form['petname']
@@ -256,24 +269,19 @@ def firstPet():
 #     if petBuyType = 5: #subject to change depending on shop
 #         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=5, petXP=0, petLevel=1)
 
-@app.route("/returnpet", methods=["GET", "`POST"])
-def returnpet():
-    return redirect(url_for("pet"))
+
 
 # @app.route("/namepet", methods=["POST"])
 # def returnpet():
 #     #add function to name pets
 #     return render_template("pet.html")
 
-# def firstPet():
-#     # usercheck = User.query.get(1)
+# def hungerFunc():
+#     lastVisit = Pets.query.filter_by(user_id=current_user.id)
 #     print('free pet given')
 #     current_user.petsOwned = 1
 #     db.session.commit()
 #     print(current_user.petsOwned) #testline
-# # def petsOwned(): #code to check number of pets owned per user
-# #     conn_obj = sqlite3.connect('database.db', check_same_thread=False)
-# #     curs_obj = conn_obj.cursor()
 
 # @app.route("/petfeed", methods=['POST'])
 # def pet_feed():

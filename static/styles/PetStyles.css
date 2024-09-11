@@ -169,11 +169,23 @@ table, th, td {
 }
 
 .petbox{
-  margin: 30px;
-  border-radius: 3px;
+  margin: 0px;
+  border-style: solid;
+  border-width: 1px;
   border-color: #131313;
   width: 256px;
-  height: 328px;
+  height: 360px;
+  background-color: rgba(255, 255, 255, 0px);
+}
+
+.petbox-firstpet{
+  margin-left: auto;
+  margin-right: auto;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #131313;
+  width: 256px;
+  height: 360px;
   background-color: #00000000;
 }
 
@@ -181,6 +193,52 @@ table, th, td {
   display: inline;
 }
 
-.fieldset-inline{
+.fieldset-pet{
+  position: relative;
+  background-color: rgb(137, 186, 241);
+  width: 500px;
+  left: 275px;
+  bottom: 275px;
+}
+
+.fieldset-firstpet{
+  background-color: rgb(137, 186, 241);
+  margin-left: auto;
+  margin-right: auto;
+  width: 301px;
+}
+
+legend{
+  font-family: "Pixelify Sans", sans-serif;
+}
+
+meter{
+  width: 500px;
+  height: 30px;
+}
+
+.petsname{
+  font-family: "Pixelify Sans", sans-serif;
+  margin: 0px;
+  text-align: center;
+  border-bottom-style: solid;
+  border-width: 1px;
+  border-color: #131313;
+}
+
+.text-firstpet{
+  text-align: center;
+  font-family: "Pixelify Sans", sans-serif;
+}
+
+.levelXP{
+  font-family: "Pixelify Sans", sans-serif;
+  margin-top: 0px;
+  margin-bottom: 0px;
   display: inline;
+}
+
+.templink{
+  position: relative;
+  bottom: 150px;
 }
