@@ -212,28 +212,52 @@ def delete(habit_id):
 @login_required
 def pet():
     # usercheck = db.session.query(PetsOwned).with_entities(PetsOwned.user_id).filter(PetsOwned.user_id==current_user.id).first()
-    usercheck = PetsOwned.query.filter_by(user_id = current_user.id).first()
-    print(usercheck)
+    usercheck = PetsOwned.query.filter_by(user_id = current_user.id).first() #gets the current user based off their ID number
+    # print(usercheck)
     # print(current_user.id)
     if (usercheck == None):#if user is new and has no pets, this value will be None.
         #here is that gives the user their pet and sends the pets name to DB       
         return render_template("firstpetcreate.html")
     if (usercheck.petsOwned >= 1):
-        petname = Pets.query.filter_by(petOwner = current_user.id, activePet = 1).first()
+        petname = Pets.query.filter_by(petOwner = current_user.id, activePet = 0).first()
         XPcount = Pets.query.get(current_user.id).petXP
         petlevel = Pets.query.get(current_user.id).petLevel
-        # pettype = Pets.query.get(current_user.id).petType
-        # if pettype == 1:
+        typecheck = petname.petType
+        if typecheck == 1:
+            petimage = "/static/petimages/Sereno.png"
+        if typecheck == 2:
+            petimage = "/static/petimages/Mori.png"
+        if typecheck == 3:
+           petimage = "/static/petimages/pet3.png"
+        return render_template("pet.html", petname=petname, XPcount = XPcount, petlevel = petlevel, petimage=petimage)
 
-        return render_template("pet.html", petname=petname, XPcount = XPcount, petlevel = petlevel)
+@app.route("/petnest", methods=["GET","POST"])
+def petnest():
+    return render_template("petnest.html")
 
-@app.route("/firstpetcreate", methods=["GET","POST"])
+@app.route("/makeactive", methods=['POST'])
+def makeactive():
+    if request.form['makeactive'] == "Sereno":
+        return redirect(url_for("pet"))
+    if request.form['makeactive'] == "Mori":
+        return redirect(url_for("home"))
+    if request.form['makeactive'] == "pet3":
+        return redirect(url_for("habit"))
+    return render_template("petnest.html")
+
+@app.route("/firstpetcreate", methods=["GET","POST"]) #To remove once done.
 @login_required
 def firstpetCreate():
     if request.method == "POST":
         firstPet()
     return render_template("firstpetcreate.html")
-
+    
+@app.route("/testpet2", methods=["GET","POST"]) #To remove once done.
+@login_required
+def testpet2():
+    if request.method == "POST":
+        givepet2()
+    return redirect(url_for("pet"))
 
 @app.route("/returnpet", methods=["GET", "`POST"])
 def returnpet():
@@ -248,6 +272,17 @@ def firstPet():
     db.session.add(countPet)
     db.session.commit()
     return render_template("firstpetcreate.html")
+
+def givepet2():
+    givepet2 = Pets(petOwner=current_user.id, hunger=100, petType=2, petXP=0, petLevel=1)
+    morePet = PetsOwned.query.get(current_user.id)
+    morePet.petsOwned += 1
+    morePet2 = PetsOwned.query.get(current_user.id)
+    morePet2.pet2 = 1
+    db.session.add(givepet2)
+    db.session.add(morePet2)
+    db.session.commit()
+    return redirect(url_for("pet"))
 
 # def activePet():
 #     active = Pets.query.get(current_user.id).activePet

@@ -8,7 +8,7 @@
     <h1>Pet</h1>
     <div class="petbox">
     <h2 class="petsname">{{ petname }}</h2>
-        <img src="/static/petimages/Sereno.png" alt="Pet image" width="256px" height="328px">
+        <img src="{{ petimage }}" alt="Pet image" width="256px" height="328px">
     </div>
     <fieldset class="fieldset-pet">
         <legend>Hunger</legend>
@@ -27,6 +27,10 @@
     <li class="templink"><a href="firstpetcreate">First pet page --only for dev purposes--</a></li>
     <li class="templink"><a href="generalpetcreate">General get pet page --only for dev purposes--</a></li>
     <li class="templink"><a href="setXPmax">Sets XP to max --only for dev purposes--</a></li>
+    <form action="/testpet2" value="testpet2" method="post">
+        <li class="templink"><button type="submit" value="testpet2">Gives the user pet #2 --only for dev purposes--.</button></li>
+        
+    </form>
 
 </div>
 {% endblock %}

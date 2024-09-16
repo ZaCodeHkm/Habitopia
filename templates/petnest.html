@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block css %} <link rel="stylesheet" href="/static/styles/PetStyles.css" > {% endblock %}
+{% block title %}Pets!{% endblock %}
+{% block Pagename %}Pets{% endblock %}
+{% block heading %}htps://habitopia/pet{% endblock %}
+{% block content %}
+<div id="wrap">
+    <h1>Nest</h1>
+    <h2>Your Pets</h2>
+    <div class="petbox-nest" style="position: relative; left: 50px;">
+    <h2 class="petsname">{{ petname }}</h2>
+        <img src="/static/petimages/Sereno.png" alt="Pet image" width="175px" height="224px">
+        <form action="makeactive" method="post"><button type="submit" name="makeactive" value="Sereno">Make Active</button></form>
+    </div>
+
+    <div class="petbox-nest" style="position: relative; left: 350px; bottom: 226px">
+        <h2 class="petsname">{{ petname }}</h2>
+            <img src="/static/petimages/Mori.png" alt="Pet image" width="175px" height="224px">
+            <form action="makeactive" method="post"><button type="submit" name="makeactive" value="Mori">Make Active</button></form>
+    </div>
+
+    <div class="petbox-nest" style="position: relative; left: 650px; bottom: 451.5px">
+        <h2 class="petsname">{{ petname }}</h2>
+            <img src="/static/petimages/Sereno.png" alt="Pet image" width="175px" height="224px">
+            <form action="makeactive" method="post"><button type="submit" name="makeactive" value="pet3">Make Active</button></form>
+    </div>
+</div>
+{% endblock %}
+ 
