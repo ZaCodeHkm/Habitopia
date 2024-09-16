@@ -54,7 +54,7 @@ class Pets(db.Model):
         petType = db.Column(db.Integer, nullable=False, default=1)
         petXP = db.Column(db.Integer)
         petLevel = db.Column(db.Integer, nullable=False)
-        activePet = db.Column(db.Integer, default=1, nullable=False)
+        activePet = db.Column(db.Integer, default=0, nullable=False)
 
         def __repr__(self):
             return f"{self.petName}"
@@ -219,7 +219,7 @@ def pet():
         #here is that gives the user their pet and sends the pets name to DB       
         return render_template("firstpetcreate.html")
     if (usercheck.petsOwned >= 1):
-        petname = Pets.query.filter_by(petOwner = current_user.id, activePet = 0).first()
+        petname = Pets.query.filter_by(petOwner = current_user.id, activePet = 1).first()
         XPcount = Pets.query.get(current_user.id).petXP
         petlevel = Pets.query.get(current_user.id).petLevel
         typecheck = petname.petType
@@ -228,22 +228,66 @@ def pet():
         if typecheck == 2:
             petimage = "/static/petimages/Mori.png"
         if typecheck == 3:
-           petimage = "/static/petimages/pet3.png"
+           petimage = "/static/petimages/Pet3.png"
         return render_template("pet.html", petname=petname, XPcount = XPcount, petlevel = petlevel, petimage=petimage)
 
 @app.route("/petnest", methods=["GET","POST"])
 def petnest():
     return render_template("petnest.html")
 
-@app.route("/makeactive", methods=['POST'])
+@app.route("/makeactive", methods=['POST']) 
 def makeactive():
-    if request.form['makeactive'] == "Sereno":
-        return redirect(url_for("pet"))
+    if request.form['makeactive'] == "Sereno": # How to get multiple buttons without filtering by method? Answer by Barmar on https://stackoverflow.com/questions/43811779/use-many-submit-buttons-in-the-same-form
+        # activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
+        activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
+        activeUpdate.activePet = 1
+        activeClear2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
+        if activeClear2 == None:
+            pass
+        else:
+            activeClear2.activePet = 0
+        activeClear3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
+        if activeClear3 == None:
+            pass
+        else:
+            activeClear3.activePet = 0
+        db.session.add(activeUpdate)
+        db.session.commit()
+        return redirect(url_for("petnest")) #to do next: updating activePet on Pets table based on current_user (logged in user)
+    
     if request.form['makeactive'] == "Mori":
-        return redirect(url_for("home"))
+        activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
+        activeUpdate.activePet = 1
+        activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
+        if activeClear1 == None:
+            pass
+        else:
+            activeClear1.activePet = 0
+        activeClear3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
+        if activeClear3 == None:
+            pass
+        else:
+            activeClear3.activePet = 0
+        db.session.add(activeUpdate)
+        db.session.commit()
+        return redirect(url_for("petnest"))
+    
     if request.form['makeactive'] == "pet3":
-        return redirect(url_for("habit"))
-    return render_template("petnest.html")
+        activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
+        activeUpdate.activePet = 1
+        activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
+        if activeClear1 == None:
+            pass
+        else:
+            activeClear1.activePet = 0
+        activeClear2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
+        if activeClear2 == None:
+            pass
+        else:
+            activeClear2.activePet = 0
+        db.session.add(activeUpdate)
+        db.session.commit()
+        return redirect(url_for("petnest"))
 
 @app.route("/firstpetcreate", methods=["GET","POST"]) #To remove once done.
 @login_required
@@ -259,6 +303,13 @@ def testpet2():
         givepet2()
     return redirect(url_for("pet"))
 
+@app.route("/testpet3", methods=["GET","POST"]) #To remove once done.
+@login_required
+def testpet3():
+    if request.method == "POST":
+        givepet3()
+    return redirect(url_for("pet"))
+
 @app.route("/returnpet", methods=["GET", "`POST"])
 def returnpet():
     return redirect(url_for("pet"))
@@ -266,21 +317,32 @@ def returnpet():
 #--Pet Functions--#
 def firstPet():
     petname = request.form['petname']
-    newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100, petXP=0, petLevel=1)
+    newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100, petXP=0, petLevel=1, activePet=1)
     countPet = PetsOwned(user_id=current_user.id, petsOwned = 1, pet1 = 1)
     db.session.add(newPet)
     db.session.add(countPet)
     db.session.commit()
     return render_template("firstpetcreate.html")
 
-def givepet2():
-    givepet2 = Pets(petOwner=current_user.id, hunger=100, petType=2, petXP=0, petLevel=1)
+def givepet2(): #to remove once done
+    givepet2 = Pets(petOwner=current_user.id,petName="testingpet2", hunger=100, petType=2, petXP=0, petLevel=1)
     morePet = PetsOwned.query.get(current_user.id)
     morePet.petsOwned += 1
     morePet2 = PetsOwned.query.get(current_user.id)
     morePet2.pet2 = 1
     db.session.add(givepet2)
     db.session.add(morePet2)
+    db.session.commit()
+    return redirect(url_for("pet"))
+
+def givepet3(): #to remove once done
+    givepet3 = Pets(petOwner=current_user.id,petName="testingpet3", hunger=100, petType=3, petXP=0, petLevel=1)
+    morePet = PetsOwned.query.get(current_user.id)
+    morePet.petsOwned += 1
+    morePet3 = PetsOwned.query.get(current_user.id)
+    morePet3.pet3 = 1
+    db.session.add(givepet3)
+    db.session.add(morePet3)
     db.session.commit()
     return redirect(url_for("pet"))
 
@@ -344,6 +406,7 @@ def logout():
     logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for('login'))
+
 
 #-----Runs the app-----#
 if __name__ == "__main__":
