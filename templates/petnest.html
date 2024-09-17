@@ -4,26 +4,40 @@
 {% block Pagename %}Pets{% endblock %}
 {% block heading %}htps://habitopia/pet{% endblock %}
 {% block content %}
-<div id="wrap">
-    <h1>Nest</h1>
-    <h2>Your Pets</h2>
-    <div class="petbox-nest" style="position: relative; left: 50px;">
-    <h2 class="petsname">{{ petname }}</h2>
-        <img src="/static/petimages/Sereno.png" alt="Pet image" width="175px" height="224px">
-        <form action="makeactive" method="post"><button type="submit" name="makeactive" value="Sereno">Make Active</button></form>
+
+    <div id="wrap">
+        <h1>The Nest</h1>
+        <h2>Pets</h2>
+        <div class="petbox-nest" style="position: absolute; left: 395px; bottom: 250px">
+        <h3 class="petsname">{{ pet1name }}</h3>
+            <img src="{{ pet1image }}" alt="Pet image" width="200px" height="256.25px">
+            <form action="makeactive" method="post"><button type="submit" name="makeactive" value="Sereno">Make Active</button></form>
+        </div>
+
+        <div class="petbox-nest" style="position: absolute; left: 695px; bottom: 250px">
+            <h3 class="petsname">{{ pet2name }}</h3>
+                <img src="{{ pet2image }}" alt="Pet image" width="200px" height="256.25px">
+                <form action="makeactive" method="post"><button type="submit" name="makeactive" value="Mori">Make Active</button></form>
+        </div>
+
+        <div class="petbox-nest" style="position: absolute; left: 995px; bottom: 250px">
+            <h3 class="petsname">{{ pet3name }}</h3>
+                <img src="{{ pet3image }}" alt="Pet image" width="200px" height="256.25px">
+                <form action="makeactive" method="post"><button type="submit" name="makeactive" value="pet3">Make Active</button></form>
+        </div>
+        <div class="flash">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}
+                <ul>
+                    <p>{{ msg }}</p>
+                </ul>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        </div>
     </div>
 
-    <div class="petbox-nest" style="position: relative; left: 350px; bottom: 226px">
-        <h2 class="petsname">{{ petname }}</h2>
-            <img src="/static/petimages/Mori.png" alt="Pet image" width="175px" height="224px">
-            <form action="makeactive" method="post"><button type="submit" name="makeactive" value="Mori">Make Active</button></form>
-    </div>
 
-    <div class="petbox-nest" style="position: relative; left: 650px; bottom: 451.5px">
-        <h2 class="petsname">{{ petname }}</h2>
-            <img src="/static/petimages/Pet3.png" alt="Pet image" width="175px" height="224px">
-            <form action="makeactive" method="post"><button type="submit" name="makeactive" value="pet3">Make Active</button></form>
-    </div>
-</div>
 {% endblock %}
  

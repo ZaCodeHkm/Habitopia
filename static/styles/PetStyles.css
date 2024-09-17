@@ -8,6 +8,7 @@
   font-style: normal;
 }
 #wrap {
+  border: 5px ridge #e0e2e7;
   width: 900px;
   height: 580px;
   margin: 100px auto;
@@ -168,6 +169,12 @@ table, th, td {
   background-color: #e0e2e7; 
 }
 
+.flash{
+  font-family: "Pixelify Sans", sans-serif;
+  position: absolute;
+  bottom: 100px;
+}
+
 .petbox{
   margin: 0px;
   border-style: solid;
@@ -193,9 +200,9 @@ table, th, td {
   margin: 0px;
   border-style: solid;
   border-width: 1px;
-  border-color: #131313;
-  width: 175px;
-  height: 224px;
+  border-color: #000000;
+  width: 200px;
+  height: 279.25px;
   background-color: rgba(255, 255, 255, 0px);
 }
 
@@ -228,6 +235,7 @@ meter{
 }
 
 .petsname{
+  font-family: "Pixelify Sans", sans-serif;
   margin: 0px;
   text-align: center;
   border-bottom-style: solid;

@@ -4,7 +4,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, log
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
-from pet import hungerFunc, feedFunc, getHunger
+# from pet import hungerFunc, feedFunc, getHunger
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -40,32 +40,6 @@ class User(db.Model, UserMixin):
 
 #Table for Habits
 class Habit(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(100))
-    
-    habits = db.relationship('Habit', backref='user', lazy=True)
-
-#--Table for Pets
-class Pets(db.Model):
-    def mydefault(context):
-        return context.get_current_parameters()['currentTime']
-    
-    with app.app_context():
-        petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-        petID = db.Column(db.Integer, primary_key=True)
-        petName = db.Column(db.String(30), nullable=False, default='Sereno')
-        lastfedTime = db.Column(db.DateTime, default=mydefault)
-        currentTime = db.Column(db.DateTime, default=datetime.now)
-        hunger = db.Column(db.Integer)
-        petType = db.Column(db.Integer, nullable=False, default=1)
-        petXP = db.Column(db.Integer)
-        petLevel = db.Column(db.Integer, nullable=False)
-        activePet = db.Column(db.Integer, default=0, nullable=False)
-
-        def __repr__(self):
-            return f"{self.petName}"
-
-class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     color = db.Column(db.String(20), default="blue")
@@ -75,7 +49,6 @@ class Habit(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     logs = db.relationship('HabitLog', backref='habit_logs', cascade="all, delete-orphan") 
-    
     
 
 class HabitLog(db.Model):
@@ -87,7 +60,6 @@ class HabitLog(db.Model):
     # Explicit relationship only if needed
     habit = db.relationship('Habit', backref='habit_log', lazy=True)  # Remove conflict here
 
-
 #Diary Feature
 class DiaryEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -96,6 +68,28 @@ class DiaryEntry(db.Model):
     text = db.Column(db.Text, nullable=False)
 
     user = db.relationship('User', backref='diary_entries', lazy=True)
+
+
+#--Table for Pets
+class Pets(db.Model):
+    def mydefault(context):
+        return context.get_current_parameters()['currentTime']
+    
+    with app.app_context():
+        petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+        petID = db.Column(db.Integer, primary_key=True)
+        petName = db.Column(db.String(30), nullable=False, default='Sereno')
+        lastfedTime = db.Column(db.Integer, default=mydefault)
+        currentTime = db.Column(db.Integer, default=datetime.now().timestamp())
+        hunger = db.Column(db.Integer, default=100)
+        petType = db.Column(db.Integer, nullable=False, default=1)
+        petXP = db.Column(db.Integer, default=0)
+        petLevel = db.Column(db.Integer, nullable=False, default=1)
+        activePet = db.Column(db.Integer, default=0, nullable=False)
+
+        def __repr__(self):
+            return f"{self.petName}"
+
 class PetsOwned(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
     petsOwned = db.Column(db.Integer, nullable=False, default=0)
@@ -110,6 +104,7 @@ class UserItems(db.Model):
     coins = db.Column(db.Integer, nullable=False, default=0)
     petFood = db.Column(db.Integer, nullable=False, default=0)
 
+#Login and Registration
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "Password"})
@@ -134,7 +129,7 @@ class ChangePasswordForm(FlaskForm):
     submit = SubmitField("Change Password")
 
 
-
+###===FLASK ROUTING===###
 @app.route("/")
 def home():
     username = None
@@ -304,35 +299,78 @@ def delete_diary(entry_id):
 #-----Pets-----#
 @app.route("/pet", methods=["GET","POST"])
 @login_required
-def pet():
+def pet():  
     # usercheck = db.session.query(PetsOwned).with_entities(PetsOwned.user_id).filter(PetsOwned.user_id==current_user.id).first()
     usercheck = PetsOwned.query.filter_by(user_id = current_user.id).first() #gets the current user based off their ID number
     # print(usercheck)
     # print(current_user.id)
-    if (usercheck == None):#if user is new and has no pets, this value will be None.
-        #here is that gives the user their pet and sends the pets name to DB       
-        return render_template("firstpetcreate.html")
+    if (usercheck == None): # if user is new and has no pets, this object will be a NoneType
+        return render_template("firstpetcreate.html") # here is where the user gets their first pet
     if (usercheck.petsOwned >= 1):
-        petname = Pets.query.filter_by(petOwner = current_user.id, activePet = 1).first()
-        XPcount = Pets.query.get(current_user.id).petXP
-        petlevel = Pets.query.get(current_user.id).petLevel
-        typecheck = petname.petType
-        if typecheck == 1:
-            petimage = "/static/petimages/Sereno.png"
-        if typecheck == 2:
-            petimage = "/static/petimages/Mori.png"
-        if typecheck == 3:
-           petimage = "/static/petimages/Pet3.png"
-        return render_template("pet.html", petname=petname, XPcount = XPcount, petlevel = petlevel, petimage=petimage)
+        selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+        if selectPet == None:
+            noPet = "No pet selected..."
+            petimage = "/static/petimages/Empty.png"
+            return render_template("pet.html", petname=noPet, XPcount = 0, petlevel = 0, petimage=petimage)
+        else:
+            typecheck = selectPet.petType
+            if typecheck == 1:
+                petimage = "/static/petimages/Sereno.png"
+            if typecheck == 2:
+                petimage = "/static/petimages/Mori.png"
+            if typecheck == 3:
+                petimage = "/static/petimages/Pet3.png"
+            hungerFunc()
+            return render_template("pet.html", petname=selectPet.petName, XPcount = selectPet.petXP, petlevel = selectPet.petLevel,
+                                   petimage=petimage, satiety=selectPet.hunger)
+
+@app.route("/petfeed", methods=['GET','POST'])
+def pet_feed():
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    selectPet.hunger = 100
+    db.session.commit()
+    return redirect(url_for("pet"))
 
 @app.route("/petnest", methods=["GET","POST"])
-def petnest():
-    return render_template("petnest.html")
+def petnest():     # Pet nest images and names
+    petCheck = PetsOwned.query.filter_by(user_id = current_user.id).first()
+    nameGet1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
+    nameGet2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
+    nameGet3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
+
+    pet1name = nameGet1.petName                     # PET 1
+    pet1 = petCheck.pet1 
+    if pet1 == 1:
+        pet1image = "/static/petimages/Sereno.png"
+    else:
+        pet1image = "/static/petimages/Empty.png"
+
+    if nameGet2 == None:                            # PET 2
+        pet2name = "No pet here..."
+    else:
+        pet2name = nameGet2.petName
+    pet2 = petCheck.pet2
+    if pet2 == 1:
+        pet2image = "/static/petimages/Mori.png"
+    else:
+        pet2image = "/static/petimages/Empty.png"
+
+    if nameGet3 == None:                            # PET 3
+        pet3name = "No pet here..."
+    else:
+        pet3name = nameGet3.petName
+    pet3 = petCheck.pet3
+    if pet3 == 1:
+        pet3image = "/static/petimages/Pet3.png"
+    else:
+        pet3image = "/static/petimages/Empty.png"
+
+    return render_template("petnest.html", pet1image=pet1image, pet2image=pet2image, pet3image=pet3image,
+                           pet1name=pet1name, pet2name=pet2name, pet3name=pet3name)
 
 @app.route("/makeactive", methods=['POST']) 
 def makeactive():
     if request.form['makeactive'] == "Sereno": # How to get multiple buttons without filtering by method? Answer by Barmar on https://stackoverflow.com/questions/43811779/use-many-submit-buttons-in-the-same-form
-        # activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         activeUpdate.activePet = 1
         activeClear2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
@@ -351,7 +389,12 @@ def makeactive():
     
     if request.form['makeactive'] == "Mori":
         activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
-        activeUpdate.activePet = 1
+        if activeUpdate == None:
+           flash("You don't have this pet...", "info")
+           pass
+        else:       
+            activeUpdate.activePet = 1
+            db.session.add(activeUpdate)
         activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         if activeClear1 == None:
             pass
@@ -361,14 +404,18 @@ def makeactive():
         if activeClear3 == None:
             pass
         else:
-            activeClear3.activePet = 0
-        db.session.add(activeUpdate)
+            activeClear3.activePet = 0    
         db.session.commit()
         return redirect(url_for("petnest"))
     
     if request.form['makeactive'] == "pet3":
         activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
-        activeUpdate.activePet = 1
+        if activeUpdate == None:
+            flash("You don't have this pet...", "info")
+            pass
+        else:
+            activeUpdate.activePet = 1
+            db.session.add(activeUpdate)
         activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         if activeClear1 == None:
             pass
@@ -379,7 +426,6 @@ def makeactive():
             pass
         else:
             activeClear2.activePet = 0
-        db.session.add(activeUpdate)
         db.session.commit()
         return redirect(url_for("petnest"))
 
@@ -388,7 +434,7 @@ def makeactive():
 def firstpetCreate():
     if request.method == "POST":
         firstPet()
-    return render_template("firstpetcreate.html")
+    return redirect(url_for("pet"))
     
 @app.route("/testpet2", methods=["GET","POST"]) #To remove once done.
 @login_required
@@ -411,7 +457,7 @@ def returnpet():
 #--Pet Functions--#
 def firstPet():
     petname = request.form['petname']
-    newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100, petXP=0, petLevel=1, activePet=1)
+    newPet = Pets(petOwner=current_user.id, petName=petname, petXP=0, activePet=1)
     countPet = PetsOwned(user_id=current_user.id, petsOwned = 1, pet1 = 1)
     db.session.add(newPet)
     db.session.add(countPet)
@@ -440,13 +486,26 @@ def givepet3(): #to remove once done
     db.session.commit()
     return redirect(url_for("pet"))
 
-# def activePet():
-#     active = Pets.query.get(current_user.id).activePet
-#     typecheck = Pets.query.get(current_user.id).petType
-#     if active == 1:
-#         if typecheck == 1:
-#         if typecheck == 2:
-#         if typecheck == 3:
+def hungerFunc():
+    # getTime = Pets.query.filter_by(petOwner = current_user.id, activePet = 1).first()
+    # getTime.lastfedTime = getTime.currentTime
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    selectPet.lastfedTime = selectPet.currentTime
+    selectPet.currentTime = datetime.now().timestamp()
+    Diff = selectPet.currentTime - selectPet.lastfedTime
+    print(Diff)
+    # if Diff < 3600:
+    #     pass
+    # else:
+    if Diff >= 5 and Diff < 15:
+        selectPet.hunger = 67
+    if Diff >= 16 and Diff < 25:
+        selectPet.hunger = 34
+    if Diff >= 26 and Diff < 35:
+        selectPet.hunger = 1
+    if Diff > 36:
+        selectPet.hunger = 0
+    db.session.commit()
 
 # @app.route("/generalpetcreate", methods=["GET","POST"])
 # def generalPet():
@@ -455,10 +514,6 @@ def givepet3(): #to remove once done
 #         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=2, petXP=0, petLevel=1)
 #     if petBuyType = 3: #subject to change depending on shop
 #         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=3, petXP=0, petLevel=1)
-#     if petBuyType = 4: #subject to change depending on shop
-#         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=4, petXP=0, petLevel=1)
-#     if petBuyType = 5: #subject to change depending on shop
-#         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=5, petXP=0, petLevel=1)
 
 
 
@@ -467,22 +522,8 @@ def givepet3(): #to remove once done
 #     #add function to name pets
 #     return render_template("pet.html")
 
-# def hungerFunc():
-#     lastVisit = Pets.query.filter_by(user_id=current_user.id)
-#     print('free pet given')
-#     current_user.petsOwned = 1
-#     db.session.commit()
-#     print(current_user.petsOwned) #testline
 
-# @app.route("/petfeed", methods=['POST'])
-# def pet_feed():
-#     petHunger = str(getHunger())
-#     print("Hunger was: "+petHunger)
-#     feedFunc()
-#     petHunger = str(getHunger())
-#     print("Hunger now: "+petHunger)
-#     return render_template("pet.html", satiety=petHunger)
-
+#----Shop----#
 @app.route("/shop")
 @login_required
 def shop():
