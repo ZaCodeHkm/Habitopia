@@ -3,30 +3,54 @@
 {% extends "base.html" %}
 {% block title %}Login!{% endblock %}
     {% block css %} 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
                 <link rel="stylesheet" href="/static/styles/LoginStyles.css">
     {% endblock %}
+
 {% block Pagename %}Login{% endblock %}
 {% block heading %}htps://habitopia/login{% endblock %}
+
 {% block content %}
-<div id="wrap">
-    <h1>Login</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul class=flashes>
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+<div class="container" id="container">
+    
+    <div class="form-container Login">
+            <h1> Login</h1>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
 
-    <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <div>{{ form.username.label }} {{ form.username() }}</div>
-            <div>{{ form.password.label }} {{ form.password() }}</div>
-            <div>{{ form.submit() }}</div>
-    </form>
+                <div>{{ form.username.label }} {{ form.username() }}</div>
+                <div>{{ form.password.label }} {{ form.password() }}</div>
 
-        <a href="{{url_for('register')}}">What?? Don't have an account yet? Sign up then!</a>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <ul class="flashes">
+                            {% for category, message in messages %}
+                                <li class="{{ category }}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+
+                <div>{{ form.submit() }}</div>
+            </form>
+    </div>
+        
+    <div class="toggle-container">
+        <div class="toggle">
+            <div class="toggle-panel toggle-left">
+                <h1>Welcome Back!</h1>
+                <p>Enter your personal details to use all of site features</p>
+                <button class="hidden" id="login"><a href="{{ url_for('login') }}">Login</a></button>
+            </div>
+
+            <div class="toggle-panel toggle-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Don't have an account yet? Register now!</p>
+                    <button class="hidden" id="register"><a href="{{url_for('register')}}">Register</a></button>
+                </div>
+            </div>
+        </div>
 </div>
+
+<script src="Login_Register.js"></script>
 {% endblock %}
