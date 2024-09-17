@@ -5,6 +5,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
 from pet import hungerFunc, feedFunc, getHunger
+from flask_bcrypt import Bcrypt
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+from flask import jsonify
+
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 import sqlite3
@@ -38,12 +43,13 @@ class Habit(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100))
     
+    habits = db.relationship('Habit', backref='user', lazy=True)
 
 #--Table for Pets
 class Pets(db.Model):
     def mydefault(context):
         return context.get_current_parameters()['currentTime']
-
+    
     with app.app_context():
         petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
         petID = db.Column(db.Integer, primary_key=True)
@@ -59,6 +65,37 @@ class Pets(db.Model):
         def __repr__(self):
             return f"{self.petName}"
 
+class Habit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    color = db.Column(db.String(20), default="blue")
+    tag = db.Column(db.String(50), default="")
+    frequency = db.Column(db.Integer, default=30)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    logs = db.relationship('HabitLog', backref='habit_logs', cascade="all, delete-orphan") 
+    
+    
+
+class HabitLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    habit_id = db.Column(db.Integer, db.ForeignKey('habit.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    checked = db.Column(db.Boolean, default=False)
+
+    # Explicit relationship only if needed
+    habit = db.relationship('Habit', backref='habit_log', lazy=True)  # Remove conflict here
+
+
+#Diary Feature
+class DiaryEntry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    text = db.Column(db.Text, nullable=False)
+
+    user = db.relationship('User', backref='diary_entries', lazy=True)
 class PetsOwned(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
     petsOwned = db.Column(db.Integer, nullable=False, default=0)
@@ -180,32 +217,89 @@ def change_password():
 @app.route("/habit")
 @login_required
 def habit():
-    habit_list = Habit.query.all()
-    return render_template("habit.html", habit_list=habit_list)
+    habits = Habit.query.filter_by(user_id=current_user.id).all()
+    selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
+    month_start = datetime.strptime(selected_month, '%Y-%m').date()
+    month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
+    
+    logs = HabitLog.query.filter(
+        HabitLog.date.between(month_start, month_end),
+        HabitLog.habit_id.in_([habit.id for habit in habits])
+    ).all()
+    diary_entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
 
-@app.route("/add", methods=["POST"])
-def add():
-    title = request.form.get("title")
-    new_habit = Habit(title=title, complete=False)
+    return render_template('habit.html', habits=habits, logs=logs, selected_month=selected_month, month_start=month_start, datetime=datetime, timedelta=timedelta, relativedelta=relativedelta, diary_entries=diary_entries)
+
+
+@app.route('/add_habit', methods=['POST'])
+def add_habit():
+    name = request.form['name']
+    color = request.form['color']
+    tag = request.form['tag']
+    frequency = int(request.form['frequency'])
+    new_habit = Habit(name=name, color=color, tag=tag, frequency=frequency, user_id=current_user.id)
     db.session.add(new_habit)
     db.session.commit()
-    return redirect(url_for("habit"))
+    return redirect(url_for('habit'))
+
+@app.route('/toggle_check/<int:habit_id>/<string:date>', methods=['POST'])
+def toggle_check(habit_id, date):
+    try:
+        data = request.get_json()
+        checked = data.get('checked')
+        
+        print(f"Received request: habit_id={habit_id}, date={date}, checked={checked}")  # Debug print
+        
+        date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+        log = HabitLog.query.filter_by(habit_id=habit_id, date=date_obj).first()
+        
+        if log:
+            log.checked = checked
+        else:
+            new_log = HabitLog(habit_id=habit_id, date=date_obj, checked=checked)
+            db.session.add(new_log)
+
+        db.session.commit()
+        print("Database updated successfully")  # Debug print
+        return jsonify({'success': True, 'checked': checked})
+
+    except Exception as e:
+        print(f"Error in toggle_check: {str(e)}")  # Debug print
 
 
-@app.route("/update/<int:habit_id>")
-def update(habit_id):
-    habit = Habit.query.filter_by(id=habit_id).first()
-    habit.complete = not habit.complete
-    db.session.commit()
-    return redirect(url_for("index"))
 
-
-@app.route("/delete/<int:habit_id>")
+@app.route("/delete/<int:habit_id>", methods=['POST'])
 def delete(habit_id):
     habit = Habit.query.filter_by(id=habit_id).first()
     db.session.delete(habit)
     db.session.commit()
+       
     return redirect(url_for("habit"))
+
+#Diary
+@app.route('/add_diary', methods=['POST'])
+@login_required
+def add_diary():
+    date = request.form['date']
+    text = request.form['text']
+    new_entry = DiaryEntry(date=datetime.strptime(date, '%Y-%m-%d').date(), text=text, user_id=current_user.id)
+    db.session.add(new_entry)
+    db.session.commit()
+    return redirect(url_for('habit'))
+
+
+@app.route('/diary_entries', methods=['GET'])
+def diary_entries():
+    entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
+    return render_template('habit.html', diary_entries=entries)
+
+@app.route('/delete_diary/<int:entry_id>', methods=['POST'])
+def delete_diary(entry_id):
+    entry = DiaryEntry.query.get(entry_id)
+    db.session.delete(entry)
+    db.session.commit()
+    return redirect(url_for('habit'))
+
 
 #-----Pets-----#
 @app.route("/pet", methods=["GET","POST"])
