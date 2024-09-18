@@ -10,10 +10,9 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from flask import jsonify
 from collections import defaultdict
-
-from datetime import datetime
 from flask_bcrypt import Bcrypt
 import sqlite3
+
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -38,8 +37,20 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
+
+#--Table for Pets
         
-#Table for Habits
+class PetsOwned(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
+    petsOwned = db.Column(db.Integer, nullable=False, default=0)
+    pet1 = db.Column(db.Integer, nullable=False, default=0)
+    pet2 = db.Column(db.Integer, nullable=False, default=0)
+    pet3 = db.Column(db.Integer, nullable=False, default=0)
+    pet4 = db.Column(db.Integer, nullable=False, default=0)
+    pet5 = db.Column(db.Integer, nullable=False, default=0) 
+
+
+#-----Table for Habits-----
 class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -49,6 +60,7 @@ class Habit(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     repeat_days = db.Column(db.String(100), default="")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+     
 
 class HabitLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -57,7 +69,7 @@ class HabitLog(db.Model):
     checked = db.Column(db.Boolean, default=False)
 
 
-#Diary Feature
+#-----Diary Feature-----
 class DiaryEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -205,7 +217,7 @@ def change_password():
     
     return render_template("change_password.html", form=form)
 
-#habit 
+#-----------  habit  ---------- # 
 @app.route("/habit")
 @login_required
 def habit():
@@ -213,12 +225,8 @@ def habit():
     selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
     month_start = datetime.strptime(selected_month, '%Y-%m').date()
     month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
-
-    # Fetch logs for the current user and month
     habit_logs = HabitLog.query.filter(HabitLog.habit_id.in_([habit.id for habit in habits]),
                                        HabitLog.date.between(month_start, month_end)).all()
-
-    # Create a dictionary for easy lookup (habit_id, date) -> log
     habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
 
 
@@ -241,15 +249,11 @@ def add_habit():
     return redirect(url_for('habit'))
 
 @app.route('/complete_habit/<int:habit_id>', methods=['POST'])
-@login_required
 def complete_habit(habit_id):
     today = datetime.now().date()
-    
-    # Check if an entry for this habit and today's date already exists
     log = HabitLog.query.filter_by(habit_id=habit_id, date=today).first()
     
     if not log:
-        # Create a new HabitLog entry with checked=True
         new_log = HabitLog(habit_id=habit_id, date=today, checked=True)
         db.session.add(new_log)
         flash("Habit completed!", "success")
@@ -258,10 +262,9 @@ def complete_habit(habit_id):
         if user_items:
             user_items.coins += 10  # Add 10 coins
         else:
-            # If user doesn't have a UserItems record, create it
             user_items = UserItems(user_id=current_user.id, coins=10, petFood=0)
-            db.session.add(user_items)
             flash("You've earned 10 coins!", "coin_reward")
+            db.session.add(user_items)
         db.session.commit()    
     return redirect(url_for('habit'))
 
@@ -272,7 +275,7 @@ def complete_habit(habit_id):
 def delete(habit_id):
     habit = Habit.query.filter_by(id=habit_id).first()
     db.session.delete(habit)
-    flash("Habit Succesfully Deleted", "success")
+    flash("Habit Succesfully Deleted", "failed")
     db.session.commit()   
     return redirect(url_for("habit"))
 
