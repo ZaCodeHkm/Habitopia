@@ -96,13 +96,13 @@ class PetsOwned(db.Model):
     pet1 = db.Column(db.Integer, nullable=False, default=0)
     pet2 = db.Column(db.Integer, nullable=False, default=0)
     pet3 = db.Column(db.Integer, nullable=False, default=0)
-    pet4 = db.Column(db.Integer, nullable=False, default=0)
-    pet5 = db.Column(db.Integer, nullable=False, default=0)
+    # pet4 = db.Column(db.Integer, nullable=False, default=0)
+    # pet5 = db.Column(db.Integer, nullable=False, default=0)
 
 class UserItems(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    coins = db.Column(db.Integer, nullable=False, default=0)
-    petFood = db.Column(db.Integer, nullable=False, default=0)
+    coins = db.Column(db.Integer, nullable=False, default=50)
+    petFood = db.Column(db.Integer, nullable=False, default=5)
 
 #Login and Registration
 class RegisterForm(FlaskForm):
@@ -327,7 +327,12 @@ def pet():
 @app.route("/petfeed", methods=['GET','POST'])
 def pet_feed():
     selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
-    selectPet.hunger = 100
+    selectFood = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+    if selectFood.petFood >= 1:
+        selectFood.petFood -= 1
+        selectPet.hunger = 100
+    if selectFood.petFood == 0:
+        flash("You dont have any food left. Complete some habits to get coins then buy some.", "info")
     db.session.commit()
     return redirect(url_for("pet"))
 
@@ -373,18 +378,22 @@ def makeactive():
     if request.form['makeactive'] == "Sereno": # How to get multiple buttons without filtering by method? Answer by Barmar on https://stackoverflow.com/questions/43811779/use-many-submit-buttons-in-the-same-form
         activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         activeUpdate.activePet = 1
+        db.session.add(activeUpdate)
+
         activeClear2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
         if activeClear2 == None:
             pass
         else:
             activeClear2.activePet = 0
+
         activeClear3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
         if activeClear3 == None:
             pass
         else:
             activeClear3.activePet = 0
-        db.session.add(activeUpdate)
+
         db.session.commit()
+        timeReset()
         return redirect(url_for("petnest")) #to do next: updating activePet on Pets table based on current_user (logged in user)
     
     if request.form['makeactive'] == "Mori":
@@ -395,17 +404,21 @@ def makeactive():
         else:       
             activeUpdate.activePet = 1
             db.session.add(activeUpdate)
+
         activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         if activeClear1 == None:
             pass
         else:
             activeClear1.activePet = 0
+
         activeClear3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
         if activeClear3 == None:
             pass
         else:
             activeClear3.activePet = 0    
+
         db.session.commit()
+        timeReset()
         return redirect(url_for("petnest"))
     
     if request.form['makeactive'] == "pet3":
@@ -416,18 +429,29 @@ def makeactive():
         else:
             activeUpdate.activePet = 1
             db.session.add(activeUpdate)
+
         activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         if activeClear1 == None:
             pass
         else:
             activeClear1.activePet = 0
+
         activeClear2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
         if activeClear2 == None:
             pass
         else:
             activeClear2.activePet = 0
+
         db.session.commit()
+        timeReset()
         return redirect(url_for("petnest"))
+
+
+@app.route("/timereset", methods=["GET","POST"])
+def timeReset():
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    selectPet.lastfedTime = datetime.now().timestamp()
+    db.session.commit()
 
 @app.route("/firstpetcreate", methods=["GET","POST"]) #To remove once done.
 @login_required
@@ -449,6 +473,15 @@ def testpet3():
     if request.method == "POST":
         givepet3()
     return redirect(url_for("pet"))
+
+@app.route("/testfood", methods =["GET", "POST"])
+@login_required
+def testfood():
+    if request.method == "POST":
+        selectFood = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+        selectFood.petFood = 100
+        return redirect(url_for("pet"))
+
 
 @app.route("/returnpet", methods=["GET", "`POST"])
 def returnpet():
@@ -494,9 +527,6 @@ def hungerFunc():
     selectPet.currentTime = datetime.now().timestamp()
     Diff = selectPet.currentTime - selectPet.lastfedTime
     print(Diff)
-    # if Diff < 3600:
-    #     pass
-    # else:
     if Diff >= 5 and Diff < 15:
         selectPet.hunger = 67
     if Diff >= 16 and Diff < 25:
@@ -507,6 +537,8 @@ def hungerFunc():
         selectPet.hunger = 0
     db.session.commit()
 
+
+
 # @app.route("/generalpetcreate", methods=["GET","POST"])
 # def generalPet():
 #     petname = request.form['petname']
@@ -514,8 +546,6 @@ def hungerFunc():
 #         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=2, petXP=0, petLevel=1)
 #     if petBuyType = 3: #subject to change depending on shop
 #         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=3, petXP=0, petLevel=1)
-
-
 
 # @app.route("/namepet", methods=["POST"])
 # def returnpet():
