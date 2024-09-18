@@ -126,12 +126,46 @@ class DiaryEntry(db.Model):
 
     user = db.relationship('User', backref='diary_entries', lazy=True)
 
+class PetsOwned(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
+    petsOwned = db.Column(db.Integer, nullable=False, default=0)
+    pet1 = db.Column(db.Integer, nullable=False, default=0)
+    pet2 = db.Column(db.Integer, nullable=False, default=0)
+    pet3 = db.Column(db.Integer, nullable=False, default=0)
+    pet4 = db.Column(db.Integer, nullable=False, default=0)
+    pet5 = db.Column(db.Integer, nullable=False, default=0)
+
+class UserItems(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
+    coins = db.Column(db.Integer, nullable=False, default=60)
+    petFood = db.Column(db.Integer, nullable=False, default=5)
+
+class RegisterForm(FlaskForm):
+    username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "Password"})
+    submit = SubmitField("Register")
+#check if have same users
+    def validate_username(self, username):
+        existing_user = User.query.filter_by(username=username.data).first()
+        if existing_user:   
+            raise ValidationError("That username already exists. Please choose a different one.")
+        
+
+class LoginForm(FlaskForm):
+    username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "Password"})
+    submit = SubmitField("Login")
+
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField(validators=[InputRequired()], render_kw={"placeholder": "Current Password"})
+    new_password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "New Password"})
+    confirm_new_password = PasswordField(validators=[InputRequired(), EqualTo('new_password', message='Passwords must match')], render_kw={"placeholder": "Confirm New Password"})
+    submit = SubmitField("Change Password")
 
 
 
 
-
-#------------  ROUTES  ---------------#
 
 @app.route("/")
 def home():
@@ -162,6 +196,11 @@ def register():
             new_user = User(username=form.username.data, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
+
+            user_items = UserItems(user_id=new_user.id, coins=60, petFood=3) # Set coins & petfood to 0
+            db.session.add(user_items)
+            db.session.commit()
+            
             flash("Registration Successful! You can now log in.", "success")
             return redirect(url_for('login'))
     return render_template("register.html", form=form)
@@ -389,10 +428,26 @@ def returnpet():
 #     print("Hunger now: "+petHunger)
 #     return render_template("pet.html", satiety=petHunger)
 
+#--------------------------------------shop----------------------------------------------------#
 @app.route("/shop")
 @login_required
 def shop():
-    return render_template("shop.html")
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+    return render_template("shop.html", coins=user_items.coins, petFood=user_items.petFood)
+
+#@app.route("/buy_item", methods=['POST'])
+#@login_required
+#def buy_item():
+    #items = request.form.get('item')
+    #price = int(request.form.get('price'))
+
+    #user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+
+    #if user_items.coins >= price:
+    #    user_items.coins -= price
+
+    #    if items == 'pet_food':
+    #        user_items.petfood +=1
 
 #-----Account-----#
 @app.route("/account")
