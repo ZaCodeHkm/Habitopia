@@ -110,8 +110,8 @@ class PetsOwned(db.Model):
 
 class UserItems(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    coins = db.Column(db.Integer, nullable=False, default=50)
-    petFood = db.Column(db.Integer, nullable=False, default=5)
+    coins = db.Column(db.Integer, nullable=False, default=60)
+    petFood = db.Column(db.Integer, nullable=False, default=3)
 
 #Login and Registration
 class RegisterForm(FlaskForm):
@@ -168,6 +168,11 @@ def register():
             new_user = User(username=form.username.data, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
+
+            user_items = UserItems(user_id=new_user.id, coins=60, petFood=3) # Set coins & petfood to 0
+            db.session.add(user_items)
+            db.session.commit()
+            
             flash("Registration Successful! You can now log in.", "success")
             return redirect(url_for('login'))
     return render_template("register.html", form=form)
@@ -581,11 +586,26 @@ def hungerFunc():
 #     return render_template("pet.html")
 
 
-#----Shop----#
+
 @app.route("/shop")
 @login_required
 def shop():
-    return render_template("shop.html")
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+    return render_template("shop.html", coins=user_items.coins, petFood=user_items.petFood)
+
+#@app.route("/buy_item", methods=['POST'])
+#@login_required
+#def buy_item():
+    #items = request.form.get('item')
+    #price = int(request.form.get('price'))
+
+    #user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+
+    #if user_items.coins >= price:
+    #    user_items.coins -= price
+
+    #    if items == 'pet_food':
+    #        user_items.petfood +=1
 
 #-----Account-----#
 @app.route("/account")
