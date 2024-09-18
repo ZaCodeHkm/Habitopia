@@ -9,6 +9,7 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from flask import jsonify
+from collections import defaultdict
 
 from datetime import datetime
 from flask_bcrypt import Bcrypt
@@ -38,6 +39,25 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
+#--Table for Pets
+class Pets(db.Model):
+    def mydefault(context):
+        return context.get_current_parameters()['currentTime']
+    
+    with app.app_context():
+        petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+        petID = db.Column(db.Integer, primary_key=True)
+        petName = db.Column(db.String(30), nullable=False, default='Sereno')
+        lastfedTime = db.Column(db.DateTime, default=mydefault)
+        currentTime = db.Column(db.DateTime, default=datetime.now)
+        hunger = db.Column(db.Integer)
+        petType = db.Column(db.Integer, nullable=False, default=1)
+        petXP = db.Column(db.Integer)
+        petLevel = db.Column(db.Integer, nullable=False)
+
+        def __repr__(self):
+            return f"{self.petName}"
+        
 #Table for Habits
 class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,10 +66,8 @@ class Habit(db.Model):
     tag = db.Column(db.String(50), default="")
     frequency = db.Column(db.Integer, default=30)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    repeat_days = db.Column(db.String(100), default="")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
-    logs = db.relationship('HabitLog', backref='habit_logs', cascade="all, delete-orphan") 
-    
 
 class HabitLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -57,8 +75,6 @@ class HabitLog(db.Model):
     date = db.Column(db.Date, nullable=False)
     checked = db.Column(db.Boolean, default=False)
 
-    # Explicit relationship only if needed
-    habit = db.relationship('Habit', backref='habit_log', lazy=True)  # Remove conflict here
 
 #Diary Feature
 class DiaryEntry(db.Model):
@@ -216,50 +232,58 @@ def habit():
     selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
     month_start = datetime.strptime(selected_month, '%Y-%m').date()
     month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
-    
-    logs = HabitLog.query.filter(
-        HabitLog.date.between(month_start, month_end),
-        HabitLog.habit_id.in_([habit.id for habit in habits])
-    ).all()
-    diary_entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
 
-    return render_template('habit.html', habits=habits, logs=logs, selected_month=selected_month, month_start=month_start, datetime=datetime, timedelta=timedelta, relativedelta=relativedelta, diary_entries=diary_entries)
+    # Fetch logs for the current user and month
+    habit_logs = HabitLog.query.filter(HabitLog.habit_id.in_([habit.id for habit in habits]),
+                                       HabitLog.date.between(month_start, month_end)).all()
+
+    # Create a dictionary for easy lookup (habit_id, date) -> log
+    habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
+
+
+    return render_template('habit.html', habits=habits, selected_month=selected_month, month_start=month_start, 
+                           month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
+                           relativedelta=relativedelta)
 
 
 @app.route('/add_habit', methods=['POST'])
 def add_habit():
     name = request.form['name']
-    color = request.form['color']
     tag = request.form['tag']
     frequency = int(request.form['frequency'])
-    new_habit = Habit(name=name, color=color, tag=tag, frequency=frequency, user_id=current_user.id)
+    repeat_days = ','.join(request.form.getlist('repeat_days'))
+    new_habit = Habit(name=name, tag=tag, frequency=frequency, repeat_days=repeat_days, user_id=current_user.id)
+    
     db.session.add(new_habit)
+    flash("Habit Succesfully Added!", "success")
     db.session.commit()
     return redirect(url_for('habit'))
 
-@app.route('/toggle_check/<int:habit_id>/<string:date>', methods=['POST'])
-def toggle_check(habit_id, date):
-    try:
-        data = request.get_json()
-        checked = data.get('checked')
-        
-        print(f"Received request: habit_id={habit_id}, date={date}, checked={checked}")  # Debug print
-        
-        date_obj = datetime.strptime(date, '%Y-%m-%d').date()
-        log = HabitLog.query.filter_by(habit_id=habit_id, date=date_obj).first()
-        
-        if log:
-            log.checked = checked
+@app.route('/complete_habit/<int:habit_id>', methods=['POST'])
+@login_required
+def complete_habit(habit_id):
+    today = datetime.now().date()
+    
+    # Check if an entry for this habit and today's date already exists
+    log = HabitLog.query.filter_by(habit_id=habit_id, date=today).first()
+    
+    if not log:
+        # Create a new HabitLog entry with checked=True
+        new_log = HabitLog(habit_id=habit_id, date=today, checked=True)
+        db.session.add(new_log)
+        flash("Habit completed!", "success")
+    
+        user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+        if user_items:
+            user_items.coins += 10  # Add 10 coins
         else:
-            new_log = HabitLog(habit_id=habit_id, date=date_obj, checked=checked)
-            db.session.add(new_log)
+            # If user doesn't have a UserItems record, create it
+            user_items = UserItems(user_id=current_user.id, coins=10, petFood=0)
+            db.session.add(user_items)
+            flash("You've earned 10 coins!", "coin_reward")
+        db.session.commit()    
+    return redirect(url_for('habit'))
 
-        db.session.commit()
-        print("Database updated successfully")  # Debug print
-        return jsonify({'success': True, 'checked': checked})
-
-    except Exception as e:
-        print(f"Error in toggle_check: {str(e)}")  # Debug print
 
 
 
@@ -267,9 +291,24 @@ def toggle_check(habit_id, date):
 def delete(habit_id):
     habit = Habit.query.filter_by(id=habit_id).first()
     db.session.delete(habit)
-    db.session.commit()
-       
+    flash("Habit Succesfully Deleted", "success")
+    db.session.commit()   
     return redirect(url_for("habit"))
+
+@app.route("/notifications", methods=["GET"])
+@login_required
+def get_notifications():
+    habits = Habit.query.filter_by(user_id=current_user.id).all()
+    today_weekday = datetime.now().strftime('%A')  # Get current weekday
+    notifications = []
+
+    for habit in habits:
+        if habit.repeat_days:
+            repeat_days = habit.repeat_days.split(',')
+            if today_weekday in repeat_days:
+                notifications.append(f"Reminder for your habit: {habit.name} (Repeat on {today_weekday})")
+
+    return jsonify(notifications=notifications)
 
 #Diary
 @app.route('/add_diary', methods=['POST'])

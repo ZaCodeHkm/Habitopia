@@ -82,6 +82,31 @@ h1 {
 
 }
 
+/* Flash Messages */
+.coin_reward { 
+  color: #FFD700;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-family: "Pixelify Sans", sans-serif ;
+  vertical-align: bottom;
+}
+
+.success {
+  color: green;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-family: "Pixelify Sans", sans-serif ;
+  vertical-align: bottom;
+}
+
+.flash-message {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  
+}
 
 /* scroll-bar */
 ::-webkit-scrollbar{
@@ -99,7 +124,20 @@ h1 {
   height: 30px;
 }
 
+.repeat_days::-webkit-scrollbar{
+  background-color: aliceblue;
+  width: 10px;
+}
 
+.repeat_days::-webkit-scrollbar-thumb{
+  background-color: #c1c1c1;
+  border: 1px outset #c1c1c1;
+}
+
+.repeat_days::-webkit-scrollbar-button{
+  border: 1px outset #c1c1c1;
+  height: 10px;
+}
 
 
 /* Title */
@@ -171,10 +209,6 @@ ul {
 
 
 /* Content */
-
-.class{
-  background-color: #e0e2e7; 
-}
 
 
 .delete {
@@ -267,16 +301,18 @@ th {
   border: 1px solid #ccc;
   margin: 1px;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
-.calendar-box.unchecked {
-  background-color: white;
+.checked {
+  background-color: #2d4535;
+  height: 24px;
+  width: 24px;
+  margin: 1px;
 }
 
-.calendar-box.checked {
-  border: 1px solid #000;
-}
+
+
+
 
 
 
@@ -348,6 +384,15 @@ th {
   text-decoration: none;
   cursor: pointer;
 }
+
+/* Small scroll down section inside the modal to keep the checkboxes  */
+.repeat_days {
+  overflow-y: scroll;
+  height: 50px;
+  width: 150px;
+  
+}
+
 
 /*Diary CSS*/
 .modal-content {

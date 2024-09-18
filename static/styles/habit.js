@@ -1,51 +1,15 @@
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.calendar-box').forEach(box => {
-        updateBoxAppearance(box); // This already attempts to set the right colors based on data attributes
-    });
-});
 
-function updateBoxAppearance(box) {
-    const isChecked = box.dataset.checked === 'true';
-    const color = box.dataset.color;
-    
-    box.style.backgroundColor = isChecked ? color : 'white';
-    box.classList.toggle('checked', isChecked);
-}
-
-function toggleBox(box) {
-    const habitId = box.dataset.habitId;
-    const date = box.dataset.date;
-    const currentChecked = box.dataset.checked === 'true';
-    const newChecked = !currentChecked;
-
-    // Update local state
-    box.dataset.checked = newChecked.toString();
-    updateBoxAppearance(box);
-
-    // Send update to server
-    fetch(`/toggle_check/${habitId}/${date}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ checked: newChecked }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            // Revert if server update failed
-            box.dataset.checked = currentChecked.toString();
-            updateBoxAppearance(box);
-        }
-        console.log('Server response:', data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Revert on error
-        box.dataset.checked = currentChecked.toString();
-        updateBoxAppearance(box);
-    });
-}
+$.ajax({
+    type: 'POST',
+    url: '/complete_habit/' + habit_id,
+    success: function(data) {
+      if (data.checked) {
+        // update the template to display "hi"
+      } else {
+        // update the template to display "bye"
+      }
+    }
+  });
 
 // Modal
 
@@ -116,3 +80,49 @@ window.onclick = function(event) {
         closeDiaryModal();
     }
 }
+
+// notifications
+
+// Function to fetch notifications and display them in a custom modal
+function fetchNotifications() {
+    fetch('/notifications')
+        .then(response => response.json())
+        .then(data => {
+            if (data.notifications && data.notifications.length > 0) {
+                const modal = document.getElementById('notificationModal');
+                const messageElement = document.getElementById('notificationMessage');
+                
+                // Display all notifications in the modal
+                let notificationText = data.notifications.join('<br>');
+                messageElement.innerHTML = notificationText;
+                
+                // Show the modal
+                modal.style.display = 'block';
+            }
+        })
+        .catch(error => console.error('Error fetching notifications:', error));
+}
+
+// Call the function when the page loads for the first time
+window.onload = function() {
+    // Check if this is the user's first visit to the page in this session
+    if (!sessionStorage.getItem('firstVisit')) {
+        fetchNotifications();
+        sessionStorage.setItem('firstVisit', 'true'); // Set flag to prevent popups on reload
+    }
+};
+
+// Close the modal when the user clicks on the "x"
+const closeModalButton = document.getElementsByClassName('close')[0];
+closeModalButton.onclick = function() {
+    const modal = document.getElementById('notificationModal');
+    modal.style.display = 'none';
+};
+
+// Close the modal if the user clicks outside of the modal
+window.onclick = function(event) {
+    const modal = document.getElementById('notificationModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+};
