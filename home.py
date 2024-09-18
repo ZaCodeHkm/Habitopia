@@ -38,25 +38,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
-
-#--Table for Pets
-class Pets(db.Model):
-    def mydefault(context):
-        return context.get_current_parameters()['currentTime']
-    
-    with app.app_context():
-        petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-        petID = db.Column(db.Integer, primary_key=True)
-        petName = db.Column(db.String(30), nullable=False, default='Sereno')
-        lastfedTime = db.Column(db.DateTime, default=mydefault)
-        currentTime = db.Column(db.DateTime, default=datetime.now)
-        hunger = db.Column(db.Integer)
-        petType = db.Column(db.Integer, nullable=False, default=1)
-        petXP = db.Column(db.Integer)
-        petLevel = db.Column(db.Integer, nullable=False)
-
-        def __repr__(self):
-            return f"{self.petName}"
         
 #Table for Habits
 class Habit(db.Model):
@@ -381,7 +362,7 @@ def petnest():     # Pet nest images and names
     nameGet1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
     nameGet2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
     nameGet3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
-
+    
     pet1name = nameGet1.petName                     # PET 1
     pet1 = petCheck.pet1 
     if pet1 == 1:
@@ -424,15 +405,16 @@ def makeactive():
             pass
         else:
             activeClear2.activePet = 0
+            timeReset()
 
         activeClear3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
         if activeClear3 == None:
             pass
         else:
             activeClear3.activePet = 0
+            timeReset()
 
-        db.session.commit()
-        timeReset()
+        db.session.commit()     
         return redirect(url_for("petnest")) #to do next: updating activePet on Pets table based on current_user (logged in user)
     
     if request.form['makeactive'] == "Mori":
@@ -449,15 +431,16 @@ def makeactive():
             pass
         else:
             activeClear1.activePet = 0
+            timeReset()
 
         activeClear3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
         if activeClear3 == None:
             pass
         else:
             activeClear3.activePet = 0    
+            timeReset()
 
         db.session.commit()
-        timeReset()
         return redirect(url_for("petnest"))
     
     if request.form['makeactive'] == "pet3":
@@ -474,22 +457,26 @@ def makeactive():
             pass
         else:
             activeClear1.activePet = 0
+            timeReset()
 
         activeClear2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
         if activeClear2 == None:
             pass
         else:
             activeClear2.activePet = 0
+            timeReset()
 
         db.session.commit()
-        timeReset()
         return redirect(url_for("petnest"))
 
 
 @app.route("/timereset", methods=["GET","POST"])
 def timeReset():
-    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
-    selectPet.lastfedTime = datetime.now().timestamp()
+    try:
+        selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+        selectPet.lastfedTime = datetime.now().timestamp()
+    except:
+        pass
     db.session.commit()
 
 @app.route("/firstpetcreate", methods=["GET","POST"]) #To remove once done.
