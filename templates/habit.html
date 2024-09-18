@@ -4,6 +4,15 @@
 {% block Pagename %}Habit Tracker{% endblock %}
 {% block heading %}https://habitopia/habit{% endblock %}
 {% block content %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 <div id="wrap">
 
     <button id="openModalBtn" onclick="openModal()">Add Habit</button>
@@ -79,7 +88,7 @@
                                         <button type="submit" class="delete">Delete</button>
                                     </form>
                                     <form action="{{ url_for('complete_habit', habit_id=habit.id) }}" method="POST">
-                                        <button type="submit">Complete</button>
+                                        <button type="submit" class="delete">Complete</button>
                                     </form>
                                 </td>
                             </div>
@@ -87,27 +96,9 @@
                     {% endfor %} 
                 </table>
         </div>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul>
-                    {% for category, message in messages %}
-                        <li class="{{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
     
     {% else %}
         <p>No habits! Click [Add Habits] to add a habit!</p>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul>
-                    {% for category, message in messages %}
-                        <li class="{{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
     {% endif %}
 
 
