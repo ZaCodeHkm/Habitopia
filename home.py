@@ -455,7 +455,6 @@ def makeactive():
         activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         if activeClear1 == None:
             pass
-        else:
             activeClear1.activePet = 0
             timeReset()
 
