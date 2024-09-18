@@ -1,3 +1,4 @@
 .vscode
 instance
 __pycache__
+petdata.db
