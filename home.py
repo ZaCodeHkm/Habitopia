@@ -38,12 +38,6 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
-#Table for Habits
-class Habit(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(100))
-    
-    habits = db.relationship('Habit', backref='user', lazy=True)
 
 #--Table for Pets
 class Pets(db.Model):
@@ -95,6 +89,7 @@ class DiaryEntry(db.Model):
     text = db.Column(db.Text, nullable=False)
 
     user = db.relationship('User', backref='diary_entries', lazy=True)
+
 class PetsOwned(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
     petsOwned = db.Column(db.Integer, nullable=False, default=0)
@@ -106,8 +101,8 @@ class PetsOwned(db.Model):
 
 class UserItems(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    coins = db.Column(db.Integer, nullable=False, default=0)
-    petFood = db.Column(db.Integer, nullable=False, default=0)
+    coins = db.Column(db.Integer, nullable=False, default=60)
+    petFood = db.Column(db.Integer, nullable=False, default=5)
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
@@ -165,6 +160,11 @@ def register():
             new_user = User(username=form.username.data, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
+
+            user_items = UserItems(user_id=new_user.id, coins=60, petFood=3) # Set coins & petfood to 0
+            db.session.add(user_items)
+            db.session.commit()
+            
             flash("Registration Successful! You can now log in.", "success")
             return redirect(url_for('login'))
     return render_template("register.html", form=form)
@@ -224,12 +224,14 @@ def habit():
     month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
     
     logs = HabitLog.query.filter(
-        HabitLog.date.between(month_start, month_end),
-        HabitLog.habit_id.in_([habit.id for habit in habits])
+       #HabitLog.date.between(month_start, month_end),
+       #HabitLog.habit_id.in_([habit.id for habit in habits])
     ).all()
     diary_entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
 
-    return render_template('habit.html', habits=habits, logs=logs, selected_month=selected_month, month_start=month_start, datetime=datetime, timedelta=timedelta, relativedelta=relativedelta, diary_entries=diary_entries)
+    return render_template('habit.html', habits=habits, logs=logs, selected_month=selected_month,
+                           month_start=month_start, datetime=datetime, timedelta=timedelta, relativedelta=relativedelta,
+                           diary_entries=diary_entries)
 
 
 @app.route('/add_habit', methods=['POST'])
@@ -378,10 +380,26 @@ def returnpet():
 #     print("Hunger now: "+petHunger)
 #     return render_template("pet.html", satiety=petHunger)
 
+#--------------------------------------shop----------------------------------------------------#
 @app.route("/shop")
 @login_required
 def shop():
-    return render_template("shop.html")
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+    return render_template("shop.html", coins=user_items.coins, petFood=user_items.petFood)
+
+#@app.route("/buy_item", methods=['POST'])
+#@login_required
+#def buy_item():
+    #items = request.form.get('item')
+    #price = int(request.form.get('price'))
+
+    #user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+
+    #if user_items.coins >= price:
+    #    user_items.coins -= price
+
+    #    if items == 'pet_food':
+    #        user_items.petfood +=1
 
 #-----Account-----#
 @app.route("/account")
