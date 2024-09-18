@@ -9,10 +9,10 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from flask import jsonify
-
-from datetime import datetime
+from collections import defaultdict
 from flask_bcrypt import Bcrypt
 import sqlite3
+
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -38,6 +38,36 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
+class UserItems(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
+    coins = db.Column(db.Integer, nullable=False, default=0)
+    petFood = db.Column(db.Integer, nullable=False, default=0)
+
+
+#-----Login & Registration-----
+class RegisterForm(FlaskForm):
+    username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "Password"})
+    submit = SubmitField("Register")
+#check if have same users
+    def validate_username(self, username):
+        existing_user = User.query.filter_by(username=username.data).first()
+        if existing_user:   
+            raise ValidationError("That username already exists. Please choose a different one.")
+        
+
+class LoginForm(FlaskForm):
+    username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "Password"})
+    submit = SubmitField("Login")
+
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField(validators=[InputRequired()], render_kw={"placeholder": "Current Password"})
+    new_password = PasswordField(validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "New Password"})
+    confirm_new_password = PasswordField(validators=[InputRequired(), EqualTo('new_password', message='Passwords must match')], render_kw={"placeholder": "Confirm New Password"})
+    submit = SubmitField("Change Password")
+
 
 #--Table for Pets
 class Pets(db.Model):
@@ -57,7 +87,18 @@ class Pets(db.Model):
 
         def __repr__(self):
             return f"{self.petName}"
+        
+class PetsOwned(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
+    petsOwned = db.Column(db.Integer, nullable=False, default=0)
+    pet1 = db.Column(db.Integer, nullable=False, default=0)
+    pet2 = db.Column(db.Integer, nullable=False, default=0)
+    pet3 = db.Column(db.Integer, nullable=False, default=0)
+    pet4 = db.Column(db.Integer, nullable=False, default=0)
+    pet5 = db.Column(db.Integer, nullable=False, default=0) 
 
+
+#-----Table for Habits-----
 class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -65,11 +106,9 @@ class Habit(db.Model):
     tag = db.Column(db.String(50), default="")
     frequency = db.Column(db.Integer, default=30)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    repeat_days = db.Column(db.String(100), default="")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
-    logs = db.relationship('HabitLog', backref='habit_logs', cascade="all, delete-orphan") 
-    
-    
+     
 
 class HabitLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -77,11 +116,8 @@ class HabitLog(db.Model):
     date = db.Column(db.Date, nullable=False)
     checked = db.Column(db.Boolean, default=False)
 
-    # Explicit relationship only if needed
-    habit = db.relationship('Habit', backref='habit_log', lazy=True)  # Remove conflict here
 
-
-#Diary Feature
+#-----Diary Feature-----
 class DiaryEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -214,7 +250,7 @@ def change_password():
     
     return render_template("change_password.html", form=form)
 
-#habit 
+#-----------  habit  ---------- # 
 @app.route("/habit")
 @login_required
 def habit():
@@ -222,52 +258,49 @@ def habit():
     selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
     month_start = datetime.strptime(selected_month, '%Y-%m').date()
     month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
-    
-    logs = HabitLog.query.filter(
-       #HabitLog.date.between(month_start, month_end),
-       #HabitLog.habit_id.in_([habit.id for habit in habits])
-    ).all()
-    diary_entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
+    habit_logs = HabitLog.query.filter(HabitLog.habit_id.in_([habit.id for habit in habits]),
+                                       HabitLog.date.between(month_start, month_end)).all()
+    habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
 
-    return render_template('habit.html', habits=habits, logs=logs, selected_month=selected_month,
-                           month_start=month_start, datetime=datetime, timedelta=timedelta, relativedelta=relativedelta,
-                           diary_entries=diary_entries)
+
+    return render_template('habit.html', habits=habits, selected_month=selected_month, month_start=month_start, 
+                           month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
+                           relativedelta=relativedelta)
 
 
 @app.route('/add_habit', methods=['POST'])
 def add_habit():
     name = request.form['name']
-    color = request.form['color']
     tag = request.form['tag']
     frequency = int(request.form['frequency'])
-    new_habit = Habit(name=name, color=color, tag=tag, frequency=frequency, user_id=current_user.id)
+    repeat_days = ','.join(request.form.getlist('repeat_days'))
+    new_habit = Habit(name=name, tag=tag, frequency=frequency, repeat_days=repeat_days, user_id=current_user.id)
+    
     db.session.add(new_habit)
+    flash("Habit Succesfully Added!", "success")
     db.session.commit()
     return redirect(url_for('habit'))
 
-@app.route('/toggle_check/<int:habit_id>/<string:date>', methods=['POST'])
-def toggle_check(habit_id, date):
-    try:
-        data = request.get_json()
-        checked = data.get('checked')
-        
-        print(f"Received request: habit_id={habit_id}, date={date}, checked={checked}")  # Debug print
-        
-        date_obj = datetime.strptime(date, '%Y-%m-%d').date()
-        log = HabitLog.query.filter_by(habit_id=habit_id, date=date_obj).first()
-        
-        if log:
-            log.checked = checked
+@app.route('/complete_habit/<int:habit_id>', methods=['POST'])
+def complete_habit(habit_id):
+    today = datetime.now().date()
+    log = HabitLog.query.filter_by(habit_id=habit_id, date=today).first()
+    
+    if not log:
+        new_log = HabitLog(habit_id=habit_id, date=today, checked=True)
+        db.session.add(new_log)
+        flash("Habit completed!", "success")
+    
+        user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+        if user_items:
+            user_items.coins += 10  # Add 10 coins
         else:
-            new_log = HabitLog(habit_id=habit_id, date=date_obj, checked=checked)
-            db.session.add(new_log)
+            user_items = UserItems(user_id=current_user.id, coins=10, petFood=0)
+            flash("You've earned 10 coins!", "coin_reward")
+            db.session.add(user_items)
+        db.session.commit()    
+    return redirect(url_for('habit'))
 
-        db.session.commit()
-        print("Database updated successfully")  # Debug print
-        return jsonify({'success': True, 'checked': checked})
-
-    except Exception as e:
-        print(f"Error in toggle_check: {str(e)}")  # Debug print
 
 
 
@@ -275,9 +308,24 @@ def toggle_check(habit_id, date):
 def delete(habit_id):
     habit = Habit.query.filter_by(id=habit_id).first()
     db.session.delete(habit)
-    db.session.commit()
-       
+    flash("Habit Succesfully Deleted", "failed")
+    db.session.commit()   
     return redirect(url_for("habit"))
+
+@app.route("/notifications", methods=["GET"])
+@login_required
+def get_notifications():
+    habits = Habit.query.filter_by(user_id=current_user.id).all()
+    today_weekday = datetime.now().strftime('%A')  # Get current weekday
+    notifications = []
+
+    for habit in habits:
+        if habit.repeat_days:
+            repeat_days = habit.repeat_days.split(',')
+            if today_weekday in repeat_days:
+                notifications.append(f"Reminder for your habit: {habit.name} (Repeat on {today_weekday})")
+
+    return jsonify(notifications=notifications)
 
 #Diary
 @app.route('/add_diary', methods=['POST'])

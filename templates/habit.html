@@ -4,6 +4,15 @@
 {% block Pagename %}Habit Tracker{% endblock %}
 {% block heading %}https://habitopia/habit{% endblock %}
 {% block content %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 <div id="wrap">
 
     <button id="openModalBtn" onclick="openModal()">Add Habit</button>
@@ -15,9 +24,19 @@
                 <h2>Add a New Habit</h2>
                 <form action="/add_habit" method="POST">
                     <input type="text" name="name" placeholder="Habit Name" required>
-                    <input type="color" name="color" value="#0000FF">
                     <input type="text" name="tag" placeholder="Tag (e.g., health)">
                     <input type="number" name="frequency" placeholder="Frequency (times per month)" required>
+                    <br>
+                    <label for="repeat_days">Repeat Notifications:</label><br>
+                    <div class="repeat_days">
+                        <input type="checkbox" name="repeat_days" value="Monday"> Monday<br>
+                        <input type="checkbox" name="repeat_days" value="Tuesday"> Tuesday<br>
+                        <input type="checkbox" name="repeat_days" value="Wednesday"> Wednesday<br>
+                        <input type="checkbox" name="repeat_days" value="Thursday"> Thursday<br>
+                        <input type="checkbox" name="repeat_days" value="Friday"> Friday<br>
+                        <input type="checkbox" name="repeat_days" value="Saturday"> Saturday<br>
+                        <input type="checkbox" name="repeat_days" value="Sunday"> Sunday<br>
+                    </div>
                     <button type="submit">Add Habit</button>
                 </form>
             </div>
@@ -54,27 +73,22 @@
                                 <td>{{ habit.tag }}</td>
                                 <td>{{ habit.frequency }}</td>
                                 {% for day in range(1, (month_start + relativedelta(months=1) - timedelta(days=1)).day + 1) %}
-                                    {% set date = selected_month + '-%02d' % day %}
-                                    {% set checked = False %}
-                                    {% for log in logs %}
-                                        {% if log.habit_id == habit.id and log.date.strftime('%Y-%m-%d') == date %}
-                                            {% set checked = log.checked %}
+                                {% set date = selected_month + '-%02d' % day %}
+                                <td>
+                                    <div class="calendar-box">
+                                        {% set log = habit_logs.get((habit.id, date)) %}
+                                        {% if log and log.checked %}
+                                            <div class="checked"> </div>
                                         {% endif %}
-                                    {% endfor %}
-                                    <td>
-                                        <div class="calendar-box{% if checked %} checked{% endif %}" 
-                                            id="box-{{ habit.id }}-{{ date }}"
-                                            data-habit-id="{{ habit.id }}"
-                                            data-date="{{ date }}"
-                                            data-color="{{ habit.color }}"
-                                            data-checked="{{ 'true' if checked else 'false' }}"
-                                            onclick="toggleBox(this)">
-                                        </div>
-                                    </td>
+                                    </div>
+                                </td>
                                 {% endfor %}
                                 <td>
                                     <form action="{{ url_for('delete', habit_id=habit.id) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="delete">Delete</button>
+                                    </form>
+                                    <form action="{{ url_for('complete_habit', habit_id=habit.id) }}" method="POST">
+                                        <button type="submit" class="delete">Complete</button>
                                     </form>
                                 </td>
                             </div>
@@ -82,11 +96,12 @@
                     {% endfor %} 
                 </table>
         </div>
-        
     
     {% else %}
         <p>No habits! Click [Add Habits] to add a habit!</p>
     {% endif %}
+
+
 </div>
 <div id="wrap2">
     <button id="openDiaryModalBtn" onclick="openDiaryModal()">Add Diary Entry</button>
@@ -115,7 +130,20 @@
             <p>No diary entries found. Click [Add Diary Entry] to add to your diary! </p>
         {% endfor %}
     </div>
+
+    <!--notification modal-->
+
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <p id="notificationMessage">Reminder for your habit: {habit.name} (Repeat on {today_weekday}) </p>
+        </div>
+      </div>
+
 </div>
-<script src="/static/styles/habit.js"></script>
+<script src="/static/styles/habit.js">
+
+    
+</script>
 {% endblock %}
 
