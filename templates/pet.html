@@ -6,23 +6,33 @@
 {% block content %}
 <div id="wrap">
     <h1>Pet</h1>
-    <h2>{{ petname }}</h2>
-    <span class="petbox">
-        <img src="/static/petimages/Sereno.png" alt="Sereno Pet" width="256px" height="328px">
-    </span>
-    <fieldset class="fieldset-inline">
-        <legend>Your pet needs food</legend>
+    <div class="petbox">
+    <h2 class="petsname">{{ petname }}</h2>
+        <img src="{{ petimage }}" alt="Pet image" width="256px" height="328px">
+    </div>
+    <fieldset class="fieldset-pet">
+        <legend>Hunger</legend>
         <meter form="Feed" min="0" max="100" value='{{ satiety }}' ></meter>
         <form action="/petfeed" value="Feed" method="get">
             <button type="submit" value="Feed">Feed</button>
         </form>
     </fieldset>
-    <fieldset class="fieldset-inline">
+    <fieldset class="fieldset-pet">
         <legend>Habit XP</legend>
         <meter form="XP" min="0" max="100" value= '{{ XP }}' ></meter>
+        <div class="levelXP">
+        <p>XP:  {{ XPcount }}/100</p><p>Level: {{ petlevel }}</p>
+        </div>  
     </fieldset>
-    <li><a href="firstpetcreate">First pet page --only for dev purposes--</a></li>
-    <li><a href="generalpetcreate">General get pet page --only for dev purposes--</a></li>
-
+    <li class="templink"><a href="firstpetcreate">First pet page --only for dev purposes--</a></li>
+    <li class="templink"><a href="generalpetcreate">General get pet page --only for dev purposes--</a></li>
+    <li class="templink"><a href="setXPmax">Sets XP to max --only for dev purposes--</a></li>
+    <form action="/testpet2" value="testpet2" method="post">
+        <li class="templink"><button type="submit" value="testpet2">Gives the user pet #2 --only for dev purposes--.</button></li>   
+    </form>
+    <form action="/testpet3" value="testpet3" method="post">
+        <li class="templink"><button type="submit" value="testpet3">Gives the user pet #3 --only for dev purposes--.</button></li>   
+    </form>
+    <li class="templink"><a href="testfood">Gives the max food --only for dev purposes--.</button></li>   
 </div>
 {% endblock %}
