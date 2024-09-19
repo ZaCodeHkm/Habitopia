@@ -38,18 +38,6 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
-#--Table for Pets
-        
-class PetsOwned(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    petsOwned = db.Column(db.Integer, nullable=False, default=0)
-    pet1 = db.Column(db.Integer, nullable=False, default=0)
-    pet2 = db.Column(db.Integer, nullable=False, default=0)
-    pet3 = db.Column(db.Integer, nullable=False, default=0)
-    pet4 = db.Column(db.Integer, nullable=False, default=0)
-    pet5 = db.Column(db.Integer, nullable=False, default=0) 
-
-
 #-----Table for Habits-----
 class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
