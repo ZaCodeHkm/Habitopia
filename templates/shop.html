@@ -12,5 +12,20 @@
     
     <h1>Items:</h1>
 
+    <ul>
+        <li>
+            Pet Food - 20 coins
+            <form method="POST" action="{{ url_for('buy_item', item='pet_food', price=50) }}">
+                <button type="submit">Buy Pet Food</button>
+            </form>
+        </li>
+        <li>
+            Egg - 100 coins
+            <form method="POST" action="{{ url_for('buy_item', item='egg', price=100) }}">
+                <button type="submit">Buy Egg</button>
+            </form>
+        </li>
+    </ul>
+
 </div>
 {% endblock %}

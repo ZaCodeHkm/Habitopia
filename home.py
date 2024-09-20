@@ -42,7 +42,7 @@ class UserItems(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
     coins = db.Column(db.Integer, nullable=False, default=0)
     petFood = db.Column(db.Integer, nullable=False, default=0)
-
+    bait = db.Column(db.Integer, nullable=False, default=0)
 
 #-----Login & Registration-----
 class RegisterForm(FlaskForm):
@@ -422,19 +422,27 @@ def shop():
     user_items = UserItems.query.filter_by(user_id=current_user.id).first()
     return render_template("shop.html", coins=user_items.coins, petFood=user_items.petFood)
 
-#@app.route("/buy_item", methods=['POST'])
-#@login_required
-#def buy_item():
-    #items = request.form.get('item')
-    #price = int(request.form.get('price'))
+@app.route("/buy_item", methods=['POST'])
+@login_required
+def buy_item():
+    item = request.form.get('pet_food')  # The item to buy (e.g., 'pet_food', 'egg')
+    price = int(request.form.get('20'))  # The price of the item
 
-    #user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
 
-    #if user_items.coins >= price:
-    #    user_items.coins -= price
+    if user_items.coins >= price:
+        user_items.coins -= price
 
-    #    if items == 'pet_food':
-    #        user_items.petfood +=1
+        if item == 'pet_food':
+            user_items.petFood += 1
+       
+        db.session.commit()
+        flash(f"You bought {item.replace('_', ' ')}!", "success")
+    else:
+        flash("Not enough coins to buy this item.", "danger")
+
+    return redirect(url_for('shop'))
+    
 
 #-----Account-----#
 @app.route("/account")
