@@ -7,25 +7,26 @@
 <div id="wrap">
     <h1>Pet</h1>
     <div class="petbox">
-    <h2 class="petsname">{{ petname }}</h2>
+        <h2 class="petsname">{{ petname }}</h2>
         <img src="{{ petimage }}" alt="Pet image" width="256px" height="328px">
     </div>
-    <fieldset class="fieldset-pet">
-        <legend>Hunger</legend>
-        <meter form="Feed" min="0" max="100" value='{{ satiety }}' ></meter>
-        <form action="/petfeed" value="Feed" method="get">
-            <button type="submit" value="Feed">Feed</button>
-        </form>
-    </fieldset>
-    <fieldset class="fieldset-pet">
-        <legend>Habit XP</legend>
-        <meter form="XP" min="0" max="100" value= '{{ XP }}' ></meter>
-        <div class="levelXP">
-        <p>XP:  {{ XPcount }}/100</p><p>Level: {{ petlevel }}</p>
-        </div>  
-    </fieldset>
+        <fieldset class="fieldset-pet">
+            <legend>Hunger</legend>
+            <meter form="Feed" min="0" max="100" value='{{ satiety }}' ></meter>
+            <div class="fieldsettext"><span>Food: {{ food }}</p></span>
+            <form action="/petfeed" value="Feed" method="get">
+                <button type="submit" value="Feed">Feed</button>
+            </form>
+        </fieldset>
+        <fieldset class="fieldset-pet">
+            <legend>Habit XP</legend>
+            <meter form="XP" min="0" max="100" value= '{{ XPcount }}' ></meter>
+            <div class="fieldsettext">
+            <span>XP:  {{ XPcount }}/100</span><br><span>Level: {{ petlevel }}</span>
+            </div>  
+        </fieldset>
+    <!-- Temp buttons to help test -->
     <li class="templink"><a href="firstpetcreate">First pet page --only for dev purposes--</a></li>
-    <li class="templink"><a href="generalpetcreate">General get pet page --only for dev purposes--</a></li>
     <li class="templink"><a href="setXPmax">Sets XP to max --only for dev purposes--</a></li>
     <form action="/testpet2" value="testpet2" method="post">
         <li class="templink"><button type="submit" value="testpet2">Gives the user pet #2 --only for dev purposes--.</button></li>   
@@ -33,6 +34,20 @@
     <form action="/testpet3" value="testpet3" method="post">
         <li class="templink"><button type="submit" value="testpet3">Gives the user pet #3 --only for dev purposes--.</button></li>   
     </form>
-    <li class="templink"><a href="testfood">Gives the max food --only for dev purposes--.</button></li>   
+    <form action="/testfood" value="testfood" method="post">
+    <li class="templink"><button type="submit" value="testfood">Gives the user 5 food --only for dev purposes--.</button></li> 
+    </form>
+    <!-- Catches flash message -->
+    <div class="flash">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+            <ul>
+                <p>{{ msg }}</p>
+            </ul>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    </div>
 </div>
 {% endblock %}

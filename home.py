@@ -4,14 +4,12 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, log
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
-# from pet import hungerFunc, feedFunc, getHunger
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from flask import jsonify
 from collections import defaultdict
 from flask_bcrypt import Bcrypt
-import sqlite3
 
 
 app = Flask(__name__)
@@ -78,11 +76,13 @@ class Pets(db.Model):
         petName = db.Column(db.String(30), nullable=False, default='Sereno')
         lastfedTime = db.Column(db.Integer, default=mydefault)
         currentTime = db.Column(db.Integer, default=datetime.now().timestamp())
+        cumulTime = db.Column(db.Integer, default=0)
         hunger = db.Column(db.Integer, default=100)
         petType = db.Column(db.Integer, nullable=False, default=1)
         petXP = db.Column(db.Integer, default=0)
         petLevel = db.Column(db.Integer, nullable=False, default=1)
         activePet = db.Column(db.Integer, default=0, nullable=False)
+        # runaway = db.Column(db.Integer, default=0)
 
         def __repr__(self):
             return f"{self.petName}"
@@ -93,8 +93,6 @@ class PetsOwned(db.Model):
     pet1 = db.Column(db.Integer, nullable=False, default=0)
     pet2 = db.Column(db.Integer, nullable=False, default=0)
     pet3 = db.Column(db.Integer, nullable=False, default=0)
-    # pet4 = db.Column(db.Integer, nullable=False, default=0)
-    # pet5 = db.Column(db.Integer, nullable=False, default=0)
 
 class UserItems(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
@@ -323,6 +321,7 @@ def pet():
     if (usercheck == None): # if user is new and has no pets, this object will be a NoneType
         return render_template("firstpetcreate.html") # here is where the user gets their first pet
     if (usercheck.petsOwned >= 1):
+        selectUser = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
         selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
         if selectPet == None:
             noPet = "No pet selected..."
@@ -338,7 +337,7 @@ def pet():
                 petimage = "/static/petimages/Pet3.png"
             hungerFunc()
             return render_template("pet.html", petname=selectPet.petName, XPcount = selectPet.petXP, petlevel = selectPet.petLevel,
-                                   petimage=petimage, satiety=selectPet.hunger)
+                                   petimage=petimage, satiety=selectPet.hunger, food=selectUser.petFood)
 
 @app.route("/petfeed", methods=['GET','POST'])
 def pet_feed():
@@ -347,6 +346,8 @@ def pet_feed():
     if selectFood.petFood >= 1:
         selectFood.petFood -= 1
         selectPet.hunger = 100
+        selectPet.cumulTime =0
+        xpFunc()
     if selectFood.petFood == 0:
         flash("You dont have any food left. Complete some habits to get coins then buy some.", "info")
     db.session.commit()
@@ -391,82 +392,80 @@ def petnest():     # Pet nest images and names
 
 @app.route("/makeactive", methods=['POST']) 
 def makeactive():
-    if request.form['makeactive'] == "Sereno": # How to get multiple buttons without filtering by method? Answer by Barmar on https://stackoverflow.com/questions/43811779/use-many-submit-buttons-in-the-same-form
+    if request.form['makeactive'] == "Sereno": # Pet 1
         activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
         activeUpdate.activePet = 1
         db.session.add(activeUpdate)
 
-        activeClear2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
-        if activeClear2 == None:
+        activeCheck2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
+        if activeCheck2 == None:
             pass
         else:
-            activeClear2.activePet = 0
+            activeCheck2.activePet = 0 # Clears Pet 2 of active status
             timeReset()
 
-        activeClear3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
-        if activeClear3 == None:
+        activeCheck3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
+        if activeCheck3 == None:
             pass
         else:
-            activeClear3.activePet = 0
+            activeCheck3.activePet = 0 # Clears Pet 3 of active status
             timeReset()
 
         db.session.commit()     
-        return redirect(url_for("petnest")) #to do next: updating activePet on Pets table based on current_user (logged in user)
+        return redirect(url_for("petnest"))
     
-    if request.form['makeactive'] == "Mori":
+    if request.form['makeactive'] == "Mori": # Pet 2
         activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
-        if activeUpdate == None:
-           flash("You don't have this pet...", "info")
+        if activeUpdate == None: # If the user doesn't have the pet:
+           flash("You don't have this pet...", "info") 
            pass
-        else:       
-            activeUpdate.activePet = 1
-            db.session.add(activeUpdate)
+        else: # If the user has the pet:
+            activeCheck1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first() # 
+            if activeCheck1 == None:
+                pass
+            else:
+                activeCheck1.activePet = 0 # Makes pet 1 non-active. Maybe change variable name to clearPet1
+                activeUpdate.activePet = 1 # Makes pet 2 active only if they have the pet. Man, i need better variable names.
+                db.session.add(activeUpdate)
+                timeReset()
 
-        activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
-        if activeClear1 == None:
-            pass
-        else:
-            activeClear1.activePet = 0
-            timeReset()
-
-        activeClear3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
-        if activeClear3 == None:
-            pass
-        else:
-            activeClear3.activePet = 0    
-            timeReset()
+            activeCheck3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
+            if activeCheck3 == None:
+                pass
+            else:
+                activeCheck3.activePet = 0    # Clears Pet 3 of active status
+                timeReset()
 
         db.session.commit()
         return redirect(url_for("petnest"))
     
-    if request.form['makeactive'] == "pet3":
+    if request.form['makeactive'] == "pet3": # Pet 3
         activeUpdate = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
         if activeUpdate == None:
             flash("You don't have this pet...", "info")
             pass
         else:
-            activeUpdate.activePet = 1
-            db.session.add(activeUpdate)
+            activeCheck1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
+            if activeCheck1 == None:
+                pass
+                activeCheck1.activePet = 0
+                activeUpdate.activePet = 1
+                db.session.add(activeUpdate)
+                timeReset()
 
-        activeClear1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
-        if activeClear1 == None:
-            pass
-            activeClear1.activePet = 0
-            timeReset()
-
-        activeClear2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
-        if activeClear2 == None:
-            pass
-        else:
-            activeClear2.activePet = 0
-            timeReset()
+            activeCheck2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
+            if activeCheck2 == None:
+                pass
+            else:
+                activeCheck2.activePet = 0
+                timeReset()
 
         db.session.commit()
         return redirect(url_for("petnest"))
 
 
 @app.route("/timereset", methods=["GET","POST"])
-def timeReset():
+def timeReset(): # This is what prevents non-active pets losing hunger after they are made active after some time.
     try:
         selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
         selectPet.lastfedTime = datetime.now().timestamp()
@@ -499,10 +498,10 @@ def testpet3():
 @login_required
 def testfood():
     if request.method == "POST":
-        selectFood = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
-        selectFood.petFood = 100
-        return redirect(url_for("pet"))
-
+        giveFood = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+        giveFood.petFood = 5
+        db.session.commit()
+    return redirect(url_for("pet"))
 
 @app.route("/returnpet", methods=["GET", "`POST"])
 def returnpet():
@@ -540,41 +539,48 @@ def givepet3(): #to remove once done
     db.session.commit()
     return redirect(url_for("pet"))
 
-def hungerFunc():
+def hungerFunc(): # Runs when "Pets" page is loaded (given the user has a pet)
     # getTime = Pets.query.filter_by(petOwner = current_user.id, activePet = 1).first()
     # getTime.lastfedTime = getTime.currentTime
     selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
     selectPet.lastfedTime = selectPet.currentTime
     selectPet.currentTime = datetime.now().timestamp()
     Diff = selectPet.currentTime - selectPet.lastfedTime
-    print(Diff)
-    if Diff >= 5 and Diff < 15:
+    selectPet.cumulTime += Diff
+    petName = selectPet.petName
+    print(selectPet.cumulTime)
+    if selectPet.cumulTime >= 5 and selectPet.cumulTime < 15:
         selectPet.hunger = 67
-    if Diff >= 16 and Diff < 25:
+    if selectPet.cumulTime >= 16 and selectPet.cumulTime < 25:
         selectPet.hunger = 34
-    if Diff >= 26 and Diff < 35:
+    if selectPet.cumulTime >= 26 and selectPet.cumulTime < 35:
         selectPet.hunger = 1
-    if Diff > 36:
+        flash(f"Hey it looks like { petName } is getting hungry!")
+    if selectPet.cumulTime > 36:
         selectPet.hunger = 0
+    if selectPet.cumulTime > 50:
+        flash(f"{ petName } ran off! He was hungry for too long.")
     db.session.commit()
 
+def xpFunc(): # Runs when pet is fed.
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    selectPet.petXP += 10
+    if selectPet.petXP >= 100:
+        lvlupFunc()
+        selectPet.petXP = 0
+    db.session.commit()
 
+def lvlupFunc(): # Runs when xpFunc is run.
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    selectPet.petLevel += 1
+    db.session.commit()
 
-# @app.route("/generalpetcreate", methods=["GET","POST"])
-# def generalPet():
-#     petname = request.form['petname']
-#     if petBuyType = 2: #subject to change depending on shop
-#         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=2, petXP=0, petLevel=1)
-#     if petBuyType = 3: #subject to change depending on shop
-#         newPet = Pets(petOwner=current_user.id, petName=petname, hunger=100,petType=3, petXP=0, petLevel=1)
-
-# @app.route("/namepet", methods=["POST"])
+# @app.route("/renamepet", methods=["POST"])
 # def returnpet():
 #     #add function to name pets
 #     return render_template("pet.html")
 
-
-
+#----Shop----#
 @app.route("/shop")
 @login_required
 def shop():
@@ -614,3 +620,8 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug=True) #to remove before deploying
+
+
+#Stack Overflow References (that I remember):
+# https://stackoverflow.com/questions/6699360/flask-sqlalchemy-update-a-rows-information
+# https://stackoverflow.com/questions/43811779/use-many-submit-buttons-in-the-same-form Q: How to get multiple buttons without filtering by method?
