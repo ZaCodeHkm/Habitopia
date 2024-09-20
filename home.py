@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
 from pet import hungerFunc, feedFunc, getHunger
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
+#from dateutil.relativedelta import relativedelta
 from flask import jsonify
 from collections import defaultdict
 from flask_bcrypt import Bcrypt
@@ -126,19 +126,6 @@ class DiaryEntry(db.Model):
 
     user = db.relationship('User', backref='diary_entries', lazy=True)
 
-class PetsOwned(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    petsOwned = db.Column(db.Integer, nullable=False, default=0)
-    pet1 = db.Column(db.Integer, nullable=False, default=0)
-    pet2 = db.Column(db.Integer, nullable=False, default=0)
-    pet3 = db.Column(db.Integer, nullable=False, default=0)
-    pet4 = db.Column(db.Integer, nullable=False, default=0)
-    pet5 = db.Column(db.Integer, nullable=False, default=0)
-
-class UserItems(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    coins = db.Column(db.Integer, nullable=False, default=60)
-    petFood = db.Column(db.Integer, nullable=False, default=5)
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
@@ -254,18 +241,18 @@ def change_password():
 @app.route("/habit")
 @login_required
 def habit():
-    habits = Habit.query.filter_by(user_id=current_user.id).all()
-    selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
-    month_start = datetime.strptime(selected_month, '%Y-%m').date()
-    month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
-    habit_logs = HabitLog.query.filter(HabitLog.habit_id.in_([habit.id for habit in habits]),
-                                       HabitLog.date.between(month_start, month_end)).all()
-    habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
+    # habits = Habit.query.filter_by(user_id=current_user.id).all()
+    # selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
+    # month_start = datetime.strptime(selected_month, '%Y-%m').date()
+    # month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
+    # habit_logs = HabitLog.query.filter(HabitLog.habit_id.in_([habit.id for habit in habits]),
+    #                                    HabitLog.date.between(month_start, month_end)).all()
+    # habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
 
 
-    return render_template('habit.html', habits=habits, selected_month=selected_month, month_start=month_start, 
-                           month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
-                           relativedelta=relativedelta)
+    return render_template('habit.html')#, habits=habits, selected_month=selected_month, month_start=month_start, 
+                        #    month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
+                        #    relativedelta=relativedelta)
 
 
 @app.route('/add_habit', methods=['POST'])
