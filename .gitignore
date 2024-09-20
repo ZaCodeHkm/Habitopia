@@ -3,3 +3,4 @@ instance
 __pycache__
 petdata.db
 petFunc.py
+database.db
