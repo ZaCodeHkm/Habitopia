@@ -369,9 +369,9 @@ def delete_diary(entry_id):
 @login_required
 def pet():  
     checkUser = PetsOwned.query.filter_by(user_id = current_user.id).first() #gets the current user based off their ID number
-    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
     if (checkUser == None): # if user is new and has no pets, this object will be a NoneType
         return render_template("firstpetcreate.html") # here is where the user gets their first pet
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
     if (checkUser.petsOwned >= 1):
         checkUser = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
         selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
@@ -381,21 +381,21 @@ def pet():
             return render_template("pet.html", petname=noPet, XPcount = 0, petlevel = 0, petimage=petimage)
         else:
             typecheck = selectPet.petType
-            if typecheck == 1:
+            if typecheck == 1: # Pet 1
                 if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
                     petimage = "/static/petimages/AirEgg.png"
                 if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
                     petimage = "/static/petimages/Sereno.png"
                 if selectPet.petLevel >= 10:
                     petimage = "/static/petimages/BeegBird.png" ###
-            if typecheck == 2:
+            if typecheck == 2: # Pet 2
                 if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
                     petimage = "/static/petimages/EarthEgg.png" ###
                 if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
                     petimage = "/static/petimages/Mori.png"
                 if selectPet.petLevel >= 10:
                     petimage = "/static/petimages/BeegRRat.png" ###
-            if typecheck == 3:
+            if typecheck == 3: # Pet 3
                 if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
                     petimage = "/static/petimages/WaterEgg.png" ###
                 if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
@@ -413,7 +413,7 @@ def pet_feed():
     if selectFood.petFood >= 1:
         selectFood.petFood -= 1
         selectPet.hunger = 100
-        selectPet.cumulTime =0
+        selectPet.cumulTime = 0
         xpFunc()
     if selectFood.petFood == 0:
         flash("You dont have any food left. Complete some habits to get coins then buy some.", "info")
@@ -423,43 +423,101 @@ def pet_feed():
 @app.route("/petnest", methods=["GET","POST"])
 @login_required
 def petnest():     # Pet nest images and names
-    petCheck = PetsOwned.query.filter_by(user_id = current_user.id).first()
+    petCheck = db.session.execute(db.select(PetsOwned).filter_by(user_id=current_user.id)).scalar()
     nameGet1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
     nameGet2 = Pets.query.filter_by(petOwner = current_user.id, petType = 2).first()
     nameGet3 = Pets.query.filter_by(petOwner = current_user.id, petType = 3).first()
-    
+    selectPet1 = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, petType = 1)).scalar()
+    selectPet2 = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, petType = 2)).scalar()
+    selectPet3 = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, petType = 3)).scalar()
+
+
     if petCheck == None:
         return redirect(url_for("pet"))
-    else:
-        pet1name = nameGet1.petName                     # PET 1
-        pet1 = petCheck.pet1 
-        if pet1 == 1:
+
+    if petCheck.pet1 == 1:
+        pet1name = nameGet1.petName
+        if selectPet1.petLevel >= 1 and selectPet1.petLevel < 5:
+            pet1image = "/static/petimages/AirEgg.png"
+        if selectPet1.petLevel >= 5 and selectPet1.petLevel < 10:
             pet1image = "/static/petimages/Sereno.png"
-        else:
-            pet1image = "/static/petimages/Empty.png"
+        if selectPet1.petLevel >= 10:
+            pet1image = "/static/petimages/BeegBird.png"
+    if petCheck.pet1 == 0:
+        pet1image = "/static/petimages/Empty.png"
+        pet1name = "..."
 
-        if nameGet2 == None:                            # PET 2
-            pet2name = "No pet here..."
-        else:
-            pet2name = nameGet2.petName
-        pet2 = petCheck.pet2
-        if pet2 == 1:
+    if petCheck.pet2 == 1:
+        print(selectPet2)
+        pet2name = nameGet2.petName
+        if selectPet2.petLevel >= 1 and selectPet2.petLevel < 5:
+            pet2image = "/static/petimages/EarthEgg.png"
+            
+        if selectPet2.petLevel >= 5 and selectPet2.petLevel < 10:
             pet2image = "/static/petimages/Mori.png"
-        else:
-            pet2image = "/static/petimages/Empty.png"
+        if selectPet2.petLevel >= 10:
+            pet2image = "/static/petimages/BeegRRat.png" ###
+    if petCheck.pet2 == 0:
+        pet2image = "/static/petimages/Empty.png"
+        pet2name = "..."
 
-        if nameGet3 == None:                            # PET 3
-            pet3name = "No pet here..."
-        else:
-            pet3name = nameGet3.petName
-        pet3 = petCheck.pet3
-        if pet3 == 1:
-            pet3image = "/static/petimages/Pet3.png"
-        else:
-            pet3image = "/static/petimages/Empty.png"
+    if petCheck.pet3 == 1:
+        pet3name = nameGet3.petName
+        if selectPet3.petLevel >= 1 and selectPet3.petLevel < 5:
+            pet3image = "/static/petimages/WaterEgg.png" ###
+        if selectPet3.petLevel >= 5 and selectPet3.petLevel < 10:
+            pet3image = "/static/petimages/Newt.png" ###
+        if selectPet3.petLevel >= 10:
+            pet3image = "/static/petimages/BeegFroog.png" ###
+    if petCheck.pet3 == 0 :
+        pet3image = "/static/petimages/Empty.png"
+        pet3name = "..."
 
-        return render_template("petnest.html", pet1image=pet1image, pet2image=pet2image, pet3image=pet3image,
-                           pet1name=pet1name, pet2name=pet2name, pet3name=pet3name)
+    # if selectPet.petType == 1:
+    #     pet1name = nameGet1.petName  # Pet 1 name
+    #     pet1 = petCheck.pet1
+    #     if pet1 == 1: # Checks if the user has the pet
+    #         if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+    #             pet1image = "/static/petimages/AirEgg.png"
+    #         if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+    #             pet1image = "/static/petimages/Sereno.png"
+    #         if selectPet.petLevel >= 10:
+    #             pet1image = "/static/petimages/BeegBird.png"
+    #     else:
+    #         pet1image = "/static/petimages/Empty.png"
+    
+    # if selectPet.petType == 2:
+    #     pet2 = petCheck.pet2
+    #     if pet2 == 1: # Checks if the user has the pet
+    #         print('works')
+    #         pet2name = nameGet2.petName
+    #         if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+    #             pet2image = "/static/petimages/EarthEgg.png"
+    #         if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+    #             pet2image = "/static/petimages/Mori.png"
+    #         if selectPet.petLevel >= 10:
+    #             pet2image = "/static/petimages/BeegRRat.png" ###
+    # else:
+    #     pet2image = "/static/petimages/Empty.png"
+    #     pet2name = "..."
+
+    # if nameGet3 == None:
+    #     pet3name = "No pet here..."
+    # else:
+    #     pet3name = nameGet3.petName  # Pet 3 name
+    # pet3 = petCheck.pet3
+    # if pet3 == 1: # Checks if the user has the pet
+    #     if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+    #         pet3image = "/static/petimages/WaterEgg.png" ###
+    #     if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+    #         pet3image = "/static/petimages/pet3.png"
+    #     if selectPet.petLevel >= 10:
+    #         pet3image = "/static/petimages/Beeg.png" ###
+    # else:
+    #         pet3image = "/static/petimages/Empty.png"
+
+    return render_template("petnest.html", pet1name=pet1name, pet2name=pet2name, pet3name=pet3name,
+                           pet1image=pet1image, pet2image=pet2image, pet3image=pet3image)
 
 @app.route("/makeactive", methods=['POST']) 
 def makeactive():
