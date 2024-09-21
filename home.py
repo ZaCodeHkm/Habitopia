@@ -6,7 +6,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
-#from dateutil.relativedelta import relativedelta
+from dateutil.relativedelta import relativedelta
 from flask import jsonify
 from collections import defaultdict
 from flask_bcrypt import Bcrypt
@@ -15,6 +15,7 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
+#database url
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 #secret key to encrypt cookies
 app.config['SECRET_KEY'] = 'secretkey'
@@ -67,37 +68,9 @@ class ChangePasswordForm(FlaskForm):
     submit = SubmitField("Change Password")
 
 
-#--Table for Pets
-class Pets(db.Model):
-    def mydefault(context):
-        return context.get_current_parameters()['currentTime']
-    
-    with app.app_context():
-        petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-        petID = db.Column(db.Integer, primary_key=True)
-        petName = db.Column(db.String(30), nullable=False, default='Sereno')
-        lastfedTime = db.Column(db.DateTime, default=mydefault)
-        currentTime = db.Column(db.DateTime, default=datetime.now)
-        hunger = db.Column(db.Integer)
-        petType = db.Column(db.Integer, nullable=False, default=1)
-        petXP = db.Column(db.Integer)
-        petLevel = db.Column(db.Integer, nullable=False)
-
-        def __repr__(self):
-            return f"{self.petName}"
-        
-class PetsOwned(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    petsOwned = db.Column(db.Integer, nullable=False, default=0)
-    pet1 = db.Column(db.Integer, nullable=False, default=0)
-    pet2 = db.Column(db.Integer, nullable=False, default=0)
-    pet3 = db.Column(db.Integer, nullable=False, default=0)
-    pet4 = db.Column(db.Integer, nullable=False, default=0)
-    pet5 = db.Column(db.Integer, nullable=False, default=0) 
-
-
 #-----Table for Habits-----
 class Habit(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     color = db.Column(db.String(20), default="blue")
@@ -105,10 +78,11 @@ class Habit(db.Model):
     frequency = db.Column(db.Integer, default=30)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     repeat_days = db.Column(db.String(100), default="")
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
      
 
 class HabitLog(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     id = db.Column(db.Integer, primary_key=True)
     habit_id = db.Column(db.Integer, db.ForeignKey('habit.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
@@ -117,8 +91,8 @@ class HabitLog(db.Model):
 
 #-----Diary Feature-----
 class DiaryEntry(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
     text = db.Column(db.Text, nullable=False)
 
@@ -211,7 +185,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            user_items = UserItems(user_id=new_user.id, coins=60, petFood=3) # Set coins & petfood to 0
+            user_items = UserItems(user_id=new_user.id, coins=60, petFood=3, bait=1) # Set coins, petfood, bait
             db.session.add(user_items)
             db.session.commit()
             
@@ -222,11 +196,35 @@ def register():
 @app.route("/delete_account", methods=['POST'])
 @login_required
 def delete_account():
-    user = current_user
-
+    user = User.query.get(current_user.id)
     try:
+        
+        UserItems.query.filter_by(user_id=user.id).delete()
+        Pets.query.filter_by(petOwner=user.id).delete()
+        PetsOwned.query.filter_by(user_id=user.id).delete()
+        Habit.query.filter_by(user_id=user.id).delete()
+        HabitLog.query.filter_by(user_id=user.id).delete()
+        DiaryEntry.query.filter_by(user_id=user.id).delete()
+
         db.session.delete(user)
         db.session.commit()
+
+
+        # UserItems.query.filter_by(user_id=user.id).first()
+        # Pets.query.filter_by(petOwner=user.id).first()
+        # PetsOwned.query.filter_by(user_id=user.id).first()
+        # Habit.query.filter_by(user_id=user.id).first()
+        # HabitLog.query.filter_by(user_id=user.id).first()
+        # DiaryEntry.query.filter_by(user_id=user.id).first()
+    # try:
+    #     db.session.delete(user)
+    #     db.session.delete(user_items)
+    #     db.session.delete(pets)
+    #     db.session.delete(pets_owned)
+    #     db.session.delete(habit)
+    #     #db.session.delete(habit_log)
+    #     db.session.delete(diary_entry)
+        
         flash("Your account has been deleted successfully.", "success")
     except Exception as error:
         db.session.rollback()
@@ -268,18 +266,18 @@ def change_password():
 @app.route("/habit")
 @login_required
 def habit():
-    # habits = Habit.query.filter_by(user_id=current_user.id).all()
-    # selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
-    # month_start = datetime.strptime(selected_month, '%Y-%m').date()
-    # month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
-    # habit_logs = HabitLog.query.filter(HabitLog.habit_id.in_([habit.id for habit in habits]),
-    #                                    HabitLog.date.between(month_start, month_end)).all()
-    # habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
+    habits = Habit.query.filter_by(user_id=current_user.id).all()
+    selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
+    month_start = datetime.strptime(selected_month, '%Y-%m').date()
+    month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
+    habit_logs = HabitLog.query.filter(HabitLog.habit_id.in_([habit.id for habit in habits]),
+                                       HabitLog.date.between(month_start, month_end)).all()
+    habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
 
 
-    return render_template('habit.html')#, habits=habits, selected_month=selected_month, month_start=month_start, 
-                        #    month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
-                        #    relativedelta=relativedelta)
+    return render_template('habit.html', habits=habits, selected_month=selected_month, month_start=month_start, 
+                            month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
+                            relativedelta=relativedelta)
 
 
 @app.route('/add_habit', methods=['POST'])
@@ -301,7 +299,7 @@ def complete_habit(habit_id):
     log = HabitLog.query.filter_by(habit_id=habit_id, date=today).first()
     
     if not log:
-        new_log = HabitLog(habit_id=habit_id, date=today, checked=True)
+        new_log = HabitLog(user_id=current_user.id, habit_id=habit_id, date=today, checked=True)
         db.session.add(new_log)
         flash("Habit completed!", "success")
     
@@ -410,6 +408,7 @@ def pet_feed():
     return redirect(url_for("pet"))
 
 @app.route("/petnest", methods=["GET","POST"])
+@login_required
 def petnest():     # Pet nest images and names
     petCheck = PetsOwned.query.filter_by(user_id = current_user.id).first()
     nameGet1 = Pets.query.filter_by(petOwner = current_user.id, petType = 1).first()
@@ -637,32 +636,35 @@ def lvlupFunc(): # Runs when xpFunc is run.
 #     return render_template("pet.html")
 
 #----Shop----#
-@app.route("/shop")
+@app.route("/shop", methods=["GET", "POST"])
 @login_required
 def shop():
-    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
-    return render_template("shop.html", coins=user_items.coins, petFood=user_items.petFood)
-
-@app.route("/buy_item", methods=['POST'])
-@login_required
-def buy_item():
-    item = request.form.get('pet_food')  # The item to buy (e.g., 'pet_food', 'egg')
-    price = int(request.form.get('20'))  # The price of the item
 
     user_items = UserItems.query.filter_by(user_id=current_user.id).first()
 
-    if user_items.coins >= price:
-        user_items.coins -= price
+    if request.method == "POST":
+        item = request.form['item']
 
-        if item == 'pet_food':
-            user_items.petFood += 1
-       
+        if item == "pet_food":
+            if user_items.coins >= 20:  # Check if user has enough coins
+                user_items.coins -= 20  # Deduct 20 coins
+                user_items.petFood += 1  # Add 1 pet food to the inventory
+                flash("You bought 1 pet food!", "success")
+            else:
+                flash("Not enough coins to buy pet food.", "danger")
+
+        elif item == "bait":
+            if user_items.coins >= 100:
+                user_items.coins -= 100  
+                user_items.bait += 1 
+                flash("You bought 1 bait!", "success")
+            else:
+                flash("Not enough coins to buy bait.", "danger")
+
         db.session.commit()
-        flash(f"You bought {item.replace('_', ' ')}!", "success")
-    else:
-        flash("Not enough coins to buy this item.", "danger")
 
-    return redirect(url_for('shop'))
+    return render_template("shop.html", coins=user_items.coins, petFood=user_items.petFood, bait=user_items.bait)
+
     
 
 #-----Account-----#

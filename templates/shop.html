@@ -9,21 +9,28 @@
 
     <h2>Coins: {{ coins }}</h2>
     <h2>Petfood: {{ petFood }}</h2>
-    
+    <h2>Baits: {{ bait }}</h2>
     <h1>Items:</h1>
 
     <ul>
         <li>
-            Pet Food - 20 coins
-            <form method="POST" action="{{ url_for('buy_item', item='pet_food', price=50) }}">
+            Pet Food - 20 Coins
+
+            <form method="POST" action="{{ url_for('shop') }}">
+                <input type="hidden" name="item" value="pet_food">
                 <button type="submit">Buy Pet Food</button>
             </form>
         </li>
+        
         <li>
-            Egg - 100 coins
-            <form method="POST" action="{{ url_for('buy_item', item='egg', price=100) }}">
-                <button type="submit">Buy Egg</button>
+            Bait - 100 Coins
+
+            <form method="POST" action="{{ url_for('shop') }}">
+                <input type="hidden" name="item" value="bait">
+                <button type="submit">Buy Bait</button>
             </form>
+            
+           
         </li>
     </ul>
 
