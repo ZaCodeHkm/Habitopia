@@ -210,20 +210,7 @@ def delete_account():
         db.session.commit()
 
 
-        # UserItems.query.filter_by(user_id=user.id).first()
-        # Pets.query.filter_by(petOwner=user.id).first()
-        # PetsOwned.query.filter_by(user_id=user.id).first()
-        # Habit.query.filter_by(user_id=user.id).first()
-        # HabitLog.query.filter_by(user_id=user.id).first()
-        # DiaryEntry.query.filter_by(user_id=user.id).first()
-    # try:
-    #     db.session.delete(user)
-    #     db.session.delete(user_items)
-    #     db.session.delete(pets)
-    #     db.session.delete(pets_owned)
-    #     db.session.delete(habit)
-    #     #db.session.delete(habit_log)
-    #     db.session.delete(diary_entry)
+  
         
         flash("Your account has been deleted successfully.", "success")
     except Exception as error:
@@ -714,6 +701,7 @@ def lvlupFunc(): # Runs when xpFunc is run.
 def shop():
 
     user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+    user_pets = PetsOwned.query.filter_by(user_id=current_user.id).first()
 
     if request.method == "POST":
         item = request.form['item']
@@ -734,6 +722,28 @@ def shop():
             else:
                 flash("Not enough coins to buy bait.", "danger")
 
+        # elif item == "earth_egg":
+        #     if user_items.coins >=10:
+        #         user_items.coins -= 10
+        #         if user_pets.pet2 == 0:
+        #             user_pets.petsOwned += 1
+        #             flash("You bought an Earth Egg!", "success")
+        #         else:
+        #             flash("You already own an Earth pet.", "danger")
+        #     else:
+        #         flash("Not enough coins to buy an Earth Egg.", "danger")
+
+        # elif item == "water_egg":
+        #     if user_items.coins >= 10:
+        #         user_items.coins -= 10
+        #         if user_pets.pet3 == 0:
+        #             user_pets.petsOwned += 1
+        #             flash("You bought a Water Egg!", "success")
+        #         else:
+        #             flash("You already own a Water pet.", "danger")
+        #     else:
+        #         flash("Not enough coins to buy a Water Egg.", "danger")
+
         db.session.commit()
 
     return render_template("shop.html", coins=user_items.coins, petFood=user_items.petFood, bait=user_items.bait)
@@ -744,7 +754,9 @@ def shop():
 @app.route("/account")
 @login_required
 def account():
-    return render_template("account.html", user=current_user)
+    user = current_user
+    pets_owned = PetsOwned.query.filter_by(user_id=current_user.id).first()
+    return render_template("account.html", user=user, pets_owned=pets_owned)
 
 @app.route("/logout")
 @login_required
