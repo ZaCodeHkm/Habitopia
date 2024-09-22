@@ -2,11 +2,19 @@
 {% block css %} <link rel="stylesheet" href="/static/styles/ShopStyles.css" > {% endblock %}
 {% block title %}The Shop!{% endblock %}
 {% block Pagename %}Shop Page{% endblock %}
-{% block heading %}htps://habitopia/shop{% endblock %}
+{% block heading %}https://habitopia/shop{% endblock %}
 {% block content %}
 <div id="wrap">
     <h1>Shop</h1>
-
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class=flashes>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
     <h2>Coins: {{ coins }}</h2>
     <h2>Petfood: {{ petFood }}</h2>
     <h2>Baits: {{ bait }}</h2>
@@ -29,8 +37,22 @@
                 <input type="hidden" name="item" value="bait">
                 <button type="submit">Buy Bait</button>
             </form>
-            
-           
+        </li>
+
+        <li>
+            Earth Egg - 1000 Coins
+            <form method="POST" action="{{ url_for('shop') }}">
+                <input type="hidden" name="item" value="earth_egg">
+                <button type="submit">Buy Earth Egg</button>
+            </form>
+        </li>
+
+        <li>
+            Water Egg - 2000 Coins
+            <form method="POST" action="{{ url_for('shop') }}">
+                <input type="hidden" name="item" value="water_egg">
+                <button type="submit">Buy Water Egg</button>
+            </form>
         </li>
     </ul>
 
