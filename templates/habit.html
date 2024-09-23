@@ -92,6 +92,9 @@
                                     <form action="{{ url_for('complete_habit', habit_id=habit.id) }}" method="POST">
                                         <button type="submit" class="delete">Complete</button>
                                     </form>
+                                    <form action="{{ url_for('undo_complete', habit_id=habit.id) }}" method="POST">
+                                        <button type="submit" class="delete">Undo</button>
+                                    </form>
                                 </td>
                             </div>
                         </tr>
@@ -111,36 +114,31 @@
         <div class="modal-content">
             <span class="close" onclick="closeDiaryModal()">&times;</span>
             <h2>Add a Diary Entry</h2>
-            <form action="/add_diary" method="POST">
-                <input type="date" name="date" required>
-                <textarea name="text" placeholder="Write your diary entry here..." required></textarea>
-                <button type="submit">Add Entry</button>
-            </form>
+            <form action="{{ url_for('add_diary') }}" method="POST">
+                <textarea name="text" required></textarea>
+                <button type="submit">Add Diary Entry</button>
+            </form>            
         </div>
     </div>
 
-    <div class="diary-entries">
-        {% for entry in diary_entries %}
-            <div class="diary-entry">
-                <p class="entry-date">{{ entry.date.strftime('%Y-%m-%d') }}</p>
-                <p class="entry-text">{{ entry.text }}</p>
-                <form action="{{ url_for('delete_diary', entry_id=entry.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="delete">Delete</button>
-                </form>
-            </div>
+    <div class="diary-entry">
+        {% if diary_entries %}
+            {% for entry in diary_entries %}
+                <div class="diary-entry">
+                    <p class="entry-date">{{ entry.date.strftime('%Y-%m-%d') }}</p>
+                    <p class="entry-text">{{ entry.text }}</p>
+                    <form action="{{ url_for('delete_diary', entry_id=entry.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="delete">Delete</button>
+                    </form>
+                </div>
+            {% endfor %}
         {% else %}
             <p>No diary entries found. Click [Add Diary Entry] to add to your diary! </p>
-        {% endfor %}
-    </div>
+        {% endif %}
+    </div>    
 
     <!--notification modal-->
 
-    <div id="notificationModal" class="modal">
-        <div class="modal-content">
-          <span class="close">&times;</span>
-          <p id="notificationMessage">Reminder for your habit: {habit.name} (Repeat on {today_weekday}) </p>
-        </div>
-      </div>
 
 </div>
 <script src="/static/styles/habit.js">

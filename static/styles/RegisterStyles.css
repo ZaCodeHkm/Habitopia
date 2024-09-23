@@ -382,3 +382,9 @@ body{
 .container.active .toggle-right{
     transform: translateX(200%);
 }
+
+/* Login/Register Header Edit By Rie */
+
+.form-container-title{
+  margin: 10px;
+}
