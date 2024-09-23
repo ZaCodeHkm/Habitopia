@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash
+from flask import Flask, render_template, url_for, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -106,7 +106,7 @@ class Pets(db.Model):
     with app.app_context():
         petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
         petID = db.Column(db.Integer, primary_key=True)
-        petName = db.Column(db.String(30), nullable=False, default='Sereno')
+        petName = db.Column(db.String(30), nullable=False, default='noname')
         lastfedTime = db.Column(db.Integer, default=mydefault)
         currentTime = db.Column(db.Integer, default=datetime.now().timestamp())
         cumulTime = db.Column(db.Integer, default=0)
@@ -401,7 +401,7 @@ def pet():
                 if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
                     petimage = "/static/petimages/Mori.png"
                 if selectPet.petLevel >= 10:
-                    petimage = "/static/petimages/BeegRRat.png" ###
+                    petimage = "/static/petimages/BeegRat.png" ###
             if typecheck == 3: # Pet 3
                 if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
                     petimage = "/static/petimages/WaterEgg.png" ###
@@ -572,6 +572,26 @@ def firstpetCreate():
         firstPet()
     return redirect(url_for("pet"))
     
+@app.route("/petnaming", methods=["GET","POST"])
+@login_required
+def petnaming():
+    petName = request.form['nameyourpet']
+    petType = session.get("petType", None)
+
+    if request.method == "POST":
+        if petType == 2:
+            selectPet = Pets.query.filter_by(petOwner=current_user.id, petType=2).first()
+            selectPet.petName = petName
+            db.session.commit()
+            return redirect(url_for('petnest'))
+        if petType == 3:
+            selectPet = Pets.query.filter_by(petOwner=current_user.id, petType=3).first()
+            selectPet.petName = petName
+            db.session.commit()
+            return redirect(url_for('petnest'))
+
+    return render_template("petnaming.html")
+
 @app.route("/testpet2", methods=["GET","POST"]) #To remove once done.
 @login_required
 def testpet2():
@@ -592,6 +612,15 @@ def testfood():
     if request.method == "POST":
         giveFood = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
         giveFood.petFood += 5
+        db.session.commit()
+    return redirect(url_for("pet"))
+
+@app.route("/testcoins", methods =["GET", "POST"]) #To remove once done.
+@login_required
+def testcoins():
+    if request.method == "POST":
+        giveFood = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+        giveFood.coins += 9001
         db.session.commit()
     return redirect(url_for("pet"))
 
@@ -665,11 +694,6 @@ def lvlupFunc(): # Runs when xpFunc is run.
     selectPet.petLevel += 1
     db.session.commit()
 
-# @app.route("/renamepet", methods=["POST"])
-# def returnpet():
-#     #add function to name pets
-#     return render_template("pet.html")
-
 #----Shop----#
 @app.route("/shop", methods=["GET", "POST"])
 @login_required
@@ -697,27 +721,39 @@ def shop():
             else:
                 flash("Not enough coins to buy bait.", "danger")
 
-        # elif item == "earth_egg":
-        #     if user_items.coins >=10:
-        #         user_items.coins -= 10
-        #         if user_pets.pet2 == 0:
-        #             user_pets.petsOwned += 1
-        #             flash("You bought an Earth Egg!", "success")
-        #         else:
-        #             flash("You already own an Earth pet.", "danger")
-        #     else:
-        #         flash("Not enough coins to buy an Earth Egg.", "danger")
+        elif item == "earth_egg":
+            if user_items.coins >= 10:
+                user_items.coins -= 10
+                if user_pets.pet2 == 0:
+                    user_pets.petsOwned += 1
+                    user_pets.pet2 = 1
+                    add_pet2 = Pets(petOwner=current_user.id, hunger=100, petType=2, petXP=0, petLevel=1)
+                    db.session.add(add_pet2)
+                    db.session.commit()
+                    session["petType"] = 2
+                    # flash("You bought an Earth Egg!", "success")
+                    return render_template("petnaming.html", petimage="/static/petimages/EarthEgg.png")
+                else:
+                    flash("You already own an Earth Egg.", "danger")
+            else:
+                flash("Not enough coins to buy an Earth Egg.", "danger")
 
-        # elif item == "water_egg":
-        #     if user_items.coins >= 10:
-        #         user_items.coins -= 10
-        #         if user_pets.pet3 == 0:
-        #             user_pets.petsOwned += 1
-        #             flash("You bought a Water Egg!", "success")
-        #         else:
-        #             flash("You already own a Water pet.", "danger")
-        #     else:
-        #         flash("Not enough coins to buy a Water Egg.", "danger")
+        elif item == "water_egg":
+            if user_items.coins >= 10:
+                user_items.coins -= 10
+                if user_pets.pet3 == 0:
+                    user_pets.petsOwned += 1
+                    user_pets.pet3 = 1
+                    add_pet3 = Pets(petOwner=current_user.id, hunger=100, petType=3, petXP=0, petLevel=1)
+                    db.session.add(add_pet3)
+                    db.session.commit()
+                    session["petType"] = 3
+                    # flash("You bought a Water Egg!", "success")
+                    return render_template("petnaming.html", petimage="/static/petimages/WaterEgg.png")
+                else:
+                    flash("You already own a Water Egg.", "danger")
+            else:
+                flash("Not enough coins to buy a Water Egg.", "danger")
 
         db.session.commit()
 
