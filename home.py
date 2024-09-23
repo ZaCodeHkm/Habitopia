@@ -387,29 +387,32 @@ def pet():
             petimage = "/static/petimages/Empty.png"
             return render_template("pet.html", petname=noPet, XPcount = 0, petlevel = 0, petimage=petimage)
         else:
-            typecheck = selectPet.petType
-            if typecheck == 1: # Pet 1
-                if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
-                    petimage = "/static/petimages/AirEgg.png"
-                if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
-                    petimage = "/static/petimages/Sereno.png"
-                if selectPet.petLevel >= 10:
-                    petimage = "/static/petimages/BeegBird.png" 
-            if typecheck == 2: # Pet 2
-                if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
-                    petimage = "/static/petimages/EarthEgg.png"
-                if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
-                    petimage = "/static/petimages/Mori.png"
-                if selectPet.petLevel >= 10:
-                    petimage = "/static/petimages/BeegRat.png" ###
-            if typecheck == 3: # Pet 3
-                if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
-                    petimage = "/static/petimages/WaterEgg.png" ###
-                if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
-                    petimage = "/static/petimages/Newt.png"
-                if selectPet.petLevel >= 10:
-                    petimage = "/static/petimages/Beeg.png" ###
             hungerFunc()
+            if selectPet.cumulTime > 50:
+                return redirect(url_for("runaway"))
+            else:
+                typecheck = selectPet.petType
+                if typecheck == 1: # Pet 1
+                    if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+                        petimage = "/static/petimages/AirEgg.png"
+                    if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+                        petimage = "/static/petimages/Sereno.png"
+                    if selectPet.petLevel >= 10:
+                        petimage = "/static/petimages/BeegBird.png" 
+                if typecheck == 2: # Pet 2
+                    if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+                        petimage = "/static/petimages/EarthEgg.png"
+                    if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+                        petimage = "/static/petimages/Mori.png"
+                    if selectPet.petLevel >= 10:
+                        petimage = "/static/petimages/BeegRat.png" ###
+                if typecheck == 3: # Pet 3
+                    if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+                        petimage = "/static/petimages/WaterEgg.png" ###
+                    if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+                        petimage = "/static/petimages/Newt.png"
+                    if selectPet.petLevel >= 10:
+                        petimage = "/static/petimages/Beeg.png" ###    
             return render_template("pet.html", petname=selectPet.petName, XPcount = selectPet.petXP, petlevel = selectPet.petLevel,
                                    petimage=petimage, satiety=selectPet.hunger, food=checkUser.petFood)
 
@@ -592,6 +595,26 @@ def petnaming():
 
     return render_template("petnaming.html")
 
+@app.route("/runaway", methods=["GET","POST"])
+@login_required
+def runaway(): 
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    userItems = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+    return render_template("runaway.html", petname=selectPet.petName,bait=userItems.bait)
+
+@app.route("/lure", methods=["GET","POST"])
+def lure():
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    selectBait = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+    if selectBait.bait >= 1:
+        selectBait.bait -= 1
+        selectPet.hunger = 100
+        selectPet.cumulTime = 0
+    if selectBait.bait == 0:
+        flash("You dont have any bait left.", "info")
+    db.session.commit()
+    return redirect(url_for('pet'))
+
 @app.route("/testpet2", methods=["GET","POST"]) #To remove once done.
 @login_required
 def testpet2():
@@ -677,10 +700,11 @@ def hungerFunc(): # Reduces the active pets hunger. Runs when "Pets" page is loa
         flash(f"Hey it looks like { petName } is getting hungry!")
     if selectPet.cumulTime > 36:
         selectPet.hunger = 0
-    if selectPet.cumulTime > 50:
-        flash(f"{ petName } ran off! He was hungry for too long.")
     db.session.commit()
-
+    if selectPet.cumulTime > 50:
+        petName = selectPet.petName
+        return redirect(url_for("runaway"))
+    
 def xpFunc(): # Runs when pet is fed.
     selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
     selectPet.petXP += 10
@@ -693,6 +717,7 @@ def lvlupFunc(): # Runs when xpFunc is run.
     selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
     selectPet.petLevel += 1
     db.session.commit()
+
 
 #----Shop----#
 @app.route("/shop", methods=["GET", "POST"])
@@ -787,3 +812,6 @@ if __name__ == "__main__":
 #Stack Overflow References (that I remember):
 # https://stackoverflow.com/questions/6699360/flask-sqlalchemy-update-a-rows-information
 # https://stackoverflow.com/questions/43811779/use-many-submit-buttons-in-the-same-form Q: How to get multiple buttons without filtering by method?
+
+#Non SO References
+# https://www.geeksforgeeks.org/how-to-use-flask-session-in-python-flask/
