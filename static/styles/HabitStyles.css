@@ -93,9 +93,9 @@ h1 {
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif ;
   vertical-align:top;
-  float: right;
+  float: left;
   -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
 
 }
 
@@ -110,7 +110,7 @@ h1 {
   vertical-align:top;
   float: right;
   -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
 }
 
 .failed {
@@ -124,7 +124,19 @@ h1 {
   vertical-align:top;
   float: right;
   -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
+}
+
+.reminder {
+  color: white;
+  background-color: green;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 1;
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif ;
+  vertical-align:top;
+  float: center;
 }
 
 .flash-message {

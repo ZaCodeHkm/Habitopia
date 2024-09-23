@@ -7,9 +7,9 @@ from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from flask import jsonify
 from collections import defaultdict
 from flask_bcrypt import Bcrypt
+from flask import session
 
 
 app = Flask(__name__)
@@ -259,11 +259,12 @@ def habit():
     habit_logs = HabitLog.query.filter(HabitLog.habit_id.in_([habit.id for habit in habits]),
                                        HabitLog.date.between(month_start, month_end)).all()
     habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
+    diary_entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
 
 
     return render_template('habit.html', habits=habits, selected_month=selected_month, month_start=month_start, 
                             month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
-                            relativedelta=relativedelta)
+                            relativedelta=relativedelta, diary_entries=diary_entries)
 
 
 @app.route('/add_habit', methods=['POST'])
@@ -305,10 +306,11 @@ def complete_habit(habit_id):
 @app.route("/delete/<int:habit_id>", methods=['POST'])
 def delete(habit_id):
     habit = Habit.query.filter_by(id=habit_id).first()
-    log = HabitLog.query.filter_by(habit_id=habit_id).first()
     db.session.delete(habit)
-    db.session.delete(log)
-    flash("Habit Succesfully Deleted", "failed")
+    log = HabitLog.query.filter_by(habit_id=habit_id).first()
+    if log:
+        db.session.delete(log)
+        flash("Habit Succesfully Deleted", "failed")
     db.session.commit()   
     return redirect(url_for("habit"))
 
@@ -318,33 +320,37 @@ def undo_complete(habit_id):
     today = datetime.now().date()
     log = HabitLog.query.filter_by(habit_id=habit_id, date=today).first()
     db.session.delete(log)
-    flash("Habit Uncompleted", "success")
+    flash("Habit Uncompleted", "failed")
 
     user_items = UserItems.query.filter_by(user_id=current_user.id).first()
     if user_items:
         user_items.coins -= 10  # Remove 10 coins
     else:
         user_items = UserItems(user_id=current_user.id, coins=10, petFood=0)
-        flash("You've Lost 10 coins", "failed")
+        flash("You've Lost 10 coins", "coin_reward")
         db.session.add(user_items)
 
     db.session.commit()   
     return redirect(url_for("habit"))
 
-@app.route("/notifications", methods=["GET"])
-@login_required
+@app.before_request
 def get_notifications():
-    habits = Habit.query.filter_by(user_id=current_user.id).all()
-    today_weekday = datetime.now().strftime('%A')  # Get current weekday
-    notifications = []
+    if request.endpoint == 'habit':  
+        last_visit = session.get('last_visit')  
+        
+        if not last_visit or (datetime.now() - datetime.strptime(last_visit, '%Y-%m-%d')).days >= 1:
+            session['last_visit'] = datetime.now().strftime('%Y-%m-%d')  
+            habits = Habit.query.filter_by(user_id=current_user.id).all()
+            today_weekday = datetime.now().strftime('%A') 
 
-    for habit in habits:
-        if habit.repeat_days:
-            repeat_days = habit.repeat_days.split(',')
-            if today_weekday in repeat_days:
-                notifications.append(f"Reminder for your habit: {habit.name} (Repeat on {today_weekday})")
+            for habit in habits:
+                if habit.repeat_days:
+                    repeat_days = habit.repeat_days.split(',')
+                    if today_weekday in repeat_days:
+                        flash(f"Reminder for your habit: {habit.name} (Repeat on {today_weekday})", "reminder")
+    
+        return None
 
-    return jsonify(notifications=notifications)
 
 #Diary
 @app.route('/diary_entry', methods=['GET'])
