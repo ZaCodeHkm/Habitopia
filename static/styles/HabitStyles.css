@@ -456,8 +456,10 @@ th {
 .entry-date {
   font-weight: bold;
   margin-bottom: 5px;
+  font-family: "Pixelify Sans", sans-serif;
 }
 
 .entry-text {
   color: #333;
+  font-family: "Pixelify Sans", sans-serif;
 }

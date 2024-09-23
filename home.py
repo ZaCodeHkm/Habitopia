@@ -73,7 +73,6 @@ class Habit(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    color = db.Column(db.String(20), default="blue")
     tag = db.Column(db.String(50), default="")
     frequency = db.Column(db.Integer, default=30)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -96,7 +95,7 @@ class DiaryEntry(db.Model):
     date = db.Column(db.Date, nullable=False)
     text = db.Column(db.Text, nullable=False)
 
-    user = db.relationship('User', backref='diary_entries', lazy=True)
+    user = db.relationship('User', backref='diary_entry', lazy=True)
 
 
 #--Table for Pets
@@ -303,8 +302,29 @@ def complete_habit(habit_id):
 @app.route("/delete/<int:habit_id>", methods=['POST'])
 def delete(habit_id):
     habit = Habit.query.filter_by(id=habit_id).first()
+    log = HabitLog.query.filter_by(habit_id=habit_id).first()
     db.session.delete(habit)
+    db.session.delete(log)
     flash("Habit Succesfully Deleted", "failed")
+    db.session.commit()   
+    return redirect(url_for("habit"))
+
+
+@app.route("/undo_complete/<int:habit_id>", methods=['GET', 'POST'])
+def undo_complete(habit_id):
+    today = datetime.now().date()
+    log = HabitLog.query.filter_by(habit_id=habit_id, date=today).first()
+    db.session.delete(log)
+    flash("Habit Uncompleted", "success")
+
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+    if user_items:
+        user_items.coins -= 10  # Remove 10 coins
+    else:
+        user_items = UserItems(user_id=current_user.id, coins=10, petFood=0)
+        flash("You've Lost 10 coins", "failed")
+        db.session.add(user_items)
+
     db.session.commit()   
     return redirect(url_for("habit"))
 
@@ -324,21 +344,21 @@ def get_notifications():
     return jsonify(notifications=notifications)
 
 #Diary
+@app.route('/diary_entry', methods=['GET'])
+@login_required
+def diary_entry():
+    entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
+    return render_template('habit.html', diary_entries=entries)
+
 @app.route('/add_diary', methods=['POST'])
 @login_required
 def add_diary():
-    date = request.form['date']
+    date = datetime.now().date()
     text = request.form['text']
-    new_entry = DiaryEntry(date=datetime.strptime(date, '%Y-%m-%d').date(), text=text, user_id=current_user.id)
+    new_entry = DiaryEntry(date=date, text=text, user_id=current_user.id)
     db.session.add(new_entry)
     db.session.commit()
     return redirect(url_for('habit'))
-
-
-@app.route('/diary_entries', methods=['GET'])
-def diary_entries():
-    entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
-    return render_template('habit.html', diary_entries=entries)
 
 @app.route('/delete_diary/<int:entry_id>', methods=['POST'])
 def delete_diary(entry_id):
