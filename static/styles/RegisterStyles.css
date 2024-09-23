@@ -190,7 +190,7 @@ body{
 }
 
 .container{
-    background-color: #fff;
+    background-color: #fffefb;
     border-radius: 30px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
     position: relative;
@@ -238,7 +238,7 @@ body{
 }
 
 .container form{
-    background-color: #fff;
+    background-color: #fffefb;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -248,7 +248,7 @@ body{
 }
 
 .container input{
-    background-color: #eee;
+    background-color: #eeeeeefe;
     border: none;
     margin: 8px 0;
     padding: 10px 15px;
@@ -259,6 +259,7 @@ body{
 }
 
 .form-container{
+    padding: 3px 10px;
     position: absolute;
     top: 0;
     height: 100%;
@@ -336,7 +337,7 @@ body{
 .toggle{
     background-color: #518162;
     height: 100%;
-    background: linear-gradient(to right, #3c5f48, #5e9270);
+    background: linear-gradient(to right, #052510, #5e9270);
     color: #fff;
     position: relative;
     left: -100%;

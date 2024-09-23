@@ -4,6 +4,7 @@
 {% block Pagename %}Habit Tracker{% endblock %}
 {% block heading %}https://habitopia/habit{% endblock %}
 {% block content %}
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul>
@@ -13,6 +14,7 @@
             </ul>
         {% endif %}
     {% endwith %}
+    
 <div id="wrap">
 
     <button id="openModalBtn" onclick="openModal()">Add Habit</button>

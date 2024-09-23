@@ -12,6 +12,7 @@
     <h1>Account</h1>
     <h2>Welcome, {{ user.username }}!</h2>
     <p>Your user ID: {{ user.id }}</p>
+    <p>Total Pets Owned: {{ pets_owned.petsOwned }}</p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
