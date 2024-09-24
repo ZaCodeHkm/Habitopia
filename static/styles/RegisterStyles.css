@@ -259,7 +259,6 @@ body{
 }
 
 .form-container{
-    padding: 3px 10px;
     position: absolute;
     top: 0;
     height: 100%;
@@ -384,4 +383,13 @@ body{
 }
 
 
+<<<<<<< HEAD
 
+=======
+.form-container-title{
+  position: absolute;
+  top: 50px;
+  left: 125px;
+  
+}
+>>>>>>> main

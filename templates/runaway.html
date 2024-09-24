@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block css %} <link rel="stylesheet" href="/static/styles/PetStyles.css" > {% endblock %}
+{% block title %}Pets!{% endblock %}
+{% block Pagename %}Pets{% endblock %}
+{% block heading %}https://habitopia/pet{% endblock %}
+{% block content %}
+<div id="wrap">
+    <h2 class="text-runaway">{{ petname }} ran off! You let {{ petname }} go hungry for too long!</h2>
+    <div class="petbox-runaway">
+        <img src="/static/petimages/runaway.png" alt="Pet image" width="256px" height="328px">
+    </div>
+            <p class="text-runaway">Pets need to eat, so {{ petname }} had to leave and find some.<br>
+                If that happens, they won't return :(</p>
+                <p class="text-runaway"><b>But...</b> if you have some bait, you can lure {{ petname }} back!</p>
+
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <p class="text-runaway" style="margin-right: 10px;">Bait : {{ bait }}</p>
+                <form action="/lure" value="Feed" method="get">
+                    <button type="submit" value="Feed">Lure</button>
+                </form>
+            </div>
+            <p class="text-runaway" style="font-size: 10px;">just dont forget to feed {{ petname }} this time!</p>
+
+    <div class="flash" style="position: absolute; bottom: 98px; left: 860px; font-size: 15px;">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+            <ul>
+                <img src="/static/petimages/Sora-Meliae-Matrilineare-Status-dialog-warning.24.png" style="position: absolute;">
+                <p style="margin-left: 30px;">{{ msg }}</p>
+            </ul>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    </div>
+</div>
+{% endblock %}
