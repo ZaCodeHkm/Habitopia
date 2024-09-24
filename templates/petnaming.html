@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block css %} <link rel="stylesheet" href="/static/styles/PetStyles.css" > {% endblock %}
+{% block title %}Pets!{% endblock %}
+{% block Pagename %}Pets{% endblock %}
+{% block heading %}https://habitopia/pet{% endblock %}
+{% block content %}
+<div id="wrap">
+        <p class="text-firstpet">A new buddy... take good care of 'em.</p>
+            <div class="petbox-firstpet">
+            <img src="{{ petimage }}" alt="pet image" width="256px" height="328px">
+            </div>
+        <p class="text-firstpet">Your buddy will need food to grow so don't forget to feed them!</p>
+        <form action="/petnaming" method="post" class="form-inline">
+            <fieldset class="fieldset-firstpet">
+            <legend><label for="nameyourpet">What would you like to name your pet?</label></legend>
+            <input name="nameyourpet" type="text" placeholder="Name" required>
+            <input type="submit" value="Name">
+        
+        </fieldset>
+        </form>
+        <form action="/returnpet" method="get" class="form-inline">
+            <button type="submit" value="returnpet">Return to your Pet page.</button>
+        </form>
+        <div id="wrap">
+{% endblock %}

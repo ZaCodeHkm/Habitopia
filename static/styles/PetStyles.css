@@ -208,6 +208,16 @@ table, th, td {
   background-color: rgba(255, 255, 255, 0px);
 }
 
+.petbox-runaway{
+  margin: auto;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #000000;
+  width: 256px;
+  height: 329px;
+  background-color: rgba(255, 255, 255, 0px);
+}
+
 .form-inline{
   display: inline;
 }
@@ -249,12 +259,22 @@ meter{
   text-align: center;
   font-family: "Pixelify Sans", sans-serif;
 }
+.text-runaway{
+  text-align: center;
+  font-family: "Pixelify Sans", sans-serif;
+}
 
 .fieldsettext{
   font-family: "Pixelify Sans", sans-serif;
   margin-top: 10px;
   margin-bottom: 0px;
   display: inline;
+}
+
+.active-button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .templink{
