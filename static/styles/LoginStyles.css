@@ -383,6 +383,10 @@ body{
     transform: translateX(200%);
 }
 
+<<<<<<< HEAD
+
+ 
+=======
 /* Login Header Moved to Middle */
 
 .form-container-title{
@@ -391,3 +395,4 @@ body{
   left: 140px;
   
 }
+>>>>>>> main

@@ -93,9 +93,10 @@ h1 {
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif ;
   vertical-align:top;
-  float: right;
+  float: left;
   -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
+  z-index: 1;
 
 }
 
@@ -110,7 +111,8 @@ h1 {
   vertical-align:top;
   float: right;
   -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
+  z-index: 1;
 }
 
 .failed {
@@ -124,13 +126,28 @@ h1 {
   vertical-align:top;
   float: right;
   -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
+  z-index: 1;
+}
+
+.reminder {
+  color: white;
+  background-color: green;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 1;
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif ;
+  vertical-align:top;
+  float: center;
+  z-index: 1;
 }
 
 .flash-message {
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
+  z-index: 1;
   
 }
 
@@ -366,46 +383,35 @@ th {
   background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
 }
 
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-/* Modal Styles */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+.modal2 {
+  display: none; 
+  position: fixed; 
+  z-index: 1; 
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
 }
 
 .modal-content {
   background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
+  margin: 15% auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
+  width: 50%;
+  max-height: 40%;
+}
+
+.modal-content2 {
+  background-color: #fefefe;
+  float: right;
+  margin: 70px 10px 0px;
+  padding: 20px;
+  width: 20%;
+  height: 40%;
+  overflow: scroll;
+  overflow-y: hidden;
 }
 
 .close {
@@ -421,6 +427,7 @@ th {
   text-decoration: none;
   cursor: pointer;
 }
+
 
 /* Small scroll down section inside the modal to keep the checkboxes  */
 .repeat_days {
