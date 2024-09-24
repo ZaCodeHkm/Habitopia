@@ -259,33 +259,33 @@ body{
 }
 
 .form-container{
-    padding: 3px 10px;
     position: absolute;
     top: 0;
     height: 100%;
     width: 50%;
+    left: 50%;
     transition: all 0.6s ease-in-out;
 }
 
 .Login{
-    left: 0;
+    left: 50%;
     width: 50%;
     z-index: 2;
 }
 
 .container.active .Login{
-    transform: translateX(100%);
+    transform: translateX(-100%);
 }
 
 .Register{
-    left: 0;
+    left: 50%;
     width: 50%;
     opacity: 1;
     z-index: 5;
 }
 
 .container.active .Register{
-    transform: translateX(100%);
+    transform: translateX(-100%);
     opacity: 1;
     z-index: 5;
     animation: move 0.6s;
@@ -320,27 +320,27 @@ body{
 .toggle-container{
     position: absolute;
     top: 0;
-    left: 50%;
+    left: 0;
     width: 50%;
     height: 100%;
     overflow: hidden;
     transition: all 0.6s ease-in-out;
-    border-radius: 150px 0 0 100px;
+    border-radius: 0 150px  100px 0;
     z-index: 1000;
 }
 
 .container.active .toggle-container{
     transform: translateX(-100%);
-    border-radius: 0 150px 100px 0;
+    border-radius:  150px 0 0 100px ;
 }
 
 .toggle{
     background-color: #518162;
     height: 100%;
-    background: linear-gradient(to right, #052510, #5e9270);
+    background: linear-gradient(to left, #052510, #5e9270);
     color: #fff;
     position: relative;
-    left: -100%;
+    left: 0;
     height: 100%;
     width: 200%;
     transform: translateX(0);
@@ -348,7 +348,7 @@ body{
 }
 
 .container.active .toggle{
-    transform: translateX(50%);
+    transform: translateX(-50%);
 }
 
 .toggle-panel{
@@ -367,11 +367,11 @@ body{
 }
 
 .toggle-left{
-    transform: translateX(-200%);
+    transform: translateX(0);
 }
 
 .container.active .toggle-left{
-    transform: translateX(0);
+    transform: translateX(-200%);
 }
 
 .toggle-right{
@@ -383,8 +383,11 @@ body{
     transform: translateX(200%);
 }
 
-/* Login/Register Header Edit By Rie */
+/* Login Header Moved to Middle */
 
 .form-container-title{
-  margin: 10px;
+  position: absolute;
+  top: 50px;
+  left: 140px;
+  
 }
