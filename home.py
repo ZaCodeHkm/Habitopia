@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash
+from flask import Flask, render_template, url_for, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -106,7 +106,7 @@ class Pets(db.Model):
     with app.app_context():
         petOwner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
         petID = db.Column(db.Integer, primary_key=True)
-        petName = db.Column(db.String(30), nullable=False, default='Sereno')
+        petName = db.Column(db.String(30), nullable=False, default='noname')
         lastfedTime = db.Column(db.Integer, default=mydefault)
         currentTime = db.Column(db.Integer, default=datetime.now().timestamp())
         cumulTime = db.Column(db.Integer, default=0)
@@ -387,29 +387,32 @@ def pet():
             petimage = "/static/petimages/Empty.png"
             return render_template("pet.html", petname=noPet, XPcount = 0, petlevel = 0, petimage=petimage)
         else:
-            typecheck = selectPet.petType
-            if typecheck == 1: # Pet 1
-                if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
-                    petimage = "/static/petimages/AirEgg.png"
-                if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
-                    petimage = "/static/petimages/Sereno.png"
-                if selectPet.petLevel >= 10:
-                    petimage = "/static/petimages/BeegBird.png" 
-            if typecheck == 2: # Pet 2
-                if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
-                    petimage = "/static/petimages/EarthEgg.png"
-                if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
-                    petimage = "/static/petimages/Mori.png"
-                if selectPet.petLevel >= 10:
-                    petimage = "/static/petimages/BeegRRat.png" ###
-            if typecheck == 3: # Pet 3
-                if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
-                    petimage = "/static/petimages/WaterEgg.png" ###
-                if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
-                    petimage = "/static/petimages/Newt.png"
-                if selectPet.petLevel >= 10:
-                    petimage = "/static/petimages/Beeg.png" ###
             hungerFunc()
+            if selectPet.cumulTime > 50:
+                return redirect(url_for("runaway"))
+            else:
+                typecheck = selectPet.petType
+                if typecheck == 1: # Pet 1
+                    if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+                        petimage = "/static/petimages/AirEgg.png"
+                    if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+                        petimage = "/static/petimages/Sereno.png"
+                    if selectPet.petLevel >= 10:
+                        petimage = "/static/petimages/BeegBird.png" 
+                if typecheck == 2: # Pet 2
+                    if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+                        petimage = "/static/petimages/EarthEgg.png"
+                    if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+                        petimage = "/static/petimages/Mori.png"
+                    if selectPet.petLevel >= 10:
+                        petimage = "/static/petimages/BeegRat.png" ###
+                if typecheck == 3: # Pet 3
+                    if selectPet.petLevel >= 1 and selectPet.petLevel < 5:
+                        petimage = "/static/petimages/WaterEgg.png" ###
+                    if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
+                        petimage = "/static/petimages/Newt.png"
+                    if selectPet.petLevel >= 10:
+                        petimage = "/static/petimages/Beeg.png" ###    
             return render_template("pet.html", petname=selectPet.petName, XPcount = selectPet.petXP, petlevel = selectPet.petLevel,
                                    petimage=petimage, satiety=selectPet.hunger, food=checkUser.petFood)
 
@@ -565,33 +568,82 @@ def timeReset(): # This is what prevents non-active pets losing hunger after the
         pass
     db.session.commit()
 
-@app.route("/firstpetcreate", methods=["GET","POST"]) #To remove once done.
+@app.route("/firstpetcreate", methods=["GET","POST"]) #To comment out once done.
 @login_required
 def firstpetCreate():
     if request.method == "POST":
         firstPet()
     return redirect(url_for("pet"))
     
-@app.route("/testpet2", methods=["GET","POST"]) #To remove once done.
+@app.route("/petnaming", methods=["GET","POST"])
+@login_required
+def petnaming():
+    petName = request.form['nameyourpet']
+    petType = session.get("petType", None)
+
+    if request.method == "POST":
+        if petType == 2:
+            selectPet = Pets.query.filter_by(petOwner=current_user.id, petType=2).first()
+            selectPet.petName = petName
+            db.session.commit()
+            return redirect(url_for('petnest'))
+        if petType == 3:
+            selectPet = Pets.query.filter_by(petOwner=current_user.id, petType=3).first()
+            selectPet.petName = petName
+            db.session.commit()
+            return redirect(url_for('petnest'))
+
+    return render_template("petnaming.html")
+
+@app.route("/runaway", methods=["GET","POST"])
+@login_required
+def runaway(): 
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    userItems = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+    return render_template("runaway.html", petname=selectPet.petName,bait=userItems.bait)
+
+@app.route("/lure", methods=["GET","POST"])
+def lure():
+    selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
+    selectBait = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+    if selectBait.bait >= 1:
+        selectBait.bait -= 1
+        selectPet.hunger = 100
+        selectPet.cumulTime = 0
+    if selectBait.bait == 0:
+        flash("You dont have any bait left.", "info")
+    db.session.commit()
+    return redirect(url_for('pet'))
+
+@app.route("/testpet2", methods=["GET","POST"]) #To comment out once done.
 @login_required
 def testpet2():
     if request.method == "POST":
         givepet2()
     return redirect(url_for("pet"))
 
-@app.route("/testpet3", methods=["GET","POST"]) #To remove once done.
+@app.route("/testpet3", methods=["GET","POST"]) #To comment out once done.
 @login_required
 def testpet3():
     if request.method == "POST":
         givepet3()
     return redirect(url_for("pet"))
 
-@app.route("/testfood", methods =["GET", "POST"]) #To remove once done.
+@app.route("/testfood", methods =["GET", "POST"]) #To comment out once done.
 @login_required
 def testfood():
     if request.method == "POST":
         giveFood = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
         giveFood.petFood += 5
+        db.session.commit()
+    return redirect(url_for("pet"))
+
+@app.route("/testcoins", methods =["GET", "POST"]) #To comment out once done.
+@login_required
+def testcoins():
+    if request.method == "POST":
+        giveFood = db.session.execute(db.select(UserItems).filter_by(user_id=current_user.id)).scalar_one()
+        giveFood.coins += 9001
         db.session.commit()
     return redirect(url_for("pet"))
 
@@ -609,7 +661,7 @@ def firstPet():
     db.session.commit()
     return render_template("firstpetcreate.html")
 
-def givepet2(): #to remove once done
+def givepet2(): #to comment out once done
     givepet2 = Pets(petOwner=current_user.id,petName="testingpet2", hunger=100, petType=2, petXP=0, petLevel=1)
     morePet = PetsOwned.query.get(current_user.id)
     morePet.petsOwned += 1
@@ -620,7 +672,7 @@ def givepet2(): #to remove once done
     db.session.commit()
     return redirect(url_for("pet"))
 
-def givepet3(): #to remove once done
+def givepet3(): #to comment out once done
     givepet3 = Pets(petOwner=current_user.id,petName="testingpet3", hunger=100, petType=3, petXP=0, petLevel=1)
     morePet = PetsOwned.query.get(current_user.id)
     morePet.petsOwned += 1
@@ -648,10 +700,11 @@ def hungerFunc(): # Reduces the active pets hunger. Runs when "Pets" page is loa
         flash(f"Hey it looks like { petName } is getting hungry!")
     if selectPet.cumulTime > 36:
         selectPet.hunger = 0
-    if selectPet.cumulTime > 50:
-        flash(f"{ petName } ran off! He was hungry for too long.")
     db.session.commit()
-
+    if selectPet.cumulTime > 50:
+        petName = selectPet.petName
+        return redirect(url_for("runaway"))
+    
 def xpFunc(): # Runs when pet is fed.
     selectPet = db.session.execute(db.select(Pets).filter_by(petOwner=current_user.id, activePet = 1)).scalar_one()
     selectPet.petXP += 10
@@ -665,10 +718,6 @@ def lvlupFunc(): # Runs when xpFunc is run.
     selectPet.petLevel += 1
     db.session.commit()
 
-# @app.route("/renamepet", methods=["POST"])
-# def returnpet():
-#     #add function to name pets
-#     return render_template("pet.html")
 
 #----Shop----#
 @app.route("/shop", methods=["GET", "POST"])
@@ -697,27 +746,39 @@ def shop():
             else:
                 flash("Not enough coins to buy bait.", "danger")
 
-        # elif item == "earth_egg":
-        #     if user_items.coins >=10:
-        #         user_items.coins -= 10
-        #         if user_pets.pet2 == 0:
-        #             user_pets.petsOwned += 1
-        #             flash("You bought an Earth Egg!", "success")
-        #         else:
-        #             flash("You already own an Earth pet.", "danger")
-        #     else:
-        #         flash("Not enough coins to buy an Earth Egg.", "danger")
+        elif item == "earth_egg":
+            if user_items.coins >= 10:
+                user_items.coins -= 10
+                if user_pets.pet2 == 0:
+                    user_pets.petsOwned += 1
+                    user_pets.pet2 = 1
+                    add_pet2 = Pets(petOwner=current_user.id, hunger=100, petType=2, petXP=0, petLevel=1)
+                    db.session.add(add_pet2)
+                    db.session.commit()
+                    session["petType"] = 2
+                    # flash("You bought an Earth Egg!", "success")
+                    return render_template("petnaming.html", petimage="/static/petimages/EarthEgg.png")
+                else:
+                    flash("You already own an Earth Egg.", "danger")
+            else:
+                flash("Not enough coins to buy an Earth Egg.", "danger")
 
-        # elif item == "water_egg":
-        #     if user_items.coins >= 10:
-        #         user_items.coins -= 10
-        #         if user_pets.pet3 == 0:
-        #             user_pets.petsOwned += 1
-        #             flash("You bought a Water Egg!", "success")
-        #         else:
-        #             flash("You already own a Water pet.", "danger")
-        #     else:
-        #         flash("Not enough coins to buy a Water Egg.", "danger")
+        elif item == "water_egg":
+            if user_items.coins >= 10:
+                user_items.coins -= 10
+                if user_pets.pet3 == 0:
+                    user_pets.petsOwned += 1
+                    user_pets.pet3 = 1
+                    add_pet3 = Pets(petOwner=current_user.id, hunger=100, petType=3, petXP=0, petLevel=1)
+                    db.session.add(add_pet3)
+                    db.session.commit()
+                    session["petType"] = 3
+                    # flash("You bought a Water Egg!", "success")
+                    return render_template("petnaming.html", petimage="/static/petimages/WaterEgg.png")
+                else:
+                    flash("You already own a Water Egg.", "danger")
+            else:
+                flash("Not enough coins to buy a Water Egg.", "danger")
 
         db.session.commit()
 
@@ -751,3 +812,6 @@ if __name__ == "__main__":
 #Stack Overflow References (that I remember):
 # https://stackoverflow.com/questions/6699360/flask-sqlalchemy-update-a-rows-information
 # https://stackoverflow.com/questions/43811779/use-many-submit-buttons-in-the-same-form Q: How to get multiple buttons without filtering by method?
+
+#Non SO References
+# https://www.geeksforgeeks.org/how-to-use-flask-session-in-python-flask/
