@@ -259,7 +259,6 @@ body{
 }
 
 .form-container{
-    padding: 3px 10px;
     position: absolute;
     top: 0;
     height: 100%;
@@ -383,8 +382,14 @@ body{
     transform: translateX(200%);
 }
 
-/* Login/Register Header Edit By Rie */
 
+<<<<<<< HEAD
+
+=======
 .form-container-title{
-  margin: 10px;
+  position: absolute;
+  top: 50px;
+  left: 125px;
+  
 }
+>>>>>>> main

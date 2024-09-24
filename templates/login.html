@@ -14,7 +14,11 @@
 <div class="container" id="container">
     
     <div class="form-container Login">
-            <h1 class="form-container-title"> Login </h1>
+<<<<<<< HEAD
+            <h1> Login </h1>
+=======
+        <div class="form-container-title"><h1>Login</h1></div>
+>>>>>>> main
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
 
@@ -34,19 +38,19 @@
                 <div>{{ form.submit() }}</div>
             </form>
     </div>
-        
+    
     <div class="toggle-container">
         <div class="toggle">
             <div class="toggle-panel toggle-left">
                 <h1>Welcome Back!</h1>
-                <p>Enter your personal details to use all of site features</p>
-                <button class="hidden" id="login"><a href="{{ url_for('login') }}">Login</a></button>
+                <p>Enter your personal details to use all the sites features.</p>
+                <button class="hidden" id="login"><a href="{{ url_for('register') }}">Register</a></button>
             </div>
 
             <div class="toggle-panel toggle-right">
                     <h1>Hello, Friend!</h1>
                     <p>Don't have an account yet? Register now!</p>
-                    <button class="hidden" id="register"><a href="{{url_for('register')}}">Register</a></button>
+                    <button class="hidden" id="register"><a href="{{url_for('login')}}">login</a></button>
                 </div>
             </div>
         </div>
