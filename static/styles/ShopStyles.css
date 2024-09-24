@@ -166,3 +166,62 @@ table, th, td {
 .class{
   background-color: #e0e2e7; 
 }
+
+/* Shop Page Styles */
+.inventory {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 20px;
+  margin-top: -30px;
+}
+
+.items-tittle {
+  font-family: "Pixelify Sans", sans-serif; 
+  font-size: 30px;
+  margin-top: -40px;
+}
+
+.flash {
+  font-family: "Pixelify Sans", sans-serif; 
+  margin-bottom: 10px;
+}
+.item-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  grid-template-rows: 1fr 1fr;
+  height: 100%;
+  margin-top: -10px;
+}
+
+.item-grid .item {
+  font-family: "Pixelify Sans", sans-serif; 
+  font-size: 18px; 
+  color: #000000;
+}
+
+.item {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.item-images {
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px
+}
+
+.item-images img {
+  width: 100px;
+  height: 110px;
+}
