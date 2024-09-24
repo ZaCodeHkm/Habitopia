@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session
+from flask import Flask, render_template, url_for, request, redirect, flash, session, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -8,8 +8,8 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
-from flask_bcrypt import Bcrypt
-from flask import session
+from werkzeug.utils import secure_filename
+
 
 
 app = Flask(__name__)
@@ -157,9 +157,9 @@ class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     text = db.Column(db.String(255), nullable=False)
-    date = db.Column(db.String(10), nullable=False)  # YYYY-MM-DD format
-    time = db.Column(db.String(5), nullable=False)  # HH:MM format
-    type = db.Column(db.String(50), nullable=False)  # e.g., 'reminder'
+    date = db.Column(db.String(10), nullable=False)  
+    time = db.Column(db.String(5), nullable=False)
+    type = db.Column(db.String(50), nullable=False)  
 
     def __init__(self, user_id, text, type):
         self.user_id = user_id
@@ -167,6 +167,17 @@ class Notification(db.Model):
         self.date = datetime.now().strftime('%Y-%m-%d')
         self.time = datetime.now().strftime('%H:%M')
         self.type = type
+
+#--------Account Page System--------#
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    img = db.Column(db.Text, unique=True, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    mimetype = db.Column(db.Text, nullable=False)
+    bio = db.Column(db.String(500), nullable=True)
+
+
 
 ###===FLASK ROUTING===###
 @app.route("/")
@@ -827,7 +838,49 @@ def shop():
 def account():
     user = current_user
     pets_owned = PetsOwned.query.filter_by(user_id=current_user.id).first()
-    return render_template("account.html", user=user, pets_owned=pets_owned)
+    profile = Account.query.filter_by(user_id=current_user.id).first()
+    account = Account.query.filter_by(user_id=current_user.id).first()
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+    return render_template("account.html", user=user, pets_owned=pets_owned, profile = profile, account = account, user_items = user_items)
+@app.route("/edit_account", methods=["GET", "POST"])
+@login_required
+def edit_account():
+    profile = Account.query.filter_by(user_id=current_user.id).first()
+    
+    img = request.files.get("img")
+    bio = request.form.get("bio")
+
+    if profile is None:
+        if img and bio:
+            filename = secure_filename(img.filename)
+            mimetype = img.mimetype
+            profile = Account(img=img.read(), bio=bio, user_id=current_user.id, name=filename, mimetype=mimetype)
+            db.session.add(profile)
+            db.session.commit()
+            flash("Your profile has been created!", "success")
+        else:
+            flash("You must provide both a profile picture and a bio.", "danger")
+    else:
+        if img:
+            filename = secure_filename(img.filename)
+            profile.img = img.read()
+            profile.name = filename
+            profile.mimetype = img.mimetype
+        if bio:
+            profile.bio = bio
+        db.session.commit()
+        flash("Your profile has been updated!", "success")
+
+    return redirect(url_for("account"))
+
+
+@app.route("/account/<int:id>")
+def get_img(id):
+    img = Account.query.filter_by(id=id).first()
+    if img:
+        return Response(img.img, mimetype=img.mimetype)
+    else:
+        return "Image Not Found", 404
 
 @app.route("/logout")
 @login_required

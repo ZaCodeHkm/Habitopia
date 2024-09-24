@@ -29,22 +29,6 @@ window.onclick = function(event) {
     }
 }
 
-//Diary Modal
-
-function openModal2() {
-    document.getElementById('diaryModal').style.display = 'block';
-}
-
-function closeModal2() {
-    document.getElementById('diaryModal').style.display = 'none';
-}
-
-window.onclick = function(event) {
-    const modal = document.getElementById('diaryModal');
-    if (event.target === modal) {
-        closeModal2();
-    }
-}
 
 // Modal for Diary
 function openDiaryModal() {
@@ -63,6 +47,23 @@ window.onclick = function(event) {
     }
 }
 
+//Modal for Edit Account
+
+function openAccModal() {
+    document.getElementById('accModal').style.display = 'block';
+}
+
+function closeAccModal() {
+    document.getElementById('accModal').style.display = 'none';
+}
+
+// Close the modal if the user clicks outside of the modal content
+window.onclick = function(event) {
+    const accModal = document.getElementById('accModal');
+    if (event.target === accModal) {
+        closeDiaryModal();
+    }
+}
 
 
 

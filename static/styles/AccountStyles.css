@@ -161,12 +161,80 @@ table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
 }
+
+/* Flash Messages */
+.coin_reward { 
+  color: white;
+  background-color: gold;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 100px 100px;
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif ;
+  vertical-align:top;
+  float: left;
+  -webkit-animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
+  z-index: 1;
+
+}
+
+.success {
+  color: white;
+  background-color: green;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 100px 50px;
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif ;
+  vertical-align:top;
+  float: right;
+  -webkit-animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
+  z-index: 1;
+}
+
+.failed {
+  color: white;
+  background-color: coral;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 100px 50px;
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif ;
+  vertical-align:top;
+  float: right;
+  -webkit-animation: fadeinout 6s linear forwards;
+  animation: fadeinout 3s linear forwards;
+  z-index: 1;
+}
 /* Content */
 
 .class{
   background-color: #e0e2e7; 
 }
 
+/* Modals */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+  max-height: 40%;
+}
 /* Notification Modal */
 .modal2 {
   display: none; 
