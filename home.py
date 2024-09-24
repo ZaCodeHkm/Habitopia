@@ -97,7 +97,6 @@ class DiaryEntry(db.Model):
 
     user = db.relationship('User', backref='diary_entry', lazy=True)
 
-
 #--Table for Pets
 class Pets(db.Model):
     def mydefault(context):
@@ -152,6 +151,22 @@ class ChangePasswordForm(FlaskForm):
     confirm_new_password = PasswordField(validators=[InputRequired(), EqualTo('new_password', message='Passwords must match')], render_kw={"placeholder": "Confirm New Password"})
     submit = SubmitField("Change Password")
 
+#--------Notification System---------#
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    text = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.String(10), nullable=False)  # YYYY-MM-DD format
+    time = db.Column(db.String(5), nullable=False)  # HH:MM format
+    type = db.Column(db.String(50), nullable=False)  # e.g., 'reminder'
+
+    def __init__(self, user_id, text, type):
+        self.user_id = user_id
+        self.text = text
+        self.date = datetime.now().strftime('%Y-%m-%d')
+        self.time = datetime.now().strftime('%H:%M')
+        self.type = type
 
 ###===FLASK ROUTING===###
 @app.route("/")
@@ -260,11 +275,11 @@ def habit():
                                        HabitLog.date.between(month_start, month_end)).all()
     habit_logs_dict = {(log.habit_id, log.date.strftime('%Y-%m-%d')): log for log in habit_logs}
     diary_entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
-
+    notifications = Notification.query.filter_by(user_id=current_user.id).all()
 
     return render_template('habit.html', habits=habits, selected_month=selected_month, month_start=month_start, 
                             month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
-                            relativedelta=relativedelta, diary_entries=diary_entries)
+                            relativedelta=relativedelta, diary_entries=diary_entries, notifications=notifications)
 
 
 @app.route('/add_habit', methods=['POST'])
@@ -335,22 +350,36 @@ def undo_complete(habit_id):
 
 @app.before_request
 def get_notifications():
-    if request.endpoint == 'habit':  
+    if request.endpoint == 'habit': 
         last_visit = session.get('last_visit')  
+        current_date = datetime.now().strftime('%Y-%m-%d') 
         
-        if not last_visit or (datetime.now() - datetime.strptime(last_visit, '%Y-%m-%d')).days >= 1:
-            session['last_visit'] = datetime.now().strftime('%Y-%m-%d')  
+        if not last_visit or last_visit != current_date:
+            session['last_visit'] = current_date  
+
             habits = Habit.query.filter_by(user_id=current_user.id).all()
-            today_weekday = datetime.now().strftime('%A') 
+            today_weekday = datetime.now().strftime('%A')  
 
             for habit in habits:
                 if habit.repeat_days:
                     repeat_days = habit.repeat_days.split(',')
                     if today_weekday in repeat_days:
-                        flash(f"Reminder for your habit: {habit.name} (Repeat on {today_weekday})", "reminder")
+                        # Create a notification and save it in the database
+                        notification = Notification(
+                            user_id=current_user.id,
+                            text=f"Reminder for your habit: {habit.name} (Repeat on {today_weekday})",
+                            type='reminder'
+                        )
+                        db.session.add(notification)
+            db.session.commit()
     
-        return None
+            return None
 
+def cleanup_old_notifications():
+    old_notifications = Notification.query.filter(Notification.date != datetime.now().strftime('%Y-%m-%d')).all()
+    for notification in old_notifications:
+        db.session.delete(notification)
+    db.session.commit()
 
 #Diary
 @app.route('/diary_entry', methods=['GET'])
