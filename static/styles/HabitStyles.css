@@ -439,11 +439,6 @@ th {
 
 
 /*Diary CSS*/
-.modal-content {
-  background-color: white; /* You can change this color for differentiation */
-  padding: 20px;
-  border-radius: 8px;
-}
 
 .diary-section {
   margin-top: 20px;
@@ -470,3 +465,5 @@ th {
   color: #333;
   font-family: "Pixelify Sans", sans-serif;
 }
+
+
