@@ -11,12 +11,13 @@
   height: 540px;
   margin: 100px auto;
   background: #e0e2e7;
-  overflow: hidden;
+  overflow: scroll;
   padding: 15px;
+  overflow-x: hidden;
 }
   
 .body{
-  background-image: url("/static/styles/animatedbackground.gif") ;
+  background-image: url("/static/styles/assets/animatedbackground.gif") ;
   background-repeat: no-repeat;
   background-size: cover ;
   background-attachment: fixed;
@@ -163,35 +164,21 @@ table, th, td {
 }
 
 /* Flash Messages */
-.coin_reward { 
-  color: white;
-  background-color: gold;
-  padding: 10px;
-  border-radius: 5px;
-  margin: 100px 100px;
-  font-size: 17px;
-  font-family: "Pixelify Sans", sans-serif ;
-  vertical-align:top;
-  float: left;
-  -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 3s linear forwards;
-  z-index: 1;
-
-}
-
 .success {
   color: white;
   background-color: green;
   padding: 10px;
   border-radius: 5px;
-  margin: 100px 50px;
+  margin: 40px 20px;
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif ;
   vertical-align:top;
   float: right;
-  -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 3s linear forwards;
+  right: 0;
+  -webkit-animation: fadein 2s linear forwards;
+  animation: fadein 2s linear forwards;
   z-index: 1;
+  position: fixed;
 }
 
 .failed {
@@ -199,14 +186,48 @@ table, th, td {
   background-color: coral;
   padding: 10px;
   border-radius: 5px;
-  margin: 100px 50px;
+  margin: 40px 20px;
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif ;
   vertical-align:top;
   float: right;
-  -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 3s linear forwards;
+  right: 0;
+  -webkit-animation: fadein 3s linear forwards;
+  animation: fadein 2s linear forwards;
   z-index: 1;
+  position: fixed;
+}
+
+.reminder {
+  color: white;
+  background-color: green;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 1;
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif ;
+  vertical-align:top;
+  float: center;
+  z-index: 1;
+  position: absolute;
+}
+
+.flash-message {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  z-index: 1;
+  
+}
+
+@-webkit-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 /* Content */
 

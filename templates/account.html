@@ -8,24 +8,29 @@
 {% block Pagename %}Account{% endblock %}
 {% block heading %}https://habitopia/account{% endblock %}
 {% block content %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-  <div class="flash-container">
-    {% for category, message in messages %}
-      <div class="flash-message {{ category }}">
-        {{ message }}
-        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-{% endwith %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+            {{ message }}
+            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
 
 <div id="wrap">
     <h1>Account</h1>
     <h2>Welcome, {{ user.username }}!</h2>
     <p>Your user ID: {{ user.id }}</p>
-    <img src="{{ url_for('get_img', id=profile.id) }}" alt="Profile Picture" width="256px" height="256px">
+    {% if profile %}
+        <img src="{{ url_for('get_img', id=profile.id) }}" alt="Profile Picture" width="256px" height="256px">
+    {% else %}
+        <p>No profile picture available</p>
+    {% endif %}
     <p>{{ account.bio }}</p>
     <p>Coins: {{ user_items.coins }}</p>
     <p>Total Pets Owned: {{ pets_owned.petsOwned }}</p>
