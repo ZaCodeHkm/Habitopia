@@ -32,7 +32,7 @@
                     <li><a href="{{ url_for('pet') }}">Pet</a></li>
                     <li><a href="{{ url_for('shop') }}">Shop</a></li>
                     <li><a href="{{ url_for('account') }}">Account</a></li>
-                    <li class="icon"><img src="/static/styles/assets/envelope_closed-0.png" style="width:20px"></li>
+                    <li class="icon"><button id="openModalBtn" onclick="openNotifModal()"><img src="/static/styles/assets/envelope_closed-0.png" style="width:20px"></button></li>
                 {% else %}
                 <!-- Show these links when the user is logged in -->
                     <li><a href="{{ url_for('home') }}">Home</a></li>
@@ -41,13 +41,40 @@
                     <li><a href="{{ url_for('petnest') }}">Nest</a></li>
                     <li><a href="{{ url_for('shop') }}">Shop</a></li>
                     <li><a href="{{ url_for('account') }}">Account</a></li>
-                    <li class="icon"><img src="/static/styles/assets/envelope_closed-0.png" style="width:20px"></li>
+                    <li class="icon"><button id="openModalBtn" onclick="openNotifModal()"><img src="/static/styles/assets/envelope_closed-0.png" style="width:20px"></button></li>
                 {% endif %}
             </ul>
         </div>
     </div>
+    <div id="notifModal" class="modal2">
+        <div class="modal-content2">
+            <span class="close" onclick="closeNotifModal()">&times;</span>
+            
+            {% if notifications %}
+                <ul>
+                    {% for notif in notifications %}
+                        <li id="notification-{{ notif.id }}" class="notifications">
+                            {{ notif.text }} - {{ notif.time }}
+                            <button onclick="deleteNotification('{{ notif.id }}')" class="delete-button">X</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <script>
+                    
+                    openNotifModal();
+                </script>
+            {% else %}
+                <p>No notifications at the moment.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    
     {% block content %}
     
     {% endblock %}
+<script src="/static/styles/base.js">
+
+</script>
 </body>
 </html>

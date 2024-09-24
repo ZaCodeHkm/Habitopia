@@ -382,11 +382,14 @@ body{
     transform: translateX(200%);
 }
 
-/* Login/Register Header Edit By Rie */
 
+<<<<<<< HEAD
+
+=======
 .form-container-title{
   position: absolute;
   top: 50px;
   left: 125px;
   
 }
+>>>>>>> main
