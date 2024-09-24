@@ -271,6 +271,12 @@ meter{
   display: inline;
 }
 
+.active-button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .templink{
   position: relative;
   bottom: 210px;

@@ -9,13 +9,9 @@
     <div class="petbox-runaway">
         <img src="/static/petimages/runaway.png" alt="Pet image" width="256px" height="328px">
     </div>
-        <!-- <fieldset class="fieldset-pet">
-            <legend>Hunger</legend>
-            <meter form="Feed" min="0" max="100" value='0' ></meter>
-            <div class="fieldsettext"><span>Food: {{ food }}</p></span> -->
-            <p class="text-runaway">Pets need to be regularly fed, otherwise they will have to go out and hunt for food.<br>
+            <p class="text-runaway">Pets need to eat, so {{ petname }} had to leave and find some.<br>
                 If that happens, they won't return :(</p>
-                <p class="text-runaway">But it isnt it all lost... if you have some bait, you can lure {{ petname }} back!</p>
+                <p class="text-runaway"><b>But...</b> if you have some bait, you can lure {{ petname }} back!</p>
 
             <div style="display: flex; justify-content: center; align-items: center;">
                 <p class="text-runaway" style="margin-right: 10px;">Bait : {{ bait }}</p>
@@ -24,30 +20,7 @@
                 </form>
             </div>
             <p class="text-runaway" style="font-size: 10px;">just dont forget to feed {{ petname }} this time!</p>
-        <!-- </fieldset>
-        <fieldset class="fieldset-pet">
-            <legend>Habit XP</legend>
-            <meter form="XP" min="0" max="100" value= '{{ XPcount }}' ></meter>
-            <div class="fieldsettext">
-            <span>XP:  {{ XPcount }}/100</span><br><span>Level: {{ petlevel }}</span>
-            </div>  
-        </fieldset> -->
-    <!-- Temp buttons to help test -->
-    <!-- <li class="templink"><a href="firstpetcreate">First pet page --only for dev purposes--</a></li>
-    <li class="templink"><a href="setXPmax">Sets XP to max --only for dev purposes--</a></li>
-    <form action="/testpet2" value="testpet2" method="post">
-        <li class="templink"><button type="submit" value="testpet2">Gives the user pet #2 --only for dev purposes--.</button></li>   
-    </form>
-    <form action="/testpet3" value="testpet3" method="post">
-        <li class="templink"><button type="submit" value="testpet3">Gives the user pet #3 --only for dev purposes--.</button></li>   
-    </form>
-    <form action="/testfood" value="testfood" method="post">
-    <li class="templink"><button type="submit" value="testfood">Gives the user 5 food --only for dev purposes--.</button></li> 
-    </form>
-    <form action="/testcoins" value="testcoins" method="post">
-        <li class="templink"><button type="submit" value="testcoins">Gives the user 9001 coins --only for dev purposes--.</button></li> 
-    </form> -->
-    <!-- Catches flash message -->
+
     <div class="flash" style="position: absolute; bottom: 98px; left: 860px; font-size: 15px;">
         {% with messages = get_flashed_messages() %}
         {% if messages %}

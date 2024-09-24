@@ -568,7 +568,7 @@ def timeReset(): # This is what prevents non-active pets losing hunger after the
         pass
     db.session.commit()
 
-@app.route("/firstpetcreate", methods=["GET","POST"]) #To remove once done.
+@app.route("/firstpetcreate", methods=["GET","POST"]) #To comment out once done.
 @login_required
 def firstpetCreate():
     if request.method == "POST":
@@ -615,21 +615,21 @@ def lure():
     db.session.commit()
     return redirect(url_for('pet'))
 
-@app.route("/testpet2", methods=["GET","POST"]) #To remove once done.
+@app.route("/testpet2", methods=["GET","POST"]) #To comment out once done.
 @login_required
 def testpet2():
     if request.method == "POST":
         givepet2()
     return redirect(url_for("pet"))
 
-@app.route("/testpet3", methods=["GET","POST"]) #To remove once done.
+@app.route("/testpet3", methods=["GET","POST"]) #To comment out once done.
 @login_required
 def testpet3():
     if request.method == "POST":
         givepet3()
     return redirect(url_for("pet"))
 
-@app.route("/testfood", methods =["GET", "POST"]) #To remove once done.
+@app.route("/testfood", methods =["GET", "POST"]) #To comment out once done.
 @login_required
 def testfood():
     if request.method == "POST":
@@ -638,7 +638,7 @@ def testfood():
         db.session.commit()
     return redirect(url_for("pet"))
 
-@app.route("/testcoins", methods =["GET", "POST"]) #To remove once done.
+@app.route("/testcoins", methods =["GET", "POST"]) #To comment out once done.
 @login_required
 def testcoins():
     if request.method == "POST":
@@ -661,7 +661,7 @@ def firstPet():
     db.session.commit()
     return render_template("firstpetcreate.html")
 
-def givepet2(): #to remove once done
+def givepet2(): #to comment out once done
     givepet2 = Pets(petOwner=current_user.id,petName="testingpet2", hunger=100, petType=2, petXP=0, petLevel=1)
     morePet = PetsOwned.query.get(current_user.id)
     morePet.petsOwned += 1
@@ -672,7 +672,7 @@ def givepet2(): #to remove once done
     db.session.commit()
     return redirect(url_for("pet"))
 
-def givepet3(): #to remove once done
+def givepet3(): #to comment out once done
     givepet3 = Pets(petOwner=current_user.id,petName="testingpet3", hunger=100, petType=3, petXP=0, petLevel=1)
     morePet = PetsOwned.query.get(current_user.id)
     morePet.petsOwned += 1
