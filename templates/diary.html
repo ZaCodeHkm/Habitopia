@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block css %} <link rel="stylesheet" href="/static/styles/HabitStyles.css" > {% endblock %}
+{% block title %}Habit Tracker!{% endblock %}
+{% block Pagename %}Habit Tracker{% endblock %}
+{% block heading %}https://habitopia/habit{% endblock %}
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endwith %}
+    
+
+<div id="wrap">
+    <button id="openDiaryModalBtn" onclick="openDiaryModal()">Add Diary Entry</button>
+    <div id="diaryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDiaryModal()">&times;</span>
+            <h2>Add a Diary Entry</h2>
+            <form action="{{ url_for('add_diary') }}" method="POST">
+                <textarea name="text" required></textarea>
+                <button type="submit">Add Diary Entry</button>
+            </form>            
+        </div>
+    </div>
+
+    <div class="diary-entry">
+        {% if diary_entries %}
+            {% for entry in diary_entries %}
+                <div class="diary-entry">
+                    <p class="entry-date">{{ entry.date.strftime('%Y-%m-%d') }}</p>
+                    <p class="entry-text">{{ entry.text }}</p>
+                    <form action="{{ url_for('delete_diary', entry_id=entry.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="delete">Delete</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No diary entries found. Click [Add Diary Entry] to add to your diary! </p>
+        {% endif %}
+    </div>    
+
+    <!--notification modal-->
+
+
+</div>
+<script src="/static/styles/habit.js">
+
+    
+</script>
+{% endblock %}
+

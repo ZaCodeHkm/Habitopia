@@ -18,7 +18,7 @@
 }
   
 .body{
-  background-image: url("/static/styles/animatedbackground.gif") ;
+  background-image: url("/static/styles/assets/animatedbackground.gif") ;
   background-repeat: no-repeat;
   background-size: cover ;
   background-attachment: fixed;
