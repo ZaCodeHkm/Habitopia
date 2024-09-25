@@ -277,6 +277,7 @@ def change_password():
 @app.route("/habit")
 @login_required
 def habit():
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
     habits = Habit.query.filter_by(user_id=current_user.id).all()
     selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
     month_start = datetime.strptime(selected_month, '%Y-%m').date()
@@ -289,7 +290,7 @@ def habit():
 
     return render_template('habit.html', habits=habits, selected_month=selected_month, month_start=month_start, 
                             month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
-                            relativedelta=relativedelta, diary_entries=diary_entries, notifications=notifications)
+                            relativedelta=relativedelta, diary_entries=diary_entries, notifications=notifications, user_items=user_items)
 
 
 @app.route('/add_habit', methods=['POST'])

@@ -5,16 +5,25 @@
     {% block heading %}https://habitopia/shop{% endblock %}
     {% block content %}
     <div id="wrap">
-        
-        <h1 style="margin: 0px; margin-bottom: 5px;">Shop</h1>
+        <div class="topbox2">
+            <ul>
+                <li><img src="/static/styles/assets/address_book_card.png" width=20px class="topboxtext2"></li>
+                <li><h5 class="topboxtext2">Shop</h5></li>
+            </ul>
+            <ul>
+                <li><img src="/static/styles/assets/exit-active.png" class="icon"></li>
+                <li><img src="/static/styles/assets/window-active.png" class="icon"></li>
+                <li><img src="/static/styles/assets/minimise-active.png" class="icon"></li>
+            </ul>
+        </div>
         <div class="inventory">
-            
+    
             <h2>INVENTORY</h2>
             <h2 style="  margin-left: 15px;">Coins: {{ coins }}</h2>
             <h2 style="  margin-left: 15px;">Petfood: {{ petFood }}</h2>
             <h2 style="  margin-left: 15px;">Baits: {{ bait }}</h2>
         </div>
-
+    
         <h1 class="items-tittle">Items:</h1>
 
         <div class="flash">
