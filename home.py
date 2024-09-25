@@ -361,9 +361,10 @@ def undo_complete(habit_id):
     db.session.commit()   
     return redirect(url_for("habit"))
 
+
 @app.before_request
 def get_notifications():
-    if request.endpoint == 'habit': 
+    if current_user.is_authenticated and request.endpoint == 'habit': 
         last_visit = session.get('last_visit')  
         current_date = datetime.now().strftime('%Y-%m-%d') 
         
@@ -387,7 +388,6 @@ def get_notifications():
             db.session.commit()
     
             return None
-
 def cleanup_old_notifications():
     old_notifications = Notification.query.filter(Notification.date != datetime.now().strftime('%Y-%m-%d')).all()
     for notification in old_notifications:
