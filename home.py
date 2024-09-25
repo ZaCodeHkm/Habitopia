@@ -726,17 +726,18 @@ def hungerFunc(): # Reduces the active pets hunger. Runs when "Pets" page is loa
     selectPet.cumulTime += Diff
     petName = selectPet.petName
     print(selectPet.cumulTime)
-    if selectPet.cumulTime >= 5 and selectPet.cumulTime < 15:
+    if selectPet.cumulTime >= 14400 and selectPet.cumulTime < 28800: # 4 hours to 8 hours
         selectPet.hunger = 67
-    if selectPet.cumulTime >= 16 and selectPet.cumulTime < 25:
+    if selectPet.cumulTime >= 28800 and selectPet.cumulTime < 57600: # 8 hours to 16 hours
         selectPet.hunger = 34
-    if selectPet.cumulTime >= 26 and selectPet.cumulTime < 35:
-        selectPet.hunger = 1
         flash(f"Hey it looks like { petName } is getting hungry!")
-    if selectPet.cumulTime > 36:
+    if selectPet.cumulTime >= 57600 and selectPet.cumulTime < 86400: # 16 hours to 24 hours
+        selectPet.hunger = 1
+    if selectPet.cumulTime > 86400: # 24 hours
         selectPet.hunger = 0
+        flash(f"{ petName } is really hungry!")
     db.session.commit()
-    if selectPet.cumulTime > 50:
+    if selectPet.cumulTime > 172800: # 48 hours
         petName = selectPet.petName
         return redirect(url_for("runaway"))
     
