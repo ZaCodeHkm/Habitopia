@@ -6,15 +6,7 @@
   font-weight: 400;
   font-style: normal;
 }
-#wrap {
-  width: 900px;
-  height: 540px;
-  margin: 100px auto;
-  background: #e0e2e7;
-  overflow: scroll;
-  padding: 15px;
-  overflow-x: hidden;
-}
+
   
 .body{
   background-image: url("/static/styles/assets/animatedbackground.gif") ;
@@ -231,10 +223,100 @@ table, th, td {
 }
 /* Content */
 
-.class{
-  background-color: #e0e2e7; 
+#wrap {
+  width: 1400px;
+  height: 500px;
+  margin: 100px auto;
+  background: #e0e2e7 ;
+  padding: 1px;
 }
 
+.wrap2 {
+  width: 98%;
+  height: 99%;
+  padding: 10px;
+  background-color: #e0e2e7;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border: 5px ridge #e0e2e7;
+}
+
+.topbox2{
+  background-color: #2d4535;
+  height: 30px;
+  margin: 2px 2px;
+  width: 99%;
+  border: 1px solid black;
+}
+
+.topboxtext2 {
+  float: left;
+  color: #FFFFFF;
+  margin: 4px 6px;
+  text-align: left;
+  font-family: "Pixelify Sans", sans-serif ;
+  font-size: 20px;
+  vertical-align: baseline;
+
+}
+
+.nav2 {
+  background-color: #e0e2e7 ;
+  border: 5px ridge #e0e2e7;
+  width:99.5%;
+  margin: auto; 
+  overflow: hidden;
+  top: 33px;
+}
+
+.nav2 li{
+  float: left;
+  text-align: center;
+}
+
+.iconbutton{
+  width: 100px;
+  background-color: #e0e2e7;
+  border: hidden;
+}
+
+.iconbutton:hover{
+  background-color: aliceblue;
+}
+
+.icon2 {
+  width: 30px;
+  margin: 10px 10px 0px;
+}
+
+.icontext {
+  font-family: "Pixelify Sans", sans-serif ;
+  color: black;
+  font-size: 15px;
+  vertical-align: baseline;
+  margin: 0px 0px 10px 0px;
+  padding: 0;
+}
+.actionbutton{
+  border: 2px outset #c1c1c1;
+  background-color: #c1c1c1;
+  font-family: "Pixelify Sans", sans-serif ;
+  margin: 10px 10px;
+  font-size: 15px;
+}
+.withpic{
+  width: 196px;
+  height: 196px;
+  border: 5px ridge #e0e2e7;
+  float: left;
+}
+
+.picbox {
+  width: 196px;
+  height: 196px;
+  border: 5px ridge #e0e2e7;
+  float: left;
+}
 /* Modals */
 .modal {
   display: none; /* Hidden by default */
