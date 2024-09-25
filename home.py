@@ -168,8 +168,8 @@ class Notification(db.Model):
 
 #--------Account Page System--------#
 class Account(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
     img = db.Column(db.Text, unique=True, nullable=False)
     name = db.Column(db.Text, nullable=False)
     mimetype = db.Column(db.Text, nullable=False)
@@ -229,6 +229,8 @@ def delete_account():
         Habit.query.filter_by(user_id=user.id).delete()
         HabitLog.query.filter_by(user_id=user.id).delete()
         DiaryEntry.query.filter_by(user_id=user.id).delete()
+        Notification.query.filter_by(user_id=user.id).delete()
+        Account.query.filter_by(user_id=user.id).delete()
 
         db.session.delete(user)
         db.session.commit()
