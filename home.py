@@ -113,7 +113,6 @@ class Pets(db.Model):
         petXP = db.Column(db.Integer, default=0)
         petLevel = db.Column(db.Integer, nullable=False, default=1)
         activePet = db.Column(db.Integer, default=0, nullable=False)
-        # runaway = db.Column(db.Integer, default=0)
 
         def __repr__(self):
             return f"{self.petName}"
@@ -438,7 +437,7 @@ def pet():
             return render_template("pet.html", petname=noPet, XPcount = 0, petlevel = 0, petimage=petimage)
         else:
             hungerFunc()
-            if selectPet.cumulTime > 50:
+            if selectPet.cumulTime > 172800:
                 return redirect(url_for("runaway"))
             else:
                 typecheck = selectPet.petType
@@ -514,7 +513,7 @@ def petnest():     # Pet nest images and names
         if selectPet2.petLevel >= 5 and selectPet2.petLevel < 10:
             pet2image = "/static/petimages/Mori.png"
         if selectPet2.petLevel >= 10:
-            pet2image = "/static/petimages/BeegRRat.png" ###
+            pet2image = "/static/petimages/BeegRat.png" ###
     if petCheck.pet2 == 0:
         pet2image = "/static/petimages/Empty.png"
         pet2name = "..."
