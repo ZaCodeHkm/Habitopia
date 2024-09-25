@@ -8,7 +8,7 @@
 }
 #wrap {
   width: 900px;
-  height: 540px;
+  height: 690px;
   margin: 100px auto;
   background: #e0e2e7;
   overflow: hidden;
@@ -207,17 +207,16 @@ table, th, td {
 /* Shop Page Styles */
 .inventory {
   display: flex;
-  justify-content: space-between;
   margin-bottom: 20px;
   font-family: "Pixelify Sans", sans-serif;
-  font-size: 20px;
-  margin-top: -30px;
+  font-size: 14px;
+  margin-top: -15px;
 }
 
 .items-tittle {
   font-family: "Pixelify Sans", sans-serif; 
   font-size: 30px;
-  margin-top: -40px;
+  margin-top: -30px;
 }
 
 .flash {
@@ -259,6 +258,6 @@ table, th, td {
 }
 
 .item-images img {
-  width: 100px;
-  height: 110px;
+  width: 128px;
+  height: 164px;
 }
