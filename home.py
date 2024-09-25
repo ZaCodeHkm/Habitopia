@@ -447,7 +447,7 @@ def pet():
                     if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
                         petimage = "/static/petimages/Newt.png"
                     if selectPet.petLevel >= 10:
-                        petimage = "/static/petimages/Beeg.png" ###    
+                        petimage = "/static/petimages/BeegFeesh.png" ###    
             return render_template("pet.html", petname=selectPet.petName, XPcount = selectPet.petXP, petlevel = selectPet.petLevel,
                                    petimage=petimage, satiety=selectPet.hunger, food=checkUser.petFood)
 
@@ -511,7 +511,7 @@ def petnest():     # Pet nest images and names
         if selectPet3.petLevel >= 5 and selectPet3.petLevel < 10:
             pet3image = "/static/petimages/Newt.png" ###
         if selectPet3.petLevel >= 10:
-            pet3image = "/static/petimages/BeegFroog.png" ###
+            pet3image = "/static/petimages/BeegFeesh.png" ###
     if petCheck.pet3 == 0 :
         pet3image = "/static/petimages/Empty.png"
         pet3name = "..."
