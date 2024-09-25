@@ -200,11 +200,16 @@ table, th, td {
   background-color: #00000000;
 }
 
+.petboxes{ /*only for nest page*/
+  align-items: center;
+}
+
 .petbox-nest{
-  margin: 0px;
+  display: inline-block;
   border-style: solid;
-  border-width: 1px;
-  border-color: #000000;
+  margin-left: 66px;
+  border-width: 2px;
+  border-color: #414141;
   width: 200px;
   height: 279.25px;
   background-color: rgba(255, 255, 255, 0px);
@@ -253,8 +258,8 @@ meter{
   margin: 0px;
   text-align: center;
   border-bottom-style: solid;
-  border-width: 1px;
-  border-color: #131313;
+  border-width: 2px;
+  border-color: #414141;
 }
 
 .text-firstpet{
