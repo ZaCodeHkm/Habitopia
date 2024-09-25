@@ -382,12 +382,12 @@ body{
     transform: translateX(200%);
 }
 
+/* Login Header Moved to Middle */
 
 .form-container-title{
   position: absolute;
   top: 50px;
   left: 125px;
-  
 }
 
 /* Notification Modal */

@@ -152,8 +152,8 @@ class ChangePasswordForm(FlaskForm):
 #--------Notification System---------#
 
 class Notification(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(255), nullable=False)
     date = db.Column(db.String(10), nullable=False)  
     time = db.Column(db.String(5), nullable=False)
@@ -797,38 +797,38 @@ def shop():
                 flash("Not enough coins to buy bait.", "danger")
 
         elif item == "earth_egg":
-            if user_items.coins >= 10:
-                user_items.coins -= 10
-                if user_pets.pet2 == 0:
+            if user_pets.pet2 == 0:
+                if user_items.coins >= 1000:
+                    user_items.coins -= 1000
                     user_pets.petsOwned += 1
                     user_pets.pet2 = 1
                     add_pet2 = Pets(petOwner=current_user.id, hunger=100, petType=2, petXP=0, petLevel=1)
                     db.session.add(add_pet2)
                     db.session.commit()
                     session["petType"] = 2
-                    # flash("You bought an Earth Egg!", "success")
+                    flash("You bought an Earth Egg!", "success")
                     return render_template("petnaming.html", petimage="/static/petimages/EarthEgg.png")
                 else:
-                    flash("You already own an Earth Egg.", "danger")
+                    flash("Not enough coins to buy an Earth Egg.", "danger")
             else:
-                flash("Not enough coins to buy an Earth Egg.", "danger")
+                flash("You already own an Earth Egg.", "danger")
 
         elif item == "water_egg":
-            if user_items.coins >= 10:
-                user_items.coins -= 10
-                if user_pets.pet3 == 0:
+            if user_pets.pet3 == 0:
+                if user_items.coins >= 2000:
+                    user_items.coins -= 2000
                     user_pets.petsOwned += 1
                     user_pets.pet3 = 1
                     add_pet3 = Pets(petOwner=current_user.id, hunger=100, petType=3, petXP=0, petLevel=1)
                     db.session.add(add_pet3)
                     db.session.commit()
                     session["petType"] = 3
-                    # flash("You bought a Water Egg!", "success")
+                    flash("You bought a Water Egg!", "success")
                     return render_template("petnaming.html", petimage="/static/petimages/WaterEgg.png")
                 else:
-                    flash("You already own a Water Egg.", "danger")
+                    flash("Not enough coins to buy a Water Egg.", "danger")
             else:
-                flash("Not enough coins to buy a Water Egg.", "danger")
+                flash("You already own a Water Egg.", "danger")
 
         db.session.commit()
 
