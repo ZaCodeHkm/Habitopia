@@ -1,82 +1,82 @@
-{% extends "base.html" %}
-{% block css %} <link rel="stylesheet" href="/static/styles/ShopStyles.css" > {% endblock %}
-{% block title %}The Shop!{% endblock %}
-{% block Pagename %}Shop Page{% endblock %}
-{% block heading %}https://habitopia/shop{% endblock %}
-{% block content %}
-<div id="wrap">
-    
-    
-    <div class="inventory">
-        <h2>Shop</h2>
-        <h2>INVENTORY:</h2>
-        <h2>Coins: {{ coins }}</h2>
-        <h2>Petfood: {{ petFood }}</h2>
-        <h2>Baits: {{ bait }}</h2>
-    </div>
-
-    <h1 class="items-tittle">Items:</h1>
-
-    <div class="flash">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class=flashes>
-                    {% for category, message in messages %}
-                        <li class="{{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-    </div>
-
-    <div class="items-container">
-        <div class="item-grid">
-            <div class="item">
-                Pet Food - 20 Coins
-                <div class="item-images">
-                    <img src="/static/petimages/EarthEgg.png" alt="Earth Egg">
-                </div>
-                <form method="POST" action="{{ url_for('shop') }}">
-                    <input type="hidden" name="item" value="pet_food">
-                    <button type="submit">Buy Pet Food</button>
-                </form>
-            </div>
+    {% extends "base.html" %}
+    {% block css %} <link rel="stylesheet" href="/static/styles/ShopStyles.css" > {% endblock %}
+    {% block title %}The Shop!{% endblock %}
+    {% block Pagename %}Shop Page{% endblock %}
+    {% block heading %}https://habitopia/shop{% endblock %}
+    {% block content %}
+    <div id="wrap">
         
+        <h1 style="margin: 0px; margin-bottom: 5px;">Shop</h1>
+        <div class="inventory">
+            
+            <h2>INVENTORY</h2>
+            <h2 style="  margin-left: 15px;">Coins: {{ coins }}</h2>
+            <h2 style="  margin-left: 15px;">Petfood: {{ petFood }}</h2>
+            <h2 style="  margin-left: 15px;">Baits: {{ bait }}</h2>
+        </div>
 
-            <div class="item">
-                Bait - 100 Coins
-                <div class="item-images">
-                    <img src="/static/petimages/EarthEgg.png" alt="Earth Egg">
+        <h1 class="items-tittle">Items:</h1>
+
+        <div class="flash">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class=flashes>
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="items-container">
+            <div class="item-grid">
+                <div class="item">
+                    Pet Food - 20 Coins
+                    <div class="item-images">
+                        <img src="/static/petimages/Food.png" alt="Pet Food">
+                    </div>
+                    <form method="POST" action="{{ url_for('shop') }}">
+                        <input type="hidden" name="item" value="pet_food">
+                        <button type="submit">Buy Pet Food</button>
+                    </form>
                 </div>
-                <form method="POST" action="{{ url_for('shop') }}">
-                    <input type="hidden" name="item" value="bait">
-                    <button type="submit">Buy Bait</button>
-                </form>
-            </div>
+            
 
-
-            <div class="item">
-                Earth Egg - 1000 Coins
-                <div class="item-images">
-                    <img src="/static/petimages/EarthEgg.png" alt="Earth Egg">
+                <div class="item">
+                    Bait - 100 Coins
+                    <div class="item-images">
+                        <img src="/static/petimages/Bait.png" alt="Bait">
+                    </div>
+                    <form method="POST" action="{{ url_for('shop') }}">
+                        <input type="hidden" name="item" value="bait">
+                        <button type="submit">Buy Bait</button>
+                    </form>
                 </div>
-                <form method="POST" action="{{ url_for('shop') }}">
-                    <input type="hidden" name="item" value="earth_egg">
-                    <button type="submit">Buy Earth Egg</button>
-                </form>
-            </div>
 
-            <div class="item">
-                Water Egg - 2000 Coins
-                <div class="item-images">
-                    <img src="/static/petimages/EarthEgg.png" alt="Earth Egg">
+
+                <div class="item">
+                    Earth Egg - 1000 Coins
+                    <div class="item-images">
+                        <img src="/static/petimages/EarthEgg.png" alt="Earth Egg">
+                    </div>
+                    <form method="POST" action="{{ url_for('shop') }}">
+                        <input type="hidden" name="item" value="earth_egg">
+                        <button type="submit">Buy Earth Egg</button>
+                    </form>
                 </div>
-                <form method="POST" action="{{ url_for('shop') }}">
-                    <input type="hidden" name="item" value="water_egg">
-                    <button type="submit">Buy Water Egg</button>
-                </form>
+
+                <div class="item">
+                    Water Egg - 2000 Coins
+                    <div class="item-images">
+                        <img src="/static/petimages/WaterEgg.png" alt="Water Egg">
+                    </div>
+                    <form method="POST" action="{{ url_for('shop') }}">
+                        <input type="hidden" name="item" value="water_egg">
+                        <button type="submit">Buy Water Egg</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}
