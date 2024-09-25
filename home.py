@@ -113,7 +113,6 @@ class Pets(db.Model):
         petXP = db.Column(db.Integer, default=0)
         petLevel = db.Column(db.Integer, nullable=False, default=1)
         activePet = db.Column(db.Integer, default=0, nullable=False)
-        # runaway = db.Column(db.Integer, default=0)
 
         def __repr__(self):
             return f"{self.petName}"
@@ -438,7 +437,7 @@ def pet():
             return render_template("pet.html", petname=noPet, XPcount = 0, petlevel = 0, petimage=petimage)
         else:
             hungerFunc()
-            if selectPet.cumulTime > 50:
+            if selectPet.cumulTime > 172800:
                 return redirect(url_for("runaway"))
             else:
                 typecheck = selectPet.petType
@@ -462,7 +461,7 @@ def pet():
                     if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
                         petimage = "/static/petimages/Newt.png"
                     if selectPet.petLevel >= 10:
-                        petimage = "/static/petimages/Beeg.png" ###    
+                        petimage = "/static/petimages/BeegFeesh.png" ###    
             return render_template("pet.html", petname=selectPet.petName, XPcount = selectPet.petXP, petlevel = selectPet.petLevel,
                                    petimage=petimage, satiety=selectPet.hunger, food=checkUser.petFood)
 
@@ -514,7 +513,7 @@ def petnest():     # Pet nest images and names
         if selectPet2.petLevel >= 5 and selectPet2.petLevel < 10:
             pet2image = "/static/petimages/Mori.png"
         if selectPet2.petLevel >= 10:
-            pet2image = "/static/petimages/BeegRRat.png" ###
+            pet2image = "/static/petimages/BeegRat.png" ###
     if petCheck.pet2 == 0:
         pet2image = "/static/petimages/Empty.png"
         pet2name = "..."
@@ -526,7 +525,7 @@ def petnest():     # Pet nest images and names
         if selectPet3.petLevel >= 5 and selectPet3.petLevel < 10:
             pet3image = "/static/petimages/Newt.png" ###
         if selectPet3.petLevel >= 10:
-            pet3image = "/static/petimages/BeegFroog.png" ###
+            pet3image = "/static/petimages/BeegFeesh.png" ###
     if petCheck.pet3 == 0 :
         pet3image = "/static/petimages/Empty.png"
         pet3name = "..."
@@ -741,17 +740,18 @@ def hungerFunc(): # Reduces the active pets hunger. Runs when "Pets" page is loa
     selectPet.cumulTime += Diff
     petName = selectPet.petName
     print(selectPet.cumulTime)
-    if selectPet.cumulTime >= 5 and selectPet.cumulTime < 15:
+    if selectPet.cumulTime >= 14400 and selectPet.cumulTime < 28800: # 4 hours to 8 hours
         selectPet.hunger = 67
-    if selectPet.cumulTime >= 16 and selectPet.cumulTime < 25:
+    if selectPet.cumulTime >= 28800 and selectPet.cumulTime < 57600: # 8 hours to 16 hours
         selectPet.hunger = 34
-    if selectPet.cumulTime >= 26 and selectPet.cumulTime < 35:
-        selectPet.hunger = 1
         flash(f"Hey it looks like { petName } is getting hungry!")
-    if selectPet.cumulTime > 36:
+    if selectPet.cumulTime >= 57600 and selectPet.cumulTime < 86400: # 16 hours to 24 hours
+        selectPet.hunger = 1
+    if selectPet.cumulTime > 86400: # 24 hours
         selectPet.hunger = 0
+        flash(f"{ petName } is really hungry!")
     db.session.commit()
-    if selectPet.cumulTime > 50:
+    if selectPet.cumulTime > 172800: # 48 hours
         petName = selectPet.petName
         return redirect(url_for("runaway"))
     
