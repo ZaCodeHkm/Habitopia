@@ -63,18 +63,22 @@
         
         {% if profile %}
             <div class="withpic">
-                <img src="{{ url_for('get_img', id=profile.id) }}" alt="Profile Picture" width="196px" height="196px">
+                <img src="{{ url_for('get_img', id=profile.id) }}" alt="Profile Picture" width="265px" height="265px">
             </div>
         {% else %}
             <div class="picbox">
-                <p>No profile picture available</p>
+                <img src="/static/styles/assets/user.png">
             </div>
         {% endif %}
-        <h2>Welcome, {{ user.username }}!</h2>
-        <p>Your user ID: {{ user.id }}</p>
-        <p>{{ account.bio }}</p>
-        <p>Coins: {{ user_items.coins }}</p>
-        <p>Total Pets Owned: {{ pets_owned.petsOwned }}</p>
+        <h1 class="acctitle">Welcome, {{ user.username }}! (ID = {{ user.id }})</h1>
+        <h2 class="acctitle">About Me!</h2>
+        <p class="biobox">{{ account.bio }}</p>
+        <div class="nav2">
+            <ul>
+                <li class="iconbutton"><img src="/static/styles/assets/coin.png" width="20px" class="icon2" ><p class="icontext">Coins: {{ user_items.coins }}</p></li>
+                <li class="iconbutton"><img src="/static/styles/assets/game_spider-1.png" width="20px" class="icon2" ><p class="icontext">Total Pets Owned: {{ pets_owned.petsOwned }}</p></li>
+            </ul>
+        </div>
     </div>
 </div>
 
