@@ -222,6 +222,26 @@ table, th, td {
   100% { opacity: 1; }
 }
 /* Content */
+.acctitle {
+  margin: 10px 300px 0px;
+  text-align: left;
+  font-family: "Pixelify Sans", sans-serif ;
+  position: relative;
+}
+
+
+
+.biobox {
+  width: 70%;
+  height: 155px;
+  background-color: #fefefe;
+  border: 5px ridge #e0e2e7;
+  margin: 0px 300px 100px;
+  padding: 10px;
+  font-family: "Pixelify Sans", sans-serif ;
+  font-size: 20px;
+  position: relative;
+}
 
 #wrap {
   width: 1400px;
@@ -305,15 +325,15 @@ table, th, td {
   font-size: 15px;
 }
 .withpic{
-  width: 196px;
-  height: 196px;
+  width: 265px;
+  height: 265px;
   border: 5px ridge #e0e2e7;
   float: left;
 }
 
 .picbox {
-  width: 196px;
-  height: 196px;
+  width: 265px;
+  height: 265px;
   border: 5px ridge #e0e2e7;
   float: left;
 }

@@ -40,7 +40,7 @@
             </div>  
         </fieldset>
     <!-- Temp buttons to help test -->
-    <li class="templink"><a href="firstpetcreate">First pet page --only for dev purposes--</a></li>
+    <!-- <li class="templink"><a href="firstpetcreate">First pet page --only for dev purposes--</a></li>
     <li class="templink"><a href="setXPmax">Sets XP to max --only for dev purposes--</a></li>
     <form action="/testpet2" value="testpet2" method="post">
         <li class="templink"><button type="submit" value="testpet2">Gives the user pet #2 --only for dev purposes--.</button></li>   
@@ -54,6 +54,17 @@
     <form action="/testcoins" value="testcoins" method="post">
         <li class="templink"><button type="submit" value="testcoins">Gives the user 9001 coins --only for dev purposes--.</button></li> 
     </form>
-
+    <!-- Catches flash message -->
+    <div class="flash">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+            <ul>
+                <p>{{ msg }}</p>
+            </ul>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    </div>
 </div>
 {% endblock %}

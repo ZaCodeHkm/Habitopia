@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block css %} <link rel="stylesheet" href="/static/styles/HabitStyles.css" > {% endblock %}
 {% block title %}Habit Tracker!{% endblock %}
 {% block Pagename %}Habit Tracker{% endblock %}
@@ -57,6 +56,7 @@
                     </div>
                 </div>
             <li><a href="{{ url_for('diary') }}"><button class="iconbutton"><img src="/static/styles/assets/directory_business_calendar-2.png" class="icon2"><p class="icontext">Diary</p></button></a></li>
+            <li class="iconbutton"><img src="/static/styles/assets/coin.png" class="icon2"><p class="icontext">Coins : {{ user_items.coins }}</p></li>
         </ul>
     </div>
     {% if habits %}

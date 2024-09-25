@@ -168,8 +168,8 @@ class Notification(db.Model):
 
 #--------Account Page System--------#
 class Account(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
     img = db.Column(db.Text, unique=True, nullable=False)
     name = db.Column(db.Text, nullable=False)
     mimetype = db.Column(db.Text, nullable=False)
@@ -229,6 +229,8 @@ def delete_account():
         Habit.query.filter_by(user_id=user.id).delete()
         HabitLog.query.filter_by(user_id=user.id).delete()
         DiaryEntry.query.filter_by(user_id=user.id).delete()
+        Notification.query.filter_by(user_id=user.id).delete()
+        Account.query.filter_by(user_id=user.id).delete()
 
         db.session.delete(user)
         db.session.commit()
@@ -277,6 +279,7 @@ def change_password():
 @app.route("/habit")
 @login_required
 def habit():
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
     habits = Habit.query.filter_by(user_id=current_user.id).all()
     selected_month = request.args.get('month', datetime.now().strftime('%Y-%m'))
     month_start = datetime.strptime(selected_month, '%Y-%m').date()
@@ -289,7 +292,7 @@ def habit():
 
     return render_template('habit.html', habits=habits, selected_month=selected_month, month_start=month_start, 
                             month_end=month_end, habit_logs=habit_logs_dict, datetime=datetime, timedelta=timedelta, 
-                            relativedelta=relativedelta, diary_entries=diary_entries, notifications=notifications)
+                            relativedelta=relativedelta, diary_entries=diary_entries, notifications=notifications, user_items=user_items)
 
 
 @app.route('/add_habit', methods=['POST'])
