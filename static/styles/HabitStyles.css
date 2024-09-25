@@ -6,29 +6,11 @@
   font-weight: 400;
   font-style: normal;
 }
-#wrap {
-  width: 1400px;
-  height: 540px;
-  margin: 100px auto;
-  background: #e0e2e7;
-  overflow: scroll;
-  overflow-x: hidden;
-  padding: 15px;
-}
 
-#wrap2 {
-  width: 900px;
-  height: 540px;
-  margin: 100px auto;
-  background: #e0e2e7;
-  overflow: scroll;
-  padding: 15px;
-  overflow-x: hidden;
-}
 
   
 .body{
-  background-image: url("/static/styles/animatedbackground.gif") ;
+  background-image: url("/static/styles/assets/animatedbackground.gif") ;
   background-repeat: no-repeat;
   background-size: cover ;
   background-attachment: fixed;
@@ -89,13 +71,13 @@ h1 {
   background-color: gold;
   padding: 10px;
   border-radius: 5px;
-  margin: 100px 100px;
+  margin: 40px 10px;
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif ;
   vertical-align:top;
   float: left;
-  -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 3s linear forwards;
+  -webkit-animation: fadein 2s linear forwards;
+  animation: fadein 2s linear forwards;
   z-index: 1;
 
 }
@@ -105,14 +87,16 @@ h1 {
   background-color: green;
   padding: 10px;
   border-radius: 5px;
-  margin: 100px 50px;
+  margin: 40px 20px;
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif ;
   vertical-align:top;
   float: right;
-  -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 3s linear forwards;
+  right: 0;
+  -webkit-animation: fadein 2s linear forwards;
+  animation: fadein 2s linear forwards;
   z-index: 1;
+  position: fixed;
 }
 
 .failed {
@@ -120,14 +104,16 @@ h1 {
   background-color: coral;
   padding: 10px;
   border-radius: 5px;
-  margin: 100px 50px;
+  margin: 40px 20px;
   font-size: 17px;
   font-family: "Pixelify Sans", sans-serif ;
   vertical-align:top;
   float: right;
-  -webkit-animation: fadeinout 6s linear forwards;
-  animation: fadeinout 3s linear forwards;
+  right: 0;
+  -webkit-animation: fadein 3s linear forwards;
+  animation: fadein 2s linear forwards;
   z-index: 1;
+  position: fixed;
 }
 
 .reminder {
@@ -141,6 +127,7 @@ h1 {
   vertical-align:top;
   float: center;
   z-index: 1;
+  position: absolute;
 }
 
 .flash-message {
@@ -151,16 +138,15 @@ h1 {
   
 }
 
-@-webkit-keyframes fadeinout {
-  0%,100% { opacity: 0; }
-  50% { opacity: 1; }
+@-webkit-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-@keyframes fadeinout {
-  0%,100% { opacity: 0; }
-  50% { opacity: 1; }
+@keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
-
 /* scroll-bar */
 ::-webkit-scrollbar{
   background-color: aliceblue;
@@ -264,27 +250,172 @@ ul {
 
 /* Content */
 
+#wrap {
+  width: 1400px;
+  height: 500px;
+  margin: 100px auto;
+  background: #e0e2e7 ;
+  padding: 1px;
+}
 
-.delete {
-  font-family: "Pixelify Sans", sans-serif;
-  font-size: 12px; /* Adjust size according to your design */
-  padding: 5px 10px;
-  background-color:#7f7f7f; /* Light red background */
-  border: none;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
+.wrap2 {
+  width: 98%;
+  height: 99%;
+  padding: 10px;
+  background-color: #e0e2e7;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border: 5px ridge #e0e2e7;
+}
+
+.topbox2{
+  background-color: #2d4535;
+  height: 30px;
+  margin: 2px 2px;
+  width: 99%;
+  border: 1px solid black;
+}
+
+.topboxtext2 {
+  float: left;
+  color: #FFFFFF;
+  margin: 4px 6px;
+  text-align: left;
+  font-family: "Pixelify Sans", sans-serif ;
+  font-size: 20px;
   vertical-align: baseline;
+
+}
+
+.nav2 {
+  background-color: #e0e2e7 ;
+  border: 5px ridge #e0e2e7;
+  width:99.5%;
+  margin: auto; 
+  overflow: hidden;
+  top: 33px;
+}
+
+.nav2 li{
+  float: left;
+  text-align: center;
+}
+
+.iconbutton{
+  width: 100px;
+  background-color: #e0e2e7;
+  border: hidden;
+}
+
+.iconbutton:hover{
+  background-color: aliceblue;
+}
+
+.icon2 {
+  width: 30px;
+  margin: 10px 10px 0px;
+}
+
+.icontext {
+  font-family: "Pixelify Sans", sans-serif ;
+  color: black;
+  font-size: 15px;
+  vertical-align: baseline;
+  margin: 0px 0px 10px 0px;
+  padding: 0;
+}
+
+.callendarrow li {
+  float: left;
+
+}
+.callendarrow {
+  background-color: #e0e2e7 ;
+  width:99.5%;
+  height: 45px;
+  margin: auto; 
+  overflow: hidden;
+  top: 33px;
+  border: 5px outset #e0e2e7;
+}
+
+
+.callendarbutton{
+  border: 2px outset #c1c1c1;
+  background-color: #c1c1c1;
+  font-family: "Pixelify Sans", sans-serif ;
+  margin: 10px 10px;
+  font-size: 15px;
+}
+
+.month{
+  background-color: #fefefe;
+  height: 40px;
+  width: 80%;
+  float: right;
+}
+
+.month li{
+  margin: 10px 10px;
+  font-size: 20px;
+  font-family: "Pixelify Sans", sans-serif ;
+}
+/* Apply relative position to the form container */
+.complete_button, .undo_button, .delete_button {
+  position: relative; /* Make form container the relative anchor */
+  display: inline-block; /* Keep forms inline to not disrupt layout */
+}
+
+/* Button styling */
+.delete {
+  width: 30px; 
+  height: 30px;
+  padding: 5px;
+  border: 1px outset #c1c1c1;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
 }
 
 .delete:hover {
-  background-color:#474747; /* Darker red on hover */
+  background-color: #474747; 
 }
 
-.delete:disabled {
-  background-color: #cccccc; /* Grey when disabled */
-  cursor: not-allowed;
+/* Hover text */
+.hover-text {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-family: "Pixelify Sans", sans-serif;
+  padding: 5px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 14px;
+  z-index: 10;
 }
+
+/* Hover effect */
+.complete_button:hover .hover-text,
+.undo_button:hover .hover-text,
+.delete_button:hover .hover-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.actionbox {
+  display: flex; 
+  gap: 10px; 
+  justify-content: center; 
+  align-items: center;
+  white-space: nowrap; 
+}
+
 
 /*Table*/
 table {
