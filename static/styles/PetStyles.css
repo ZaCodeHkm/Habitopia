@@ -171,9 +171,6 @@ table, th, td {
 
 .flash{
   font-family: "Pixelify Sans", sans-serif;
-  position: absolute;
-  bottom: 500px;
-  left: 640px;
   font-size: 20px;
 }
 

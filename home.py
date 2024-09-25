@@ -478,7 +478,7 @@ def pet_feed():
         selectPet.cumulTime = 0
         xpFunc()
     if selectFood.petFood == 0:
-        flash("You dont have any food left. Complete some habits to get coins then buy some.", "info")
+        flash("You dont have any food left.", "info")
     db.session.commit()
     return redirect(url_for("pet"))
 

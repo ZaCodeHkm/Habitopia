@@ -27,18 +27,18 @@
                         <img src="{{ pet3image }}" alt="Pet image" width="200px" height="256.25px">
                         <span class="active-button"><form action="makeactive" method="post"><button type="submit" name="makeactive" value="pet3">Make Active</button></form></span>
                 </div>
-            </div>
-        <div class="flash" style="position: absolute; bottom: 520px; left: 660px;">
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for msg in messages %}
-                <ul>
-                    <img src="/static/petimages/Sora-Meliae-Matrilineare-Status-dialog-warning.24.png" style="position: absolute;">
-                    <p style="margin-left: 30px;">{{ msg }}</p>
-                </ul>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+                <div class="flash" style="position: relative; bottom: 365px; left: 310px;">
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for msg in messages %}
+                        <ul>
+                            <img src="/static/petimages/Sora-Meliae-Matrilineare-Status-dialog-warning.24.png" style="position: absolute;">
+                            <p style="margin-left: 30px;">{{ msg }}</p>
+                        </ul>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                </div>
         </div>
     </div>
 
