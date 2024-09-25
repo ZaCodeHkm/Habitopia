@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block css %} <link rel="stylesheet" href="/static/styles/HabitStyles.css" > {% endblock %}
+{% block title %}Habit Tracker!{% endblock %}
+{% block Pagename %}Habit Tracker{% endblock %}
+{% block heading %}https://habitopia/habit{% endblock %}
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endwith %}
+    
+
+<div id="wrap">
+    <div class="topbox2">
+        <ul>
+            <li><img src="/static/styles/assets/directory_business_calendar-2.png" width=20px class="topboxtext2"></li>
+            <li><h5 class="topboxtext2">Diary</h5></li>
+        </ul>
+        <ul>
+            <li><img src="/static/styles/assets/exit-active.png" class="icon"></li>
+            <li><img src="/static/styles/assets/window-active.png" class="icon"></li>
+            <li><img src="/static/styles/assets/minimise-active.png" class="icon"></li>
+        </ul>
+    </div>
+    <div class="nav2">
+        <ul>
+            <li><button id="openDiaryModalBtn" onclick="openDiaryModal()" class="iconbutton" ><img src="/static/styles/assets/write_wordpad-1.png" class="icon2"><p class="icontext">Add Diary Entry</p></button></li>
+                <div id="diaryModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeDiaryModal()">&times;</span>
+                        <h2>Add a Diary Entry</h2>
+                        <form action="{{ url_for('add_diary') }}" method="POST">
+                            <textarea name="text" required></textarea>
+                            <button type="submit">Add Diary Entry</button>
+                        </form>            
+                    </div>
+                </div>
+            <li><a href="{{ url_for('habit') }}"><button class="iconbutton"><img src="/static/styles/assets/calendar-3.png" class="icon2"><p class="icontext">Habit Tracker</p></button></a></li>    
+        </ul>
+    </div>
+    <div class="wrap2">
+        <div class="diary-entry">
+            {% if diary_entries %}
+                {% for entry in diary_entries %}
+                    <div class="diary-entry">
+                        <p class="entry-date">{{ entry.date.strftime('%Y-%m-%d') }}</p>
+                        <p class="entry-text">{{ entry.text }}</p>
+                        <form action="{{ url_for('delete_diary', entry_id=entry.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="callendarbutton">Delete</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No diary entries found. Click [Add Diary Entry] to add to your diary! </p>
+            {% endif %}
+        </div>    
+    </div>
+</div>
+<script src="/static/styles/habit.js">
+
+    
+</script>
+{% endblock %}
+

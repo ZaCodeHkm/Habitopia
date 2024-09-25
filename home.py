@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session
+from flask import Flask, render_template, url_for, request, redirect, flash, session, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -8,8 +8,8 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
-from flask_bcrypt import Bcrypt
-from flask import session
+from werkzeug.utils import secure_filename
+
 
 
 app = Flask(__name__)
@@ -73,7 +73,6 @@ class Habit(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    tag = db.Column(db.String(50), default="")
     frequency = db.Column(db.Integer, default=30)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     repeat_days = db.Column(db.String(100), default="")
@@ -114,7 +113,6 @@ class Pets(db.Model):
         petXP = db.Column(db.Integer, default=0)
         petLevel = db.Column(db.Integer, nullable=False, default=1)
         activePet = db.Column(db.Integer, default=0, nullable=False)
-        # runaway = db.Column(db.Integer, default=0)
 
         def __repr__(self):
             return f"{self.petName}"
@@ -157,9 +155,9 @@ class Notification(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(255), nullable=False)
-    date = db.Column(db.String(10), nullable=False)  # YYYY-MM-DD format
-    time = db.Column(db.String(5), nullable=False)  # HH:MM format
-    type = db.Column(db.String(50), nullable=False)  # e.g., 'reminder'
+    date = db.Column(db.String(10), nullable=False)  
+    time = db.Column(db.String(5), nullable=False)
+    type = db.Column(db.String(50), nullable=False)  
 
     def __init__(self, user_id, text, type):
         self.user_id = user_id
@@ -168,9 +166,21 @@ class Notification(db.Model):
         self.time = datetime.now().strftime('%H:%M')
         self.type = type
 
+#--------Account Page System--------#
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    img = db.Column(db.Text, unique=True, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    mimetype = db.Column(db.Text, nullable=False)
+    bio = db.Column(db.String(500), nullable=True)
+
+
+
 ###===FLASK ROUTING===###
 @app.route("/")
 def home():
+    
     username = None
     if current_user.is_authenticated:
         username = current_user.username
@@ -285,10 +295,9 @@ def habit():
 @app.route('/add_habit', methods=['POST'])
 def add_habit():
     name = request.form['name']
-    tag = request.form['tag']
     frequency = int(request.form['frequency'])
     repeat_days = ','.join(request.form.getlist('repeat_days'))
-    new_habit = Habit(name=name, tag=tag, frequency=frequency, repeat_days=repeat_days, user_id=current_user.id)
+    new_habit = Habit(name=name, frequency=frequency, repeat_days=repeat_days, user_id=current_user.id)
     
     db.session.add(new_habit)
     flash("Habit Succesfully Added!", "success")
@@ -307,7 +316,8 @@ def complete_habit(habit_id):
     
         user_items = UserItems.query.filter_by(user_id=current_user.id).first()
         if user_items:
-            user_items.coins += 10  # Add 10 coins
+            user_items.coins += 10 
+            flash("You've earned 10 coins!", "coin_reward")
         else:
             user_items = UserItems(user_id=current_user.id, coins=10, petFood=0)
             flash("You've earned 10 coins!", "coin_reward")
@@ -334,23 +344,26 @@ def delete(habit_id):
 def undo_complete(habit_id):
     today = datetime.now().date()
     log = HabitLog.query.filter_by(habit_id=habit_id, date=today).first()
-    db.session.delete(log)
-    flash("Habit Uncompleted", "failed")
+    if log:
+        db.session.delete(log)
+        flash("Habit Uncompleted", "failed")
 
-    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
-    if user_items:
-        user_items.coins -= 10  # Remove 10 coins
-    else:
-        user_items = UserItems(user_id=current_user.id, coins=10, petFood=0)
-        flash("You've Lost 10 coins", "coin_reward")
-        db.session.add(user_items)
+        user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+        if user_items:
+            user_items.coins -= 10  
+            flash("You've lost 10 coins", "coin_reward")
+        else:
+            user_items = UserItems(user_id=current_user.id, coins=-10, petFood=0)
+            flash("You've Lost 10 coins", "coin_reward")
+            db.session.add(user_items)
 
     db.session.commit()   
     return redirect(url_for("habit"))
 
+
 @app.before_request
 def get_notifications():
-    if request.endpoint == 'habit': 
+    if current_user.is_authenticated and request.endpoint == 'habit': 
         last_visit = session.get('last_visit')  
         current_date = datetime.now().strftime('%Y-%m-%d') 
         
@@ -374,7 +387,6 @@ def get_notifications():
             db.session.commit()
     
             return None
-
 def cleanup_old_notifications():
     old_notifications = Notification.query.filter(Notification.date != datetime.now().strftime('%Y-%m-%d')).all()
     for notification in old_notifications:
@@ -382,11 +394,13 @@ def cleanup_old_notifications():
     db.session.commit()
 
 #Diary
-@app.route('/diary_entry', methods=['GET'])
+
+
+@app.route('/diary', methods=['GET'])
 @login_required
-def diary_entry():
+def diary():
     entries = DiaryEntry.query.filter_by(user_id=current_user.id).all()
-    return render_template('habit.html', diary_entries=entries)
+    return render_template('diary.html', diary_entries=entries)
 
 @app.route('/add_diary', methods=['POST'])
 @login_required
@@ -396,14 +410,14 @@ def add_diary():
     new_entry = DiaryEntry(date=date, text=text, user_id=current_user.id)
     db.session.add(new_entry)
     db.session.commit()
-    return redirect(url_for('habit'))
+    return redirect(url_for('diary'))
 
 @app.route('/delete_diary/<int:entry_id>', methods=['POST'])
 def delete_diary(entry_id):
     entry = DiaryEntry.query.get(entry_id)
     db.session.delete(entry)
     db.session.commit()
-    return redirect(url_for('habit'))
+    return redirect(url_for('diary'))
 
 
 #-----Pets-----#
@@ -423,7 +437,7 @@ def pet():
             return render_template("pet.html", petname=noPet, XPcount = 0, petlevel = 0, petimage=petimage)
         else:
             hungerFunc()
-            if selectPet.cumulTime > 50:
+            if selectPet.cumulTime > 172800:
                 return redirect(url_for("runaway"))
             else:
                 typecheck = selectPet.petType
@@ -447,7 +461,7 @@ def pet():
                     if selectPet.petLevel >= 5 and selectPet.petLevel < 10:
                         petimage = "/static/petimages/Newt.png"
                     if selectPet.petLevel >= 10:
-                        petimage = "/static/petimages/Beeg.png" ###    
+                        petimage = "/static/petimages/BeegFeesh.png" ###    
             return render_template("pet.html", petname=selectPet.petName, XPcount = selectPet.petXP, petlevel = selectPet.petLevel,
                                    petimage=petimage, satiety=selectPet.hunger, food=checkUser.petFood)
 
@@ -499,7 +513,7 @@ def petnest():     # Pet nest images and names
         if selectPet2.petLevel >= 5 and selectPet2.petLevel < 10:
             pet2image = "/static/petimages/Mori.png"
         if selectPet2.petLevel >= 10:
-            pet2image = "/static/petimages/BeegRRat.png" ###
+            pet2image = "/static/petimages/BeegRat.png" ###
     if petCheck.pet2 == 0:
         pet2image = "/static/petimages/Empty.png"
         pet2name = "..."
@@ -511,7 +525,7 @@ def petnest():     # Pet nest images and names
         if selectPet3.petLevel >= 5 and selectPet3.petLevel < 10:
             pet3image = "/static/petimages/Newt.png" ###
         if selectPet3.petLevel >= 10:
-            pet3image = "/static/petimages/BeegFroog.png" ###
+            pet3image = "/static/petimages/BeegFeesh.png" ###
     if petCheck.pet3 == 0 :
         pet3image = "/static/petimages/Empty.png"
         pet3name = "..."
@@ -726,17 +740,18 @@ def hungerFunc(): # Reduces the active pets hunger. Runs when "Pets" page is loa
     selectPet.cumulTime += Diff
     petName = selectPet.petName
     print(selectPet.cumulTime)
-    if selectPet.cumulTime >= 5 and selectPet.cumulTime < 15:
+    if selectPet.cumulTime >= 14400 and selectPet.cumulTime < 28800: # 4 hours to 8 hours
         selectPet.hunger = 67
-    if selectPet.cumulTime >= 16 and selectPet.cumulTime < 25:
+    if selectPet.cumulTime >= 28800 and selectPet.cumulTime < 57600: # 8 hours to 16 hours
         selectPet.hunger = 34
-    if selectPet.cumulTime >= 26 and selectPet.cumulTime < 35:
-        selectPet.hunger = 1
         flash(f"Hey it looks like { petName } is getting hungry!")
-    if selectPet.cumulTime > 36:
+    if selectPet.cumulTime >= 57600 and selectPet.cumulTime < 86400: # 16 hours to 24 hours
+        selectPet.hunger = 1
+    if selectPet.cumulTime > 86400: # 24 hours
         selectPet.hunger = 0
+        flash(f"{ petName } is really hungry!")
     db.session.commit()
-    if selectPet.cumulTime > 50:
+    if selectPet.cumulTime > 172800: # 48 hours
         petName = selectPet.petName
         return redirect(url_for("runaway"))
     
@@ -827,7 +842,49 @@ def shop():
 def account():
     user = current_user
     pets_owned = PetsOwned.query.filter_by(user_id=current_user.id).first()
-    return render_template("account.html", user=user, pets_owned=pets_owned)
+    profile = Account.query.filter_by(user_id=current_user.id).first()
+    account = Account.query.filter_by(user_id=current_user.id).first()
+    user_items = UserItems.query.filter_by(user_id=current_user.id).first()
+    return render_template("account.html", user=user, pets_owned=pets_owned, profile = profile, account = account, user_items = user_items)
+@app.route("/edit_account", methods=["GET", "POST"])
+@login_required
+def edit_account():
+    profile = Account.query.filter_by(user_id=current_user.id).first()
+    
+    img = request.files.get("img")
+    bio = request.form.get("bio")
+
+    if profile is None:
+        if img and bio:
+            filename = secure_filename(img.filename)
+            mimetype = img.mimetype
+            profile = Account(img=img.read(), bio=bio, user_id=current_user.id, name=filename, mimetype=mimetype)
+            db.session.add(profile)
+            db.session.commit()
+            flash("Your profile has been created!", "success")
+        else:
+            flash("You must provide both a profile picture and a bio.", "danger")
+    else:
+        if img:
+            filename = secure_filename(img.filename)
+            profile.img = img.read()
+            profile.name = filename
+            profile.mimetype = img.mimetype
+        if bio:
+            profile.bio = bio
+        db.session.commit()
+        flash("Your profile has been updated!", "success")
+
+    return redirect(url_for("account"))
+
+
+@app.route("/account/<int:id>")
+def get_img(id):
+    img = Account.query.filter_by(id=id).first()
+    if img:
+        return Response(img.img, mimetype=img.mimetype)
+    else:
+        return "Image Not Found", 404
 
 @app.route("/logout")
 @login_required

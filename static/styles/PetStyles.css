@@ -18,7 +18,7 @@
 }
   
 .body{
-  background-image: url("/static/styles/animatedbackground.gif") ;
+  background-image: url("/static/styles/assets/animatedbackground.gif") ;
   background-repeat: no-repeat;
   background-size: cover ;
   background-attachment: fixed;
@@ -178,6 +178,8 @@ table, th, td {
 }
 
 .petbox{
+  position: relative;
+  left: 75px;
   margin-left: 13px;
   border-style: solid;
   border-width: 1px;
@@ -198,11 +200,16 @@ table, th, td {
   background-color: #00000000;
 }
 
+.petboxes{ /*only for nest page*/
+  align-items: center;
+}
+
 .petbox-nest{
-  margin: 0px;
+  display: inline-block;
   border-style: solid;
-  border-width: 1px;
-  border-color: #000000;
+  margin-left: 66px;
+  border-width: 2px;
+  border-color: #414141;
   width: 200px;
   height: 279.25px;
   background-color: rgba(255, 255, 255, 0px);
@@ -225,9 +232,9 @@ table, th, td {
 .fieldset-pet{
   position: relative;
   background-color: rgb(137, 186, 241);
-  width: 500px;
-  left: 295px;
-  bottom: 295px;
+  width: 400px;
+  left: 370px;
+  bottom: 315px;
 }
 
 .fieldset-firstpet{
@@ -242,7 +249,7 @@ legend{
 }
 
 meter{
-  width: 500px;
+  width: 400px;
   height: 30px;
 }
 
@@ -251,8 +258,8 @@ meter{
   margin: 0px;
   text-align: center;
   border-bottom-style: solid;
-  border-width: 1px;
-  border-color: #131313;
+  border-width: 2px;
+  border-color: #414141;
 }
 
 .text-firstpet{
@@ -280,4 +287,41 @@ meter{
 .templink{
   position: relative;
   bottom: 210px;
+}
+
+/* Notification Modal */
+.modal2 {
+  display: none; 
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+}
+
+.modal-content2 {
+  background-color: #fefefe;
+  float: right;
+  margin: 70px 10px 0px;
+  padding: 20px;
+  width: 20%;
+  height: 40%;
+  overflow: scroll;
+  overflow-y: hidden;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }

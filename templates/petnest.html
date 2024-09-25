@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block css %} <link rel="stylesheet" href="/static/styles/PetStyles.css" > {% endblock %}
 {% block title %}Pets!{% endblock %}
 {% block Pagename %}Pets{% endblock %}
@@ -8,23 +9,25 @@
     <div id="wrap">
         <h1>The Nest</h1>
         <h2>Pets</h2>
-        <div class="petbox-nest" style="position: absolute; left: 395px; bottom: 250px">
-        <h3 class="petsname">{{ pet1name }}</h3>
-            <img src="{{ pet1image }}" alt="Pet image" width="200px" height="256.25px">
-            <span class="active-button"><form action="makeactive" method="post"><button type="submit" name="makeactive" value="Sereno">Make Active</button></form></span>
-        </div>
+            <div class="petboxes">
+                <div class="petbox-nest">
+                <h3 class="petsname">{{ pet1name }}</h3>
+                    <img src="{{ pet1image }}" alt="Pet image" width="200px" height="256.25px">
+                    <span class="active-button"><form action="makeactive" method="post"><button type="submit" name="makeactive" value="Sereno">Make Active</button></form></span>
+                </div>
 
-        <div class="petbox-nest" style="position: absolute; left: 695px; bottom: 250px">
-            <h3 class="petsname">{{ pet2name }}</h3>
-                <img src="{{ pet2image }}" alt="Pet image" width="200px" height="256.25px">
-                <span class="active-button"><form action="makeactive" method="post"><button type="submit" name="makeactive" value="Mori">Make Active</button></form></span>
-        </div>
+                <div class="petbox-nest">
+                    <h3 class="petsname">{{ pet2name }}</h3>
+                        <img src="{{ pet2image }}" alt="Pet image" width="200px" height="256.25px">
+                        <span class="active-button"><form action="makeactive" method="post"><button type="submit" name="makeactive" value="Mori">Make Active</button></form></span>
+                </div>
 
-        <div class="petbox-nest" style="position: absolute; left: 995px; bottom: 250px">
-            <h3 class="petsname">{{ pet3name }}</h3>
-                <img src="{{ pet3image }}" alt="Pet image" width="200px" height="256.25px">
-                <span class="active-button"><form action="makeactive" method="post"><button type="submit" name="makeactive" value="pet3">Make Active</button></form></span>
-        </div>
+                <div class="petbox-nest">
+                    <h3 class="petsname">{{ pet3name }}</h3>
+                        <img src="{{ pet3image }}" alt="Pet image" width="200px" height="256.25px">
+                        <span class="active-button"><form action="makeactive" method="post"><button type="submit" name="makeactive" value="pet3">Make Active</button></form></span>
+                </div>
+            </div>
         <div class="flash" style="position: absolute; bottom: 520px; left: 660px;">
             {% with messages = get_flashed_messages() %}
             {% if messages %}
