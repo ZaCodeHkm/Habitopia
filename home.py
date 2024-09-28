@@ -334,13 +334,29 @@ def complete_habit(habit_id):
 @app.route("/delete/<int:habit_id>", methods=['POST'])
 def delete(habit_id):
     habit = Habit.query.filter_by(id=habit_id).first()
-    db.session.delete(habit)
-    log = HabitLog.query.filter_by(habit_id=habit_id).first()
-    if log:
-        db.session.delete(log)
-        flash("Habit Succesfully Deleted", "failed")
-    db.session.commit()   
-    return redirect(url_for("habit"))
+    if habit:
+        today = datetime.now().date()
+        start_of_month = today.replace(day=1)
+        count = db.session.query(db.func.count(HabitLog.id)).filter(HabitLog.user_id == current_user.id,
+                                                                    HabitLog.date.between(start_of_month, today)).scalar()
+        if count < 7:
+            if count == 3:
+                flash("Slow down! You can only delete 7 habits in a month", "failed")
+            db.session.delete(habit)
+            log = HabitLog.query.filter_by(habit_id=habit_id).first()
+            if log:
+                db.session.delete(log)
+                flash("Habit Succesfully Deleted", "failed")
+            else:
+                flash("Habit Succesfully Deleted", "failed")
+            db.session.commit()   
+            return redirect(url_for("habit"))
+        else:
+            flash("You can delete only 7 habits in a month", "failed")
+            return redirect(url_for("habit"))
+    else:
+        flash("Habit not found", "failed")
+        return redirect(url_for("habit"))
 
 
 @app.route("/undo_complete/<int:habit_id>", methods=['GET', 'POST'])
