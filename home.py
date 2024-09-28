@@ -856,7 +856,7 @@ def shop():
     
 
 #-----Account-----#
-@app.route("/account")
+@app.route("/account/")
 @login_required
 def account():
     user = current_user
